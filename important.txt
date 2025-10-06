@@ -1,0 +1,8 @@
+- create component
+ng generate component [name] --inline-templete
+
+- create service
+
+
+- run the app
+ng serve -o

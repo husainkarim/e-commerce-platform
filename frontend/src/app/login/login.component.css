@@ -1,0 +1,60 @@
+/* Login Page Styles */
+.login-container {
+	max-width: 500px;
+	margin: 60px auto;
+	padding: 32px 24px;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+.login-container h2 {
+	margin-bottom: 24px;
+	color: #1976d2;
+	font-weight: 600;
+	font-size: 2rem;
+}
+.login-container form {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+.login-container label {
+	font-weight: 500;
+	margin-bottom: 6px;
+	color: #333;
+}
+.login-container input {
+	width: calc(100% - 20px);
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	font-size: 1rem;
+	transition: border-color 0.2s;
+}
+.login-container input:focus {
+	border-color: #1976d2;
+	outline: none;
+}
+.login-container button {
+	background: #1976d2;
+	color: #fff;
+	border: none;
+	padding: 12px;
+	border-radius: 6px;
+	font-size: 1.1rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+.login-container button:hover {
+	background: #1565c0;
+}
+
+.login-container button:disabled {
+	background: #ccc;
+	cursor: not-allowed;
+}

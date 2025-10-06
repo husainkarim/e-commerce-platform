@@ -1,0 +1,48 @@
+<div class="signup-container">
+  <h3>Create a new account</h3>
+  <p>Enter your email below to create a new account</p>
+  <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+    <div>
+      <label for="name">Name</label>
+      <input formControlName="name" id="name" placeholder="Name" type="text" />
+    </div>
+    <div>
+      <label for="email">Email</label>
+      <input formControlName="email" id="email" placeholder="Email" type="email" />
+    </div>
+    <div>
+      <label for="password">Password</label>
+      <input formControlName="password" id="password" type="password" placeholder="Password" />
+    </div>
+    <div>
+      <label for="confirmPassword">Confirm Password</label>
+      <input formControlName="confirmPassword" id="confirmPassword" type="password" placeholder="Confirm Password" />
+    </div>
+    <div *ngIf="signupForm.errors?.['passwordMismatch'] && signupForm.touched" class="error">
+      Passwords do not match
+    </div>
+    <div>
+      <label for="role">Role</label><br>
+      <label *ngFor="let option of roles.options">
+          <input type="radio" [value]="option" formControlName="role" /> {{ option }}
+      </label>
+    </div>
+    <div>
+      <label for="avatar">Avatar</label>
+      <div class="avatar-options">
+        <ng-container *ngFor="let option of avatars.options; let i = index">
+          <div>
+            <input type="radio" [value]="option" formControlName="avatar" style="display: none;" />
+            <img
+              [src]="'assets/avatars/' + option"
+              alt=""
+              [class.selected-avatar]="signupForm.value.avatar === option"
+              (click)="signupForm.get('avatar')?.setValue(option)"
+            />
+          </div>
+        </ng-container>
+      </div>
+    </div>
+    <button type="submit" [disabled]="!signupForm.valid">Sign Up</button>
+  </form>
+</div>
