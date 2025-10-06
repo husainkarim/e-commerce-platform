@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.css'
 })
@@ -20,7 +21,12 @@ export class ProductDetailComponent {
       price: 99.99,
       quantity: 10,
       userId: 'seller1',
-      image: 'https://via.placeholder.com/150'
+      image: 'https://via.placeholder.com/150',
+      images: [
+        'https://via.placeholder.com/150',
+        'https://via.placeholder.com/160',
+        'https://via.placeholder.com/170'
+      ]
     },
     {
       id: 2,
@@ -29,7 +35,11 @@ export class ProductDetailComponent {
       price: 149.99,
       quantity: 5,
       userId: 'seller2',
-      image: 'https://via.placeholder.com/150'
+      image: 'https://via.placeholder.com/150',
+      images: [
+        'https://via.placeholder.com/150',
+        'https://via.placeholder.com/160'
+      ]
     },
     {
       id: 3,
@@ -38,7 +48,10 @@ export class ProductDetailComponent {
       price: 59.99,
       quantity: 20,
       userId: 'seller3',
-      image: 'https://via.placeholder.com/150'
+      image: 'https://via.placeholder.com/150',
+      images: [
+        'https://via.placeholder.com/150'
+      ]
     }
   ];
 

@@ -1,0 +1,18 @@
+
+<div class="media-container">
+	<h2>Manage Product Images</h2>
+	<div class="media-list">
+		<div class="media-item" *ngFor="let image of images; let i = index">
+			<img [src]="image" alt="Product Image" class="media-img" />
+			<button class="delete-btn" (click)="deleteImage(i)">Delete</button>
+		</div>
+	</div>
+		<form (submit)="addImage()" class="add-media-form">
+			<input type="file" (change)="onFileSelected($event)" accept="image/*" />
+			<button type="submit" class="add-btn">Add Image</button>
+		</form>
+		<div *ngIf="uploadError" class="upload-error">{{ uploadError }}</div>
+		<div *ngIf="previewImage" class="media-preview">
+			<img [src]="previewImage" alt="Preview" style="width:100px; height:100px; object-fit:cover; border-radius:8px; margin-top:10px;" />
+		</div>
+</div>

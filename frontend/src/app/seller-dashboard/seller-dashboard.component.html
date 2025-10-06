@@ -1,1 +1,20 @@
-<p>seller-dashboard works!</p>
+
+<div class="dashboard-container">
+	<h2>Seller Dashboard</h2>
+		<button class="create-product-btn" routerLink="/seller/dashboard/create-product">Create New Product</button>
+	<div class="dashboard-product-list">
+		<div class="dashboard-product-card" *ngFor="let product of products">
+			<img [src]="product.image" alt="Product Image" class="dashboard-product-image" />
+			<div class="dashboard-product-info">
+				<h3>{{ product.name }}</h3>
+				<p>{{ product.description }}</p>
+				<p>Price: ${{ product.price }}</p>
+				<p>Quantity: {{ product.quantity }}</p>
+			</div>
+			<div class="dashboard-product-actions">
+			<button class="edit-btn" [routerLink]="['/seller/dashboard/edit-product', product.id]">Edit</button>
+			<button class="media-btn" [routerLink]="['/seller/dashboard/media', product.id]">Manage Media</button>
+			</div>
+		</div>
+	</div>
+</div>
