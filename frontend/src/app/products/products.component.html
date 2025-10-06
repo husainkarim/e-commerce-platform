@@ -1,1 +1,16 @@
-<p>products works!</p>
+
+<div class="products-container">
+	<h2>Product Listings</h2>
+	<div class="product-list">
+			<a class="product-card" *ngFor="let product of products" [routerLink]="['/products', product.id]">
+				<img [src]="product.image" alt="Product Image" class="product-image" />
+				<div class="product-info">
+					<h3>{{ product.name }}</h3>
+					<p class="product-description">{{ product.description }}</p>
+					<p class="product-price">Price: ${{ product.price }}</p>
+					<p class="product-quantity">Quantity: {{ product.quantity }}</p>
+					<p class="product-seller">Seller: {{ product.userId }}</p>
+				</div>
+			</a>
+	</div>
+</div>
