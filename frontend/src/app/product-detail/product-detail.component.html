@@ -1,1 +1,11 @@
-<p>product-detail works!</p>
+
+<div class="product-detail-container">
+	<img [src]="product?.image" alt="Product Image" class="product-detail-image" />
+	<div class="product-detail-info">
+		<h2>{{ product?.name }}</h2>
+		<p class="product-detail-description">{{ product?.description }}</p>
+		<p class="product-detail-price">Price: ${{ product?.price }}</p>
+		<p class="product-detail-quantity">Quantity: {{ product?.quantity }}</p>
+		<p class="product-detail-seller">Seller: {{ product?.userId }}</p>
+	</div>
+</div>
