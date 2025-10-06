@@ -1,1 +1,10 @@
-<p>profile works!</p>
+
+<div class="profile-container">
+	<img [src]="user.avatar" alt="Avatar" class="profile-avatar" />
+	<div class="profile-info">
+		<h2>{{ user.name }}</h2>
+		<p><strong>ID:</strong> {{ user.id }}</p>
+		<p><strong>Email:</strong> {{ user.email }}</p>
+		<p><strong>Role:</strong> {{ user.role }}</p>
+	</div>
+</div>
