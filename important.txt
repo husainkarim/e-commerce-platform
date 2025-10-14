@@ -1,3 +1,4 @@
+# frontend
 - create component
 ng generate component [name] --inline-templete
 
@@ -6,3 +7,10 @@ ng generate component [name] --inline-templete
 
 - run the app
 ng serve -o
+
+# backend
+- to run:
+mvn spring-boot:run
+
+- build & clean
+mvn clean install
