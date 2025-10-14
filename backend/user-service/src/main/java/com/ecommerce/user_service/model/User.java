@@ -7,17 +7,22 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Document(collection = "users")
 public class User {
     @Id
     private String id;
 
     @NotBlank
-    @Size(min = 3, max = 50)
+    @Size(min = 3, max = 20)
     private String name;
 
     @NotBlank
@@ -25,13 +30,19 @@ public class User {
     private String email;
 
     @NotBlank
-    @Size(min = 8)
+    @Size(min = 8, max = 30)
     @JsonIgnore
     private String password;
 
-    @NotBlank
+    @NotNull
     private Role role;
 
     @NotBlank
     private String avatar;
+
+    public void setName(String name) { this.name = name; }
+    public void setEmail(String email) { this.email = email; }
+    public void setPassword(String password) { this.password = password; }
+    public void setRole(Role role) { this.role = role; }
+    public void setAvatar(String avatar) { this.avatar = avatar; }
 }
