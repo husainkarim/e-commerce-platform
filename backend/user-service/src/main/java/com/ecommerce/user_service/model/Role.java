@@ -15,4 +15,12 @@ public enum Role {
             default -> throw new IllegalArgumentException("Invalid user type: " + value);
         };
     }
+
+    @Override
+    public String toString() {
+        return switch (this) {
+            case CLIENT -> "client";
+            case SELLER -> "seller";
+        };
+    }
 }

@@ -16,6 +16,7 @@ import com.ecommerce.user_service.dto.LoginRequest;
 import com.ecommerce.user_service.dto.RegisterRequest;
 import com.ecommerce.user_service.model.User;
 import com.ecommerce.user_service.repository.UserRepository;
+import com.ecommerce.user_service.service.JwtService;
 
 import jakarta.annotation.security.PermitAll;
 
@@ -25,26 +26,31 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    // private final JwtService jwtService;
+    private final JwtService jwtService;
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     @PermitAll
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest request) {
         Map<String, Object> response = new HashMap<>();
-        //TODO: Find the user in the database by their email
         Optional<User> user = userRepository.findByEmail(request.getEmail());
-        
 
-        //TODO: Verify the user's password
+        if (user.isPresent() && passwordEncoder.matches(request.getPassword(), user.get().getPassword())) {
+            String token = jwtService.generateToken(user.get().getId(), user.get().getEmail(), user.get().getRole());
+            response.put("user", user.get());
 
+            response.put("token", token);
+            response.put("message", "Login successful");
+            return new ResponseEntity<>(response, HttpStatus.OK); // 200
+        }
 
         response.put("message", "Invalid email or password");
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED); // 401
     }
     
     @PermitAll
@@ -66,6 +72,6 @@ public class UserController {
         // userRepository.save(newUser);
 
         response.put("message", "User registered successfully");
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED); // 201
     }
 }
