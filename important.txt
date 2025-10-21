@@ -16,4 +16,27 @@ mvn spring-boot:run
 mvn clean install
 
 - build images for all microservices 
- sudo mvn clean package jib:dockerBuild
+sudo mvn clean package jib:dockerBuild
+sudo mvn clean install -DskipTests
+
+- run images
+sudo docker run -d --name discovery-service -p 8761:8761 microservices/discovery-service
+sudo docker run -d --name user-service -p 8081:8081 --link discovery-service microservices/user-service
+sudo docker run -d --name product-service -p 8082:8082 --link discovery-service microservices/product-service
+sudo docker run -d --name media-service -p 8083:8083 --link discovery-service microservices/media-service
+sudo docker run -d --name api-gateway -p 8080:8080 --link discovery-service microservices/api-gateway
+
+- stop container
+sudo docker stop [name]
+
+- remove container
+sudo docker rm [name]
+
+- container list
+sudo docker ps -a
+
+- images list
+sudo docker images
+
+- check logs
+sudo docker logs [name]
