@@ -7,9 +7,11 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import backend.user_service.dto.LoginRequest;
@@ -67,10 +69,24 @@ public class UserController {
         newUser.setEmail(request.getEmail());
         newUser.setPassword(hashedPassword);
         newUser.setRole(request.getUserType().toString());
-        newUser.setAvatar(request.getAvatar());
+        newUser.setAvatar("assets/avatars/" + request.getAvatar());
         userRepository.save(newUser);
 
         response.put("message", "User registered successfully");
         return new ResponseEntity<>(response, HttpStatus.CREATED); // 201
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<Map<String, Object>> getProfile(@RequestParam String userId) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<User> user = userRepository.findById(userId);
+
+        if (user.isPresent()) {
+            response.put("user", user.get());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        response.put("message", "User not found");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }
