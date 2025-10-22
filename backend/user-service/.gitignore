@@ -32,6 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
-### environement files ###
+### environment files ###
 env.properties
 .env
