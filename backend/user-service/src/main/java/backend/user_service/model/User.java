@@ -35,7 +35,6 @@ public class User {
     private String password;
 
     @NotNull
-    // either "USER" or "ADMIN"
     private String role;
 
     @NotBlank
