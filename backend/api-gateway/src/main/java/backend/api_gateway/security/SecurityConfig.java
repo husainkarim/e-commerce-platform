@@ -21,7 +21,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS).permitAll() // allow product viewing without auth
                 .requestMatchers(HttpMethod.POST, "/api/users/login").permitAll() // allow login without auth
                 .requestMatchers(HttpMethod.POST, "/api/users/signup").permitAll() // allow registration without auth
-                .anyRequest().authenticated() // require auth for everything else
+                // .anyRequest().authenticated() // require auth for everything else
+                .anyRequest().permitAll() // for now allow all requests
             )
             .formLogin(form -> form.disable())  // Disable default login form
             .httpBasic(basic -> basic.disable()); // Disable basic auth too, for now
