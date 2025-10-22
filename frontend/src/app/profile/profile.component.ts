@@ -1,4 +1,8 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ApiService } from '../api.service';
+import { AuthServiceService } from '../auth-service.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
@@ -9,10 +13,29 @@ import { Component } from '@angular/core';
 })
 export class ProfileComponent {
   user = {
-    id: 'u123',
-    name: 'Jane Doe',
-    email: 'jane.doe@example.com',
-    role: 'Seller',
-    avatar: 'assets/avatars/1.png'
+    id: '',
+    name: '',
+    email: '',
+    role: '',
+    avatar: ''
   };
+  constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService, private authServiceService: AuthServiceService) {
+      const id = this.route.snapshot.paramMap.get('id');
+      if (id) {
+        const userId = id;
+        this.apiService.profile(userId).subscribe({
+          next: (response) => {
+            console.log('Profile data fetched successfully:', response);
+            this.user = response.user;
+          },
+          error: (error) => {
+            console.error('Failed to fetch profile data:', error);
+            // Handle error (e.g., show error message, redirect)
+            this.router.navigate(['/not-found']);
+          }
+        });
+      } else {
+        this.user = this.authServiceService.getUser();
+      }
+    }
 }

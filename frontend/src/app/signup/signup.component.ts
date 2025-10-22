@@ -26,16 +26,15 @@ export class SignupComponent {
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', [Validators.required, Validators.minLength(8)]),
       confirmPassword: new FormControl('', [Validators.required]),
-      role: new FormControl('client', [Validators.required]),
-      avatar: new FormControl('1.png', [Validators.required])
+      role: new FormControl('client', [Validators.required, roleValidator]),
+      avatar: new FormControl('1.png', [Validators.required, avatarValidator])
     }, { validators: passwordMatchValidator });
   }
 
   onSubmit() {
     if (this.signupForm.valid) {
       console.log(this.signupForm.value);
-
-      // TODO: send post to backend API
+      // send post to backend API
       this.apiService.signup(this.signupForm.value).subscribe({
         next: (response) => {
           console.log('Signup successful:', response);
@@ -58,4 +57,18 @@ export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): V
   const password = control.get('password')?.value;
   const confirmPassword = control.get('confirmPassword')?.value;
   return password === confirmPassword ? null : { passwordMismatch: true };
+};
+
+// validator for the role selection
+export const roleValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const role = control.value;
+  const validRoles = ['client', 'seller'];
+  return validRoles.includes(role) ? null : { invalidRole: true };
+};
+
+// validator for the avatar selection
+export const avatarValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const avatar = control.value;
+  const validAvatars = ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png', '9.png'];
+  return validAvatars.includes(avatar) ? null : { invalidAvatar: true };
 };
