@@ -3,7 +3,7 @@
 ng generate component [name] --inline-templete
 
 - create service
-
+ng generate service [name]
 
 - run the app
 ng serve -o
@@ -40,3 +40,7 @@ sudo docker images
 
 - check logs
 sudo docker logs [name]
+
+# docker-compose
+- build
+
