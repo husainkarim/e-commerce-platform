@@ -25,10 +25,4 @@ public class RegisterRequest {
     private Role userType; // client or seller
     @NotBlank(message = "Avatar is required")
     private String avatar;
-
-    // public String getName() { return name; }
-    // public String getEmail() { return email; }
-    // public String getPassword() { return password; }
-    // public Role getUserType() { return userType; }
-    // public String getAvatar() { return avatar; }
 }
