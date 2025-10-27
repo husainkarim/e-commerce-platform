@@ -39,12 +39,31 @@ public class ProductController {
         response.put("message", "Product list fetched successfully");
         return new ResponseEntity<>(response, HttpStatus.OK); // 200
     }
+
+    // get user products
+    @GetMapping("/user-products")
+    public ResponseEntity<Map<String, Object>> getUserProducts(@RequestParam String userId) {
+        Map<String, Object> response = new HashMap<>();
+
+        // check if userId is provided
+        if (userId == null || userId.isEmpty()) {
+            response.put("message", "User ID is required");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST); // 400
+        }
+
+        // Logic to fetch user products from database
+        List<Product> userProducts = productRepository.findByUserId(userId);
+        response.put("products", userProducts);
+        response.put("message", "User products fetched successfully");
+        return new ResponseEntity<>(response, HttpStatus.OK); // 200
+    }
+
     // product details
     @GetMapping("/details")
-    public ResponseEntity<Map<String, Object>> getProductDetails(@RequestParam String id) {
+    public ResponseEntity<Map<String, Object>> getProductDetails(@RequestParam String productId) {
         Map<String, Object> response = new HashMap<>();
         // Logic to fetch product details from database
-        Product product = productRepository.findById(id).orElse(null);
+        Product product = productRepository.findById(productId).orElse(null);
         if (product != null) {
             response.put("product", product);
             response.put("message", "Product details fetched successfully");
@@ -60,6 +79,7 @@ public class ProductController {
     public ResponseEntity<Map<String, Object>> createProduct(@RequestBody Product product) {
         Map<String, Object> response = new HashMap<>();
         // Logic to save product to database
+        product.setId(null); // ensure id is null for new product
         Product savedProduct = productRepository.save(product);
         response.put("product", savedProduct);
         response.put("message", "Product created successfully");
@@ -68,12 +88,16 @@ public class ProductController {
 
     // update product
     @PutMapping("/update")
-    public ResponseEntity<Map<String, Object>> updateProduct(@RequestBody Product product, @RequestParam String id) {
+    public ResponseEntity<Map<String, Object>> updateProduct(@RequestBody Product product, @RequestParam String productId) {
         Map<String, Object> response = new HashMap<>();
         // Logic to update product in database
-        Product existingProduct = productRepository.findById(id).orElse(null);
+        Product existingProduct = productRepository.findById(productId).orElse(null);
         if (existingProduct != null) {
-            product.setId(id);
+            if (existingProduct.getId() == null ? product.getId() != null : !existingProduct.getId().equals(product.getId())) {
+                response.put("message", "Product ID in request body does not match the ID in query parameter");
+                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED); // 401
+            }
+            product.setId(productId);
             Product updatedProduct = productRepository.save(product);
             response.put("product", updatedProduct);
             response.put("message", "Product updated successfully");
@@ -86,16 +110,16 @@ public class ProductController {
 
     // delete product
     @DeleteMapping("/delete")
-    public ResponseEntity<Map<String, Object>> deleteProduct(@RequestParam String id) {
+    public ResponseEntity<Map<String, Object>> deleteProduct(@RequestParam String productId) {
         Map<String, Object> response = new HashMap<>();
 
         // check if product exists
-        if (!productRepository.existsById(id)) {
+        if (!productRepository.existsById(productId)) {
             response.put("message", "Product not found");
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND); // 404
         }
         // Logic to delete product from database
-        productRepository.deleteById(id);
+        productRepository.deleteById(productId);
         response.put("message", "Product deleted successfully");
         return new ResponseEntity<>(response, HttpStatus.OK); // 200
     }

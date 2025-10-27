@@ -1,22 +1,22 @@
 
 <div class="product-form-container">
 	<h2>{{ isEditMode ? 'Edit Product' : 'Create Product' }}</h2>
-	<form (ngSubmit)="onSubmit()" #productForm="ngForm">
+	<form (ngSubmit)="onSubmit()" [formGroup]="productForm">
 		<div class="form-group">
 			<label for="name">Name</label>
-			<input type="text" id="name" name="name" [(ngModel)]="product.name" required />
+			<input type="text" id="name" formControlName="name" required />
 		</div>
 		<div class="form-group">
 			<label for="description">Description</label>
-			<textarea id="description" name="description" [(ngModel)]="product.description" required></textarea>
+			<textarea id="description" formControlName="description" required></textarea>
 		</div>
 		<div class="form-group">
 			<label for="price">Price</label>
-			<input type="number" id="price" name="price" [(ngModel)]="product.price" required min="0" step="0.01" />
+			<input type="number" id="price" formControlName="price" required min="0" step="0.01" />
 		</div>
 		<div class="form-group">
 			<label for="quantity">Quantity</label>
-			<input type="number" id="quantity" name="quantity" [(ngModel)]="product.quantity" required min="0" />
+			<input type="number" id="quantity" formControlName="quantity" required min="0" />
 		</div>
 		<button type="submit" class="submit-btn">{{ isEditMode ? 'Update Product' : 'Create Product' }}</button>
 	</form>

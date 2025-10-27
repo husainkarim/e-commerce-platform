@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthServiceService } from '../auth-service.service';
+import { ApiService } from '../api.service';
 
 @Component({
   selector: 'app-product-detail',
@@ -12,51 +14,21 @@ import { CommonModule } from '@angular/common';
 export class ProductDetailComponent {
   product: any;
 
-  // Example static products data (replace with service/API in real app)
-  products = [
-    {
-      id: 1,
-      name: 'Wireless Headphones',
-      description: 'High-quality wireless headphones with noise cancellation.',
-      price: 99.99,
-      quantity: 10,
-      userId: 'seller1',
-      image: 'https://via.placeholder.com/150',
-      images: [
-        'https://via.placeholder.com/150',
-        'https://via.placeholder.com/160',
-        'https://via.placeholder.com/170'
-      ]
-    },
-    {
-      id: 2,
-      name: 'Smart Watch',
-      description: 'Feature-rich smart watch with health tracking.',
-      price: 149.99,
-      quantity: 5,
-      userId: 'seller2',
-      image: 'https://via.placeholder.com/150',
-      images: [
-        'https://via.placeholder.com/150',
-        'https://via.placeholder.com/160'
-      ]
-    },
-    {
-      id: 3,
-      name: 'Bluetooth Speaker',
-      description: 'Portable Bluetooth speaker with deep bass.',
-      price: 59.99,
-      quantity: 20,
-      userId: 'seller3',
-      image: 'https://via.placeholder.com/150',
-      images: [
-        'https://via.placeholder.com/150'
-      ]
+  constructor(private route: ActivatedRoute, private apiService: ApiService, private authServiceService: AuthServiceService, private router: Router) {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.apiService.getProductById(id).subscribe({
+        next: (response) => {
+          this.product = response.product;
+        },
+        error: (error) => {
+          console.error('Failed to fetch product details:', error);
+        }
+      });
+    } else {
+      this.product = null;
+      console.warn('No product ID found in route parameters.');
+      this.router.navigate(['/not-found']);
     }
-  ];
-
-  constructor(private route: ActivatedRoute) {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.product = this.products.find(p => p.id === id);
   }
 }

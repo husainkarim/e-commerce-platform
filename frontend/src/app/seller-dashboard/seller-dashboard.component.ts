@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ApiService } from '../api.service';
+import { AuthServiceService } from '../auth-service.service';
 
 @Component({
   selector: 'app-seller-dashboard',
@@ -10,22 +12,23 @@ import { RouterModule } from '@angular/router';
   styleUrl: './seller-dashboard.component.css'
 })
 export class SellerDashboardComponent {
-  products = [
-    {
-      id: 1,
-      name: 'Wireless Headphones',
-      description: 'High-quality wireless headphones with noise cancellation.',
-      price: 99.99,
-      quantity: 10,
-      image: 'https://via.placeholder.com/150'
-    },
-    {
-      id: 2,
-      name: 'Smart Watch',
-      description: 'Feature-rich smart watch with health tracking.',
-      price: 149.99,
-      quantity: 5,
-      image: 'https://via.placeholder.com/150'
+  products: any[] = [];
+  constructor(private apiService: ApiService, private authServiceService: AuthServiceService, private router: Router, private route: ActivatedRoute) {
+    const id = this.authServiceService.getUser().id;
+    if (!id) {
+      console.error('No user ID provided to load products.');
+      this.router.navigate(['/not-found']);
+      return;
     }
-  ];
+    this.apiService.getUserProducts(id).subscribe({
+      next: (response) => {
+        this.products = response.products;
+      },
+      error: (error) => {
+        console.error('Failed to fetch user products:', error);
+        this.router.navigate(['/not-found']);
+      }
+    });
+  }
 }
+

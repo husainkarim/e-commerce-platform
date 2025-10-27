@@ -21,6 +21,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS).permitAll() // allow product viewing without auth
                 .requestMatchers(HttpMethod.POST, "/api/users/login").permitAll() // allow login without auth
                 .requestMatchers(HttpMethod.POST, "/api/users/signup").permitAll() // allow registration without auth
+                .requestMatchers(HttpMethod.GET, "/api/products/list").permitAll() // allow product list viewing without auth
                 // .anyRequest().authenticated() // require auth for everything else
                 .anyRequest().permitAll() // for now allow all requests
             )
