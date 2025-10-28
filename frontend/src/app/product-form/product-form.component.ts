@@ -24,26 +24,6 @@ export class ProductFormComponent {
     userId: ''
   };
 
-  // Example static products data (replace with service/API in real app)
-  products = [
-    {
-      id: '1',
-      name: 'Wireless Headphones',
-      description: 'High-quality wireless headphones with noise cancellation.',
-      price: 99.99,
-      quantity: 10,
-      userId: 'seller1'
-    },
-    {
-      id: '2',
-      name: 'Smart Watch',
-      description: 'Feature-rich smart watch with health tracking.',
-      price: 149.99,
-      quantity: 5,
-      userId: 'seller2'
-    }
-  ];
-
   constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService, private authServiceService: AuthServiceService) {
     const id = this.route.snapshot.paramMap.get('id');
     this.productForm = new FormGroup({
@@ -52,6 +32,12 @@ export class ProductFormComponent {
       price: new FormControl(0, [Validators.required ]),
       quantity: new FormControl(0, [Validators.required ]),
     });
+
+    if (!this.authServiceService.isLoggedIn()) {
+      console.error('User is not logged in.');
+      this.router.navigate(['/login']);
+      return;
+    }
 
     if (id) {
       this.isEditMode = true;

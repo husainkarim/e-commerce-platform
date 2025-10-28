@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { UploadImageService } from '../upload-image.service';
 
 @Component({
   selector: 'app-manage-media',
@@ -17,7 +18,7 @@ export class ManageMediaComponent {
   newImageUrl: string = '';
   previewImage: string | null = null;
   uploadError: string | null = null;
-
+  constructor(private uploadImageService: UploadImageService) {}
   addImage() {
     if (this.previewImage) {
       this.images.push(this.previewImage);
@@ -37,6 +38,8 @@ export class ManageMediaComponent {
         this.previewImage = null;
         return;
       }
+      this.uploadImageService.uploadFile(file);
+
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.previewImage = e.target.result;

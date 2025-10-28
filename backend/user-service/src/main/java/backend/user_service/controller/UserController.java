@@ -89,4 +89,12 @@ public class UserController {
         response.put("message", "User not found");
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, Object>> logout() {
+        Map<String, Object> response = new HashMap<>();
+        // In a stateless JWT authentication, logout can be handled on the client side
+        response.put("message", "Logout successful");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

@@ -43,3 +43,6 @@ Thumbs.db
 
 # image assets
 product-images/
+
+# environment files
+.env

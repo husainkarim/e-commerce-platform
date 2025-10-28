@@ -14,19 +14,39 @@ import { AuthServiceService } from '../auth-service.service';
 export class SellerDashboardComponent {
   products: any[] = [];
   constructor(private apiService: ApiService, private authServiceService: AuthServiceService, private router: Router, private route: ActivatedRoute) {
-    const id = this.authServiceService.getUser().id;
-    if (!id) {
-      console.error('No user ID provided to load products.');
-      this.router.navigate(['/not-found']);
+    if (!this.authServiceService.isLoggedIn()) {
+      console.error('User is not logged in.');
+      this.router.navigate(['/login']);
       return;
     }
-    this.apiService.getUserProducts(id).subscribe({
+  }
+
+  ngOnInit() {
+    this.getUserProducts();
+  }
+
+  getUserProducts() {
+    const userId = this.authServiceService.getUser().id;
+    this.apiService.getUserProducts(userId).subscribe({
       next: (response) => {
         this.products = response.products;
       },
       error: (error) => {
         console.error('Failed to fetch user products:', error);
         this.router.navigate(['/not-found']);
+      }
+    });
+  }
+
+  deleteProduct(productId: string) {
+    this.apiService.deleteProduct(productId).subscribe({
+      next: (response) => {
+        console.log('Product deleted successfully:', response);
+        this.getUserProducts();
+      },
+      error: (error) => {
+        console.error('Failed to delete product:', error);
+        alert('Failed to delete product. Please try again.');
       }
     });
   }

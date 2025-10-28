@@ -29,8 +29,16 @@ export class AuthServiceService {
     return this.user;
   }
 
+  isSeller(): boolean {
+    return this.user?.role === 'seller';
+  }
+
+  isAdmin(): boolean {
+    return this.user?.role === 'admin';
+  }
+
   getToken() {
-    return this.user?.token;
+    return this.token;
   }
 
   isLoggedIn(): boolean {
@@ -39,6 +47,7 @@ export class AuthServiceService {
 
   logout() {
     this.user = null;
+    this.token = null;
     localStorage.removeItem('user');
     localStorage.removeItem('authToken');
   }

@@ -14,6 +14,7 @@
 			<div class="dashboard-product-actions">
 			<button class="edit-btn" [routerLink]="['/seller/dashboard/edit-product', product.id]">Edit</button>
 			<button class="media-btn" [routerLink]="['/seller/dashboard/media', product.id]">Manage Media</button>
+      <button class="delete-btn" (click)="deleteProduct(product.id)">Delete</button>
 			</div>
 		</div>
 	</div>

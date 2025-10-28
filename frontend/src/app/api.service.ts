@@ -25,6 +25,10 @@ export class ApiService {
     return this.http.get(`${this.baseUrl}/users/profile?userId=${id}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
   }
 
+  logout(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/users/logout`, {}, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+  }
+
   // Product APIs
   getProducts(): Observable<any> {
     return this.http.get(`${this.baseUrl}/products/list`);
