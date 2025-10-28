@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterModule, Router } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AuthServiceService } from './auth-service.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterModule],
+  imports: [RouterModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
 })
 export class AppComponent {
   title = 'E-Commerce Platform';

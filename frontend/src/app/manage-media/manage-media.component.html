@@ -4,7 +4,7 @@
 	<div class="media-list">
 		<div class="media-item" *ngFor="let image of images; let i = index">
 			<img [src]="image" alt="Product Image" class="media-img" />
-			<button class="delete-btn" (click)="deleteImage(i)">Delete</button>
+			<button class="delete-btn" (click)="deleteFile(i)">Delete</button>
 		</div>
 	</div>
 		<form (submit)="addImage()" class="add-media-form">
