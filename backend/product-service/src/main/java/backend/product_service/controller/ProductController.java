@@ -18,12 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 import backend.product_service.model.Product;
 import backend.product_service.repository.ProductRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
 
     private final ProductRepository productRepository;
 
+    @Autowired
     public ProductController(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
