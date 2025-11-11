@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import backend.media_service.model.Media;
 import backend.media_service.repository.MediaRepository;
 import backend.media_service.service.FileStorageService;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/media")
@@ -72,6 +74,21 @@ public class MediaController {
             System.out.println("Failed to fetch images: " + e.getMessage());
             response.put("message", "Failed to fetch images");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Map<String, Object>> deleteMedia(@RequestBody Media media) {
+        Map<String, Object> response = new HashMap<>();
+
+        boolean deleted = fileStorageService.deleteFileByUrl(media.getImagePath());
+        if (deleted) {
+            mediaRepository.deleteById(media.getId());
+            response.put("message", "File deleted successfully");
+            return ResponseEntity.ok(response);
+        } else {
+            response.put("message", "Failed to delete file");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }

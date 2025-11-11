@@ -21,6 +21,9 @@ import com.google.common.collect.Lists;
 
 import backend.media_service.util.ImageCompressionUtil;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 @Service
 public class FileStorageService {
 
@@ -80,6 +83,22 @@ public class FileStorageService {
         + "/o/"
         + fileName.replace("/", "%2F")
         + "?alt=media";
+    }
+
+    
+    public boolean deleteFileByUrl(String fileUrl) {
+        try {
+            // Extract the part after /o/ and before ?
+            String encodedPath = fileUrl.substring(fileUrl.indexOf("/o/") + 3, fileUrl.indexOf("?"));
+            // URL decode it
+            String filePath = URLDecoder.decode(encodedPath, StandardCharsets.UTF_8.name());
+
+            BlobId blobId = BlobId.of(bucketName, filePath);
+            return storage.delete(blobId);
+        } catch (Exception e) {
+            System.out.println("Failed to delete file: " + e.getMessage());
+            return false;
+        }
     }
 
 }
