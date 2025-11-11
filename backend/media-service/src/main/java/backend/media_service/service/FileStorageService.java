@@ -95,8 +95,11 @@ public class FileStorageService {
 
             BlobId blobId = BlobId.of(bucketName, filePath);
             return storage.delete(blobId);
-        } catch (Exception e) {
-            System.out.println("Failed to delete file: " + e.getMessage());
+        } catch (java.io.UnsupportedEncodingException | java.lang.IllegalArgumentException | java.lang.NullPointerException | java.lang.StringIndexOutOfBoundsException e) {
+            System.out.println("Failed to delete file due to invalid URL or encoding: " + e.getMessage());
+            return false;
+        } catch (com.google.cloud.storage.StorageException e) {
+            System.out.println("Failed to delete file from storage: " + e.getMessage());
             return false;
         }
     }
