@@ -32,9 +32,12 @@ export class ProductDetailComponent {
             response.images.forEach((image: { imagePath: string }) => {
               images.push(image.imagePath);
             });
-            console.log('Fetched product images:', images);
-            this.product.images = images;
-            this.product.image = this.product.images.length > 0 ? this.product.images[0] : null;
+            if (images.length > 0) {
+              this.product.images = images;
+              this.product.image = images[0];
+            } else {
+              this.product.image = 'assets/product-images/default-product-image.jpg'; // default image if none found
+            }
           }
         },
         error: (error) => {

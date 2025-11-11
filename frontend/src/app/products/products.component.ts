@@ -32,6 +32,21 @@ export class ProductsComponent {
       next: (response) => {
         console.log('Products fetched successfully:', response);
         this.products = response.products; // assuming response has a 'products' field
+        for (let product of this.products) {
+          this.apiService.getImagesByProductId(product.id).subscribe({
+            next: (imageResponse) => {
+              if (imageResponse.images && imageResponse.images.length > 0) {
+                product.image = imageResponse.images[0].imagePath; // assuming images is an array of image URLs
+              } else {
+                product.image = 'assets/product-images/default-product-image.jpg'; // default image if none found
+              }
+            },
+            error: (error) => {
+              console.error(`Failed to fetch images for product ${product.id}:`, error);
+              product.image = 'assets/product-images/default-product-image.jpg'; // default image on error
+            }
+          });
+        }
       },
       error: (error) => {
         console.error('Failed to fetch products:', error);

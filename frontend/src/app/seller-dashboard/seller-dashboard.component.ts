@@ -30,6 +30,21 @@ export class SellerDashboardComponent {
     this.apiService.getUserProducts(userId).subscribe({
       next: (response) => {
         this.products = response.products;
+        for (let product of this.products) {
+          this.apiService.getImagesByProductId(product.id).subscribe({
+            next: (imageResponse) => {
+              if (imageResponse.images && imageResponse.images.length > 0) {
+                product.image = imageResponse.images[0].imagePath;
+              } else {
+                product.image = 'assets/product-images/default-product-image.jpg';
+              }
+            },
+            error: (error) => {
+              console.error(`Failed to fetch images for product ${product.id}:`, error);
+              product.image = 'assets/product-images/default-product-image.jpg';
+            }
+          });
+        }
       },
       error: (error) => {
         console.error('Failed to fetch user products:', error);
