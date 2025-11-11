@@ -55,4 +55,11 @@ export class ApiService {
   }
 
   // Media APIs
+  addmedia(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/media/upload`, data, { headers: { 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+  }
+
+  getImagesByProductId(productId: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/media/getImagesByProductId?productId=${productId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+  }
 }

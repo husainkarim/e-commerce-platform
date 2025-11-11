@@ -25,6 +25,22 @@ export class ProductDetailComponent {
           console.error('Failed to fetch product details:', error);
         }
       });
+      this.apiService.getImagesByProductId(id).subscribe({
+        next: (response) => {
+          if (this.product) {
+            let images: string[] = [];
+            response.images.forEach((image: { imagePath: string }) => {
+              images.push(image.imagePath);
+            });
+            console.log('Fetched product images:', images);
+            this.product.images = images;
+            this.product.image = this.product.images.length > 0 ? this.product.images[0] : null;
+          }
+        },
+        error: (error) => {
+          console.error('Failed to fetch product images:', error);
+        }
+      });
     } else {
       this.product = null;
       console.warn('No product ID found in route parameters.');

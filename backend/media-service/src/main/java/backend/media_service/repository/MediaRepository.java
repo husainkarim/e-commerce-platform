@@ -9,5 +9,5 @@ import backend.media_service.model.Media;
 
 @Repository
 public interface MediaRepository extends MongoRepository<Media, String> {
-    List<Media> findByUserId(String userId);
+    List<Media> findByProductId(String productId);
 }

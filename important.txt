@@ -10,7 +10,7 @@ ng serve -o
 
 # backend
 - to run:
-mvn spring-boot:run
+sudo mvn spring-boot:run
 
 - build & clean
 mvn clean install

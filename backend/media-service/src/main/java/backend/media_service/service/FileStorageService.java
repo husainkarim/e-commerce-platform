@@ -1,5 +1,6 @@
 package backend.media_service.service;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,10 +46,25 @@ public class FileStorageService {
     }
 
     public String uploadCompressedImage(MultipartFile file) throws IOException {
-        BufferedImage img = ImageIO.read(file.getInputStream());
+        // Read original image
+        BufferedImage originalImage = ImageIO.read(file.getInputStream());
+        if (originalImage == null) {
+            throw new IOException("Invalid image format or unsupported colorspace");
+        }
+
+        // Convert to RGB if necessary
+        BufferedImage rgbImage = new BufferedImage(
+                originalImage.getWidth(),
+                originalImage.getHeight(),
+                BufferedImage.TYPE_INT_RGB
+        );
+
+        Graphics2D g = rgbImage.createGraphics();
+        g.drawImage(originalImage, 0, 0, null);
+        g.dispose();
 
         // Compress to 70% quality
-        byte[] compressedBytes = ImageCompressionUtil.compress(img, 0.7f);
+        byte[] compressedBytes = ImageCompressionUtil.compress(rgbImage, 0.7f);
 
         String fileName = "images/" + file.getOriginalFilename() + UUID.randomUUID() + ".jpg";
 
@@ -59,6 +75,11 @@ public class FileStorageService {
 
         storage.create(blobInfo, compressedBytes);
 
-        return "https://storage.googleapis.com/" + bucketName + "/" + fileName;
+        return "https://firebasestorage.googleapis.com/v0/b/"
+        + bucketName
+        + "/o/"
+        + fileName.replace("/", "%2F")
+        + "?alt=media";
     }
+
 }
