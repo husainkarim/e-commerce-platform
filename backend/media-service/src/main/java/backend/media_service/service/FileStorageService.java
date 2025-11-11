@@ -85,7 +85,6 @@ public class FileStorageService {
         + "?alt=media";
     }
 
-    
     public boolean deleteFileByUrl(String fileUrl) {
         try {
             // Extract the part after /o/ and before ?
@@ -103,5 +102,4 @@ public class FileStorageService {
             return false;
         }
     }
-
 }
