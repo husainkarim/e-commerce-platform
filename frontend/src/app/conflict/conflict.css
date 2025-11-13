@@ -1,4 +1,4 @@
-.not-found-container {
+.conflict-container {
 	max-width: 400px;
 	margin: 100px auto;
 	background: #fff;
@@ -8,25 +8,25 @@
 	text-align: center;
 }
 
-.not-found-container h1 {
+.conflict-container h1 {
 	font-size: 5rem;
 	color: #1976d2;
 	margin-bottom: 10px;
 }
 
-.not-found-container h2 {
+.conflict-container h2 {
 	font-size: 1.7rem;
 	color: #333;
 	margin-bottom: 18px;
 }
 
-.not-found-container p {
+.conflict-container p {
 	font-size: 1.1rem;
 	color: #666;
 	margin-bottom: 24px;
 }
 
-.not-found-home-btn {
+.conflict-home-btn {
 	display: inline-block;
 	padding: 12px 32px;
 	font-size: 1rem;
@@ -39,6 +39,6 @@
 	cursor: pointer;
 }
 
-.not-found-home-btn:hover {
+.conflict-home-btn:hover {
 	background-color: #1565c0;
 }

@@ -9,6 +9,11 @@ import { SellerDashboardComponent } from './seller-dashboard/seller-dashboard.co
 import { ProductFormComponent } from './product-form/product-form.component';
 import { ManageMediaComponent } from './manage-media/manage-media.component';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { BadRequest } from './bad-request/bad-request';
+import { Conflict } from './conflict/conflict';
+import { Forbidden } from './forbidden/forbidden';
+import { ServerError } from './server-error/server-error';
+import { NotAuthorizedComponent } from './not-authorized/not-authorized.component';
 
 
 export const routes: Routes = [
@@ -23,5 +28,11 @@ export const routes: Routes = [
   { path: 'seller/dashboard/create-product', component: ProductFormComponent },
   { path: 'seller/dashboard/edit-product/:id', component: ProductFormComponent },
   { path: 'seller/dashboard/media/:id', component: ManageMediaComponent },
+  { path: 'bad-request', component: BadRequest },
+  { path: 'conflict', component: Conflict },
+  { path: 'forbidden', component: Forbidden },
+  { path: 'not-found', component: NotFoundComponent },
+  { path: 'unauthorized', component: NotAuthorizedComponent },
+  { path: 'server-error', component: ServerError },
   { path: '**', component: NotFoundComponent }
 ];
