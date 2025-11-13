@@ -18,13 +18,32 @@ export class ManageMediaComponent {
   selectedFile: File | null = null;
   productId: string = '';
   images: string[] = []; // Array to hold image URLs
+  media: any[] = [];
   uploadError: boolean = false;
   previewImage: boolean = false;
-  constructor(private route: ActivatedRoute, private apiService: ApiService) {
-    if (this.route.snapshot.paramMap.has('id')) {
-      this.productId = this.route.snapshot.paramMap.get('id')!;
-      // Fetch existing images for the product
-    }
+  constructor(private route: ActivatedRoute, private apiService: ApiService) { }
+
+  ngOnInit(): void {
+    // Subscribe so it reacts if the route param changes
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (id) {
+        this.productId = id;
+        this.loadProductImages(id);
+      }
+    });
+  }
+
+  private loadProductImages(productId: string): void {
+    this.apiService.getImagesByProductId(productId).subscribe({
+      next: (response) => {
+        this.media = response.images;
+        this.images = response.images.map((img: { imagePath: string }) => img.imagePath);
+      },
+      error: (error) => {
+        console.error('Failed to fetch product images:', error);
+      }
+    });
   }
 
   onFileSelected(event: any) {
@@ -42,12 +61,9 @@ export class ManageMediaComponent {
     formData.append('productId', this.productId);  // string or number
     this.apiService.addmedia(formData).subscribe(response => {
       console.log('Image uploaded successfully', response);
-      // Assuming the response contains the URL of the uploaded image
-      if (response && response.imageUrl) {
-        this.images.push(response.imageUrl);
-      }
       this.uploadError = false;
       this.selectedFile = null; // Clear the selected file
+      this.loadProductImages(this.productId);
     }, error => {
       console.error('Error uploading image', error);
       this.uploadError = true;
@@ -55,6 +71,12 @@ export class ManageMediaComponent {
   }
 
   deleteFile(index: number) {
-    this.images.splice(index, 1);
+    let mediaData = this.media[index];
+    this.apiService.deleteImage(mediaData).subscribe(response => {
+      console.log('Image deleted successfully', response);
+      this.loadProductImages(this.productId);
+    }, error => {
+      console.error('Error deleting image', error);
+    });
   }
 }

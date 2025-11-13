@@ -11,7 +11,6 @@
 			<input type="file" (change)="onFileSelected($event)" accept="image/*" />
 			<button type="submit" class="add-btn">Add Image</button>
 		</form>
-		<div *ngIf="uploadError" class="upload-error">{{ uploadError }}</div>
 		<div *ngIf="previewImage" class="media-preview">
 			<img [src]="previewImage" alt="Preview" style="width:100px; height:100px; object-fit:cover; border-radius:8px; margin-top:10px;" />
 		</div>

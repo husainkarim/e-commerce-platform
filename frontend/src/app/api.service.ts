@@ -62,4 +62,8 @@ export class ApiService {
   getImagesByProductId(productId: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/media/getImagesByProductId?productId=${productId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
   }
+
+  deleteImage(data: any): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/media/delete`, { body: data, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+  }
 }

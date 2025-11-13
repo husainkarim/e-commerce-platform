@@ -13,7 +13,10 @@ ng serve -o
 sudo mvn spring-boot:run
 
 - build & clean
-mvn clean install
+sudo mvn clean install
+
+- build and run
+sudo mvn clean install && sudo mvn spring-boot:run
 
 - build images for all microservices 
 sudo mvn clean package jib:dockerBuild
