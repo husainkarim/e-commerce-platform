@@ -20,7 +20,12 @@ import backend.user_service.dto.RegisterRequest;
 import backend.user_service.model.User;
 import backend.user_service.repository.UserRepository;
 import backend.user_service.service.JwtService;
+import backend.user_service.service.KafkaService;
 import jakarta.annotation.security.PermitAll;
+
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import backend.user_service.dto.UpdateRole;
 
 @RestController
 @RequestMapping("/api/users")
@@ -29,14 +34,16 @@ public class UserController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final KafkaService kafkaService;
     
     // admin list
     private List<User> admins;
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, KafkaService kafkaService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.kafkaService = kafkaService;
         this.admins = userRepository.findByRole("admin");
     }
 
@@ -76,6 +83,9 @@ public class UserController {
         newUser.setRole(request.getUserType().toString());
         newUser.setAvatar("assets/avatars/" + request.getAvatar());
         userRepository.save(newUser);
+
+        kafkaService.sendUserCreatedEvent(newUser);
+
         this.admins = userRepository.findByRole("admin");
         response.put("message", "User registered successfully");
         return new ResponseEntity<>(response, HttpStatus.CREATED); // 201
@@ -95,6 +105,58 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
+    @PutMapping("/Profile-update")
+    public ResponseEntity<Map<String, Object>> updateProfile(@RequestParam String userId, @RequestBody User updatedUser) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<User> user = userRepository.findById(updatedUser.getId());
+
+        boolean isAdmin = admins.stream().anyMatch(admin -> admin.getId().equals(userId));
+        if (!userId.equals(updatedUser.getId()) && !isAdmin) {
+            // confirm that the requester is the same as the user to be deleted or has admin role
+            response.put("message", "Unauthorized to update this account");
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (user.isPresent()) {
+            User existingUser = user.get();
+            existingUser.setName(updatedUser.getName());
+            existingUser.setEmail(updatedUser.getEmail());
+            existingUser.setAvatar(updatedUser.getAvatar());
+            userRepository.save(existingUser);
+            response.put("message", "User profile updated successfully");
+            response.put("user", existingUser);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        response.put("message", "User not found");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @PatchMapping("/Role-update")
+    public ResponseEntity<Map<String, Object>> updateUserRole(@RequestParam String userId, @RequestBody UpdateRole updateRoleRequest) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<User> user = userRepository.findById(updateRoleRequest.getUserId());
+        boolean isAdmin = admins.stream().anyMatch(admin -> admin.getId().equals(userId));
+        if (!userId.equals(updateRoleRequest.getUserId()) && !isAdmin) {
+            // confirm that the requester is the same as the user to be deleted or has admin role
+            response.put("message", "Unauthorized to update this account");
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (user.isPresent()) {
+            User existingUser = user.get();
+            existingUser.setRole(updateRoleRequest.getRole());
+            userRepository.save(existingUser);
+            response.put("message", "User role updated successfully");
+            response.put("user", existingUser);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        response.put("message", "User not found");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+
     //delete the user account
     @PostMapping("/delete")
     public ResponseEntity<Map<String, Object>> deleteUser(@RequestParam String userId, @RequestBody User userRequested) {
@@ -108,6 +170,7 @@ public class UserController {
         }
         if (user.isPresent()) {
             userRepository.deleteById(userId);
+            kafkaService.sendUserDeletedEvent(user.get());
             response.put("message", "User deleted successfully");
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
