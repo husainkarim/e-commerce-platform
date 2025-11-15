@@ -7,4 +7,7 @@
 		<p><strong>Email:</strong> {{ user.email }}</p>
 		<p><strong>Role:</strong> {{ user.role }}</p>
 	</div>
+  <ng-container *ngIf="isAllowedToDelete">
+  <button class="delete-account-button" (click)="deleteAccount()">Delete Account</button>
+  </ng-container>
 </div>

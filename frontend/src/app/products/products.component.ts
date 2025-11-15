@@ -58,5 +58,4 @@ export class ProductsComponent {
     this.fetchProducts();
   }
 
-
 }

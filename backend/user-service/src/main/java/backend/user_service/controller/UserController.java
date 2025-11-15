@@ -1,6 +1,7 @@
 package backend.user_service.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,11 +29,15 @@ public class UserController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    
+    // admin list
+    private List<User> admins;
 
     public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.admins = userRepository.findByRole("admin");
     }
 
     @PermitAll
@@ -71,7 +76,7 @@ public class UserController {
         newUser.setRole(request.getUserType().toString());
         newUser.setAvatar("assets/avatars/" + request.getAvatar());
         userRepository.save(newUser);
-
+        this.admins = userRepository.findByRole("admin");
         response.put("message", "User registered successfully");
         return new ResponseEntity<>(response, HttpStatus.CREATED); // 201
     }
@@ -83,6 +88,27 @@ public class UserController {
 
         if (user.isPresent()) {
             response.put("user", user.get());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        response.put("message", "User not found");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    //delete the user account
+    @PostMapping("/delete")
+    public ResponseEntity<Map<String, Object>> deleteUser(@RequestParam String userId, @RequestBody User userRequested) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<User> user = userRepository.findById(userId);
+        boolean isAdmin = admins.stream().anyMatch(admin -> admin.getId().equals(userRequested.getId()));
+        if (!userRequested.getId().equals(userId) && !isAdmin) {
+            // confirm that the requester is the same as the user to be deleted or has admin role
+            response.put("message", "Unauthorized to delete this account");
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+        if (user.isPresent()) {
+            userRepository.deleteById(userId);
+            response.put("message", "User deleted successfully");
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
 

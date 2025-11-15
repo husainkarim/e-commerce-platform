@@ -36,3 +36,13 @@
 	color: #444;
 	margin-bottom: 8px;
 }
+
+.delete-account-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #e53935;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
