@@ -84,6 +84,7 @@ public class ProductController {
         // Logic to save product to database
         product.setId(null); // ensure id is null for new product
         Product savedProduct = productRepository.save(product);
+        kafkaService.sendProductCreatedEvent(savedProduct);
         response.put("product", savedProduct);
         response.put("message", "Product created successfully");
         return new ResponseEntity<>(response, HttpStatus.CREATED); // 201
@@ -102,6 +103,7 @@ public class ProductController {
             }
             product.setId(productId);
             Product updatedProduct = productRepository.save(product);
+            kafkaService.sendProductUpdatedEvent(updatedProduct);
             response.put("product", updatedProduct);
             response.put("message", "Product updated successfully");
             return new ResponseEntity<>(response, HttpStatus.OK); // 200
@@ -123,6 +125,9 @@ public class ProductController {
         }
         // Logic to delete product from database
         productRepository.deleteById(productId);
+        Product deletedProduct = new Product();
+        deletedProduct.setId(productId);
+        kafkaService.sendProductDeletedEvent(deletedProduct);
         response.put("message", "Product deleted successfully");
         return new ResponseEntity<>(response, HttpStatus.OK); // 200
     }
