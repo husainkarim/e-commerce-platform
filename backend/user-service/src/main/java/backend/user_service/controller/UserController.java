@@ -105,7 +105,7 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    @PutMapping("/Profile-update")
+    @PutMapping("/profile-update")
     public ResponseEntity<Map<String, Object>> updateProfile(@RequestParam String userId, @RequestBody User updatedUser) {
         Map<String, Object> response = new HashMap<>();
         Optional<User> user = userRepository.findById(updatedUser.getId());
@@ -132,7 +132,7 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    @PatchMapping("/Role-update")
+    @PatchMapping("/role-update")
     public ResponseEntity<Map<String, Object>> updateUserRole(@RequestParam String userId, @RequestBody UpdateRole updateRoleRequest) {
         Map<String, Object> response = new HashMap<>();
         Optional<User> user = userRepository.findById(updateRoleRequest.getUserId());

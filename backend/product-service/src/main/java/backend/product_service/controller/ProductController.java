@@ -17,18 +17,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import backend.product_service.model.Product;
 import backend.product_service.repository.ProductRepository;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import backend.product_service.service.KafkaService;
+import backend.product_service.service.UserEventConsumer;
+import backend.product_service.shared.events.UserCreatedEvent;
 
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
 
     private final ProductRepository productRepository;
+    private final KafkaService kafkaService;
+    private final UserEventConsumer userEventConsumer;
 
-    @Autowired
-    public ProductController(ProductRepository productRepository) {
+    public ProductController(ProductRepository productRepository, KafkaService kafkaService, UserEventConsumer userEventConsumer) {
         this.productRepository = productRepository;
+        this.kafkaService = kafkaService;
+        this.userEventConsumer = userEventConsumer;
     }
 
     // product list
@@ -47,6 +51,11 @@ public class ProductController {
     @GetMapping("/user-products")
     public ResponseEntity<Map<String, Object>> getUserProducts(@RequestParam String userId) {
         Map<String, Object> response = new HashMap<>();
+        List<UserCreatedEvent> userSellerList = userEventConsumer.getUserSellerList();
+        if (userSellerList.stream().noneMatch(user -> user.getUserId().equals(userId))) {
+            response.put("message", "User is not a seller or does not exist");
+            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN); // 403
+        }
 
         // check if userId is provided
         if (userId == null || userId.isEmpty()) {
@@ -81,6 +90,12 @@ public class ProductController {
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> createProduct(@RequestBody Product product) {
         Map<String, Object> response = new HashMap<>();
+        List<UserCreatedEvent> userSellerList = userEventConsumer.getUserSellerList();
+        if (userSellerList.stream().noneMatch(user -> user.getUserId().equals(product.getUserId()))) {
+            response.put("message", "User is not a seller or does not exist");
+            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN); // 403
+        }
+
         // Logic to save product to database
         product.setId(null); // ensure id is null for new product
         Product savedProduct = productRepository.save(product);
@@ -94,6 +109,12 @@ public class ProductController {
     @PutMapping("/update")
     public ResponseEntity<Map<String, Object>> updateProduct(@RequestBody Product product, @RequestParam String productId) {
         Map<String, Object> response = new HashMap<>();
+        List<UserCreatedEvent> userSellerList = userEventConsumer.getUserSellerList();
+        if (userSellerList.stream().noneMatch(user -> user.getUserId().equals(product.getUserId()))) {
+            response.put("message", "User is not a seller or does not exist");
+            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN); // 403
+        }
+
         // Logic to update product in database
         Product existingProduct = productRepository.findById(productId).orElse(null);
         if (existingProduct != null) {
@@ -117,6 +138,13 @@ public class ProductController {
     @DeleteMapping("/delete")
     public ResponseEntity<Map<String, Object>> deleteProduct(@RequestParam String productId) {
         Map<String, Object> response = new HashMap<>();
+
+        List<UserCreatedEvent> userSellerList = userEventConsumer.getUserSellerList();
+        if (userSellerList.stream().noneMatch(user -> user.getUserId().equals(
+            productRepository.findById(productId).map(Product::getUserId).orElse(null)))) {
+            response.put("message", "User is not a seller or does not exist");
+            return new ResponseEntity<>(response, HttpStatus.FORBIDDEN); // 403
+        }
 
         // check if product exists
         if (!productRepository.existsById(productId)) {
