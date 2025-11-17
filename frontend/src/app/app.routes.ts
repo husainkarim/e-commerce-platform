@@ -14,6 +14,7 @@ import { Conflict } from './conflict/conflict';
 import { Forbidden } from './forbidden/forbidden';
 import { ServerError } from './server-error/server-error';
 import { NotAuthorizedComponent } from './not-authorized/not-authorized.component';
+import { EditProfileComponent } from './edit-profile/edit-profile.component';
 
 
 export const routes: Routes = [
@@ -23,6 +24,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'profile', component: ProfileComponent },
+  { path: 'edit-profile/:id', component: EditProfileComponent }, // need to create EditProfileComponent
   { path: 'profile/:id', component: ProfileComponent },
   { path: 'seller/dashboard', component: SellerDashboardComponent },
   { path: 'seller/dashboard/create-product', component: ProductFormComponent },

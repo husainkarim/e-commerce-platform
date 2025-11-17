@@ -1,6 +1,6 @@
 
 <div class="profile-container">
-	<img [src]="user.avatar" alt="Avatar" class="profile-avatar" />
+	<img [src]="'assets/avatars/' + user.avatar" alt="Avatar" class="profile-avatar" />
 	<div class="profile-info">
 		<h2>{{ user.name }}</h2>
 		<p><strong>ID:</strong> {{ user.id }}</p>
@@ -9,5 +9,6 @@
 	</div>
   <ng-container *ngIf="isAllowedToDelete">
   <button class="delete-account-button" (click)="deleteAccount()">Delete Account</button>
+  <button class="edit-profile-button" (click)="openEditProfileModal()">Edit Profile</button>
   </ng-container>
 </div>

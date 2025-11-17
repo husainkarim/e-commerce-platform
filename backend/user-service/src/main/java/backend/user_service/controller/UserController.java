@@ -81,7 +81,7 @@ public class UserController {
         newUser.setEmail(request.getEmail());
         newUser.setPassword(hashedPassword);
         newUser.setRole(request.getUserType().toString());
-        newUser.setAvatar("assets/avatars/" + request.getAvatar());
+        newUser.setAvatar(request.getAvatar());
         userRepository.save(newUser);
 
         kafkaService.sendUserCreatedEvent(newUser);

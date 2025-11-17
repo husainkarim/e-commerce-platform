@@ -25,6 +25,14 @@ export class ApiService {
     return this.http.get(`${this.baseUrl}/users/profile?userId=${id}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
   }
 
+  updateProfile(id: string, data: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/users/profile-update?userId=${id}`, data, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+  }
+
+  updateRole(id: string, data: any): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/users/role-update?userId=${id}`, data, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+  }
+
   deleteAccount(id: string): Observable<any> {
     let user: any = this.authServiceService.getUser();
     return this.http.delete(`${this.baseUrl}/users/delete?userId=${id}`, { body: user, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });

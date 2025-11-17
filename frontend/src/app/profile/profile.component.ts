@@ -48,6 +48,10 @@ export class ProfileComponent {
     }
   }
 
+  openEditProfileModal() {
+    this.router.navigate([`/edit-profile/${this.user.id}`]);
+  }
+
   deleteAccount() {
     if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
       this.apiService.deleteAccount(this.user.id).subscribe({

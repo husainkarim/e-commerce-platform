@@ -1,0 +1,123 @@
+
+/* Edit Profile component styles */
+.profile-container {
+	display: flex;
+	gap: 24px;
+	align-items: flex-start;
+	padding: 20px;
+	max-width: 980px;
+	margin: 18px auto;
+	background: #ffffff;
+	border-radius: 10px;
+	box-shadow: 0 6px 18px rgba(20, 24, 28, 0.06);
+}
+
+.avatar-column {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 180px;
+}
+
+.profile-avatar {
+	width: 140px;
+	height: 140px;
+	object-fit: cover;
+	border-radius: 50%;
+	border: 2px solid #e6e9ee;
+	margin-bottom: 12px;
+	background: #f6f7f9;
+}
+
+.profile-info {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+}
+
+.field label {
+	font-size: 0.9rem;
+	margin-bottom: 6px;
+	color: #333;
+}
+
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="password"],
+.field select {
+	padding: 10px 12px;
+	border-radius: 8px;
+	border: 1px solid #d7dbe0;
+	font-size: 1rem;
+	width: 100%;
+	background: #fff;
+	color: #222;
+}
+
+.field input[readonly] {
+	background: #f8f9fb;
+	color: #6c6f75;
+}
+
+.role-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.actions {
+	margin-top: 8px;
+}
+
+.btn {
+	padding: 8px 14px;
+	border-radius: 8px;
+	border: none;
+	cursor: pointer;
+	font-weight: 600;
+	transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.btn:active { transform: translateY(1px); }
+
+.btn-primary {
+	background: #0d6efd;
+	color: #fff;
+}
+
+.btn-outline-primary {
+	background: transparent;
+	border: 1px solid #0d6efd;
+	color: #0d6efd;
+}
+
+.btn-secondary {
+	background: #6c757d;
+	color: #fff;
+}
+
+select:focus, input:focus {
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(13,110,253,0.08);
+	border-color: #0d6efd;
+}
+
+/* Small screens */
+@media (max-width: 680px) {
+	.profile-container {
+		flex-direction: column;
+		padding: 14px;
+		gap: 16px;
+	}
+	.avatar-column { width: 100%; flex-direction: row; gap: 12px; align-items: center; }
+	.profile-avatar { width: 96px; height: 96px; }
+}
+
+/* Minor utility spacing */
+.profile-info .actions { display: flex; gap: 8px; }
