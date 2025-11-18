@@ -21,6 +21,7 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
         case 401:
           console.warn('Unauthorized — logging out...');
           router.navigate(['/unauthorized']);
+          authService.logout();
           break;
         case 403:
           console.warn('Forbidden');

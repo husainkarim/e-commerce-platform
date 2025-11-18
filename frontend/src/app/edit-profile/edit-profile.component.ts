@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Auth } from '@angular/fire/auth';
 import { AuthServiceService } from '../auth-service.service';
+import { ApiService } from '../api.service';
 
 @Component({
   selector: 'app-edit-profile',
@@ -12,20 +12,13 @@ import { AuthServiceService } from '../auth-service.service';
   styleUrl: './edit-profile.component.css',
 })
 export class EditProfileComponent implements OnChanges {
-  /** Input user object (parent should pass the current user) */
   user: any = null;
-
-  /** Emitted when user saves their profile (name/avatar/password). Parent should persist changes. */
-  @Output() save = new EventEmitter<{ id?: string | number; name?: string; email?: string; role?: string; avatar?: string; password?: string }>();
-
-  /** Emitted when the role button is clicked so parent can handle role changes separately. */
-  @Output() roleAction = new EventEmitter<void>();
 
   avatars = ['1.png','2.png','3.png','4.png','5.png','6.png','7.png','8.png','9.png'];
 
   profileForm: FormGroup;
 
-  constructor(private authServiceService: AuthServiceService) {
+  constructor(private authServiceService: AuthServiceService, private apiService: ApiService) {
     this.user = authServiceService.getUser();
     this.profileForm = new FormGroup({
       id: new FormControl({ value: this.user?.id ?? '', disabled: true }),
@@ -54,23 +47,35 @@ export class EditProfileComponent implements OnChanges {
       this.profileForm.markAllAsTouched();
       return;
     }
-
-    const raw = this.profileForm.getRawValue(); // includes disabled values
-    const payload: any = {
-      id: raw.id,
-      email: raw.email,
-      name: raw.name,
-      avatar: raw.avatar
-    };
-    if (raw.password) {
-      payload.password = raw.password;
+    this.user.name = this.profileForm.get('name')?.value;
+    this.user.avatar = this.profileForm.get('avatar')?.value;
+    const newPassword = this.profileForm.get('password')?.value;
+    if (newPassword) {
+      this.user.password = newPassword;
     }
-
-    // emit to parent to persist
-    this.save.emit(payload);
+    this.apiService.updateProfile(this.user.id, this.user).subscribe({
+      next: (response) => {
+        console.log(response);
+        localStorage.setItem('user', JSON.stringify(this.user));
+        this.authServiceService.setUser(this.user);},
+      error: (error) => {
+        console.error('Error updating profile:', error);
+      }
+    });
   }
 
   onRoleButton(): void {
-    this.roleAction.emit();
+    let updatedUser = {id: this.user.id, role: this.user.role === 'client' ? 'seller' : 'client'};
+    this.apiService.updateRole(this.user.id, updatedUser).subscribe({
+      next: (response) => {
+        console.log(response);
+        this.user.role = updatedUser.role;
+        localStorage.setItem('user', JSON.stringify(this.user));
+        this.authServiceService.setUser(this.user);
+      },
+      error: (error) => {
+        console.error('Error changing user role:', error);
+      }
+    });
   }
 }

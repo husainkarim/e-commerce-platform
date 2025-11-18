@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,15 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import backend.user_service.dto.LoginRequest;
 import backend.user_service.dto.RegisterRequest;
+import backend.user_service.dto.UpdateRole;
 import backend.user_service.model.User;
 import backend.user_service.repository.UserRepository;
 import backend.user_service.service.JwtService;
 import backend.user_service.service.KafkaService;
 import jakarta.annotation.security.PermitAll;
-
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import backend.user_service.dto.UpdateRole;
 
 @RestController
 @RequestMapping("/api/users")
@@ -120,8 +119,11 @@ public class UserController {
         if (user.isPresent()) {
             User existingUser = user.get();
             existingUser.setName(updatedUser.getName());
-            existingUser.setEmail(updatedUser.getEmail());
             existingUser.setAvatar(updatedUser.getAvatar());
+            if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+                String hashedPassword = passwordEncoder.encode(updatedUser.getPassword());
+                existingUser.setPassword(hashedPassword);
+            }
             userRepository.save(existingUser);
             response.put("message", "User profile updated successfully");
             response.put("user", existingUser);

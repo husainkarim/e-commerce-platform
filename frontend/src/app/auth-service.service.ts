@@ -62,6 +62,7 @@ export class AuthServiceService {
 
   private hasToken(): boolean { return !!localStorage.getItem('authToken'); }
   getUser() { return this.user; }
+  setUser(user: any) { this.user = user; }
   isSeller(): boolean { return this.user?.role === 'seller'; }
   isAdmin(): boolean { return this.user?.role === 'admin'; }
   getToken() { return this.token; }

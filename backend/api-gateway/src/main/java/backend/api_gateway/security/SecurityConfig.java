@@ -7,11 +7,18 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -22,9 +29,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/users/login").permitAll() // allow login without auth
                 .requestMatchers(HttpMethod.POST, "/api/users/signup").permitAll() // allow registration without auth
                 .requestMatchers(HttpMethod.GET, "/api/products/list").permitAll() // allow product list viewing without auth
-                // .anyRequest().authenticated() // require auth for everything else
-                .anyRequest().permitAll() // for now allow all requests
+                .anyRequest().authenticated() // require auth for everything else
             )
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .formLogin(form -> form.disable())  // Disable default login form
             .httpBasic(basic -> basic.disable()); // Disable basic auth too, for now
 
