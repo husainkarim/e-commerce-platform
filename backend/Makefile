@@ -1,16 +1,27 @@
+COMPOSE = sudo docker-compose
+
+.PHONY: build up down logs restart remove
+
 build:
-	docker-compose build
+	$(COMPOSE) build
 
 up:
-	docker-compose up -d
+	$(COMPOSE) up -d
 
 down:
-	docker-compose down
+	$(COMPOSE) down
+
+restart:
+	$(COMPOSE) down
+	$(COMPOSE) up -d
 
 logs:
-	docker-compose logs -f
-
-.PHONY: build up down logs
+	$(COMPOSE) logs -f
 
 remove:
-	docker-compose down --rmi all --volumes --remove-orphans
+	@read -p "Are you sure you want to remove EVERYTHING? (y/N) " confirm; \
+	if [ "$$confirm" = "y" ]; then \
+		$(COMPOSE) down --rmi all --volumes --remove-orphans; \
+	else \
+		echo "Cancelled."; \
+	fi

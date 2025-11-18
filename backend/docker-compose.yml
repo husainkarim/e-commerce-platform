@@ -24,7 +24,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
       - internal
@@ -39,10 +39,10 @@ services:
     ports:
       - "8086:8086"
     depends_on:
-      - broker
+      - kafka
     environment:
       KAFKA_CLUSTERS_NAME: local
-      KAFKA_CLUSTERS_BOOTSTRAPSERVERS: broker:29092
+      KAFKA_CLUSTERS_BOOTSTRAPSERVERS: kafka:29092
       DYNAMIC_CONFIG_ENABLED: 'true'
 
   # 🧑‍💼 User Service
@@ -92,9 +92,9 @@ services:
       - "8080:8080" # only gateway exposed to outside
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - USER_SERVICE_URL=http://user-service:8080
-      - PRODUCT_SERVICE_URL=http://product-service:8080
-      - MEDIA_SERVICE_URL=http://media-service:8080
+      - USER_SERVICE_URL=http://user-service:8100
+      - PRODUCT_SERVICE_URL=http://product-service:8200
+      - MEDIA_SERVICE_URL=http://media-service:8300
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       - user-service

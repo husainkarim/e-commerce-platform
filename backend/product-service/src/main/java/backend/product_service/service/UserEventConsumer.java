@@ -30,20 +30,14 @@ public class UserEventConsumer {
     public List<UserCreatedEvent> getUserSellerList() {
         return userSellerList;
     }
-    @KafkaListener(
-        topics = "user-created-topic",
-        groupId = "product-service"
-    )
+    @KafkaListener(topics = "user-created-topic")
     public void handleSellerCreated(UserCreatedEvent event) {
         // Allow this seller to use product service
         this.userSellerList.add(event);
         System.out.println(this.userSellerList);
     }
 
-    @KafkaListener(
-        topics = "user-updated-topic",
-        groupId = "product-service"
-    )
+    @KafkaListener(topics = "user-updated-topic")
     public void handleUserRoleUpdated(UserRoleUpdated event) {
         // Handle user role update logic here   
         if(event.getNewRole().equals("SELLER")) {
@@ -65,10 +59,7 @@ public class UserEventConsumer {
         }
     }
 
-    @KafkaListener(
-        topics = "user-deleted-topic",
-        groupId = "product-service"
-    )
+    @KafkaListener( topics = "user-deleted-topic")
     public void handleUserDeleted(UserDeleteEvent event) {
         // Handle user deletion logic here
         this.userSellerList.removeIf(user -> user.getUserId().equals(event.getUserId()));

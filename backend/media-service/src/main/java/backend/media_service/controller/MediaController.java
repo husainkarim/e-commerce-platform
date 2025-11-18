@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import backend.media_service.model.Media;
 import backend.media_service.repository.MediaRepository;
 import backend.media_service.service.FileStorageService;
-import org.springframework.web.bind.annotation.RequestBody;
+import backend.media_service.service.ProductEventConsumer;
 
 @RestController
 @RequestMapping("/api/media")
@@ -26,16 +27,25 @@ public class MediaController {
 
     private final MediaRepository mediaRepository;
     private final FileStorageService fileStorageService;
+    private final ProductEventConsumer productEventConsumer;
 
     @Autowired
-    public MediaController(MediaRepository mediaRepository, FileStorageService fileStorageService) {
+    public MediaController(MediaRepository mediaRepository, FileStorageService fileStorageService, ProductEventConsumer productEventConsumer) {
         this.mediaRepository = mediaRepository;
         this.fileStorageService = fileStorageService;
+        this.productEventConsumer = productEventConsumer;
     }
 
     @PostMapping("/upload")
     public ResponseEntity<Map<String, Object>> uploadMedia(@RequestParam("file") MultipartFile file, @RequestParam("productId") String productId) {
         Map<String, Object> response = new HashMap<>();
+        // check if the product exists in the consumed products list
+        boolean productExists = productEventConsumer.getProducts().stream()
+                .anyMatch(p -> p.getProductId().equals(productId));
+        if (!productExists) {
+            response.put("message", "Product does not exist");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
         try {
             if (file.isEmpty()) {
                 System.out.println("File is empty");
@@ -65,6 +75,12 @@ public class MediaController {
     @GetMapping("/getImagesByProductId")
     public ResponseEntity<Map<String, Object>> getMediaByProductId(@RequestParam("productId") String productId) {
         Map<String, Object> response = new HashMap<>();
+        boolean productExists = productEventConsumer.getProducts().stream()
+                .anyMatch(p -> p.getProductId().equals(productId));
+        if (!productExists) {
+            response.put("message", "Product does not exist");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
         try {
             var mediaList = mediaRepository.findByProductId(productId);
             response.put("images", mediaList);
@@ -80,6 +96,12 @@ public class MediaController {
     @DeleteMapping("/delete")
     public ResponseEntity<Map<String, Object>> deleteMedia(@RequestBody Media media) {
         Map<String, Object> response = new HashMap<>();
+        boolean productExists = productEventConsumer.getProducts().stream()
+                .anyMatch(p -> p.getProductId().equals(media.getProductId()));
+        if (!productExists) {
+            response.put("message", "Product does not exist");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
 
         boolean deleted = fileStorageService.deleteFileByUrl(media.getImagePath());
         if (deleted) {
