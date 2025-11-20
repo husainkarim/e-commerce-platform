@@ -4,15 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Service;
 
+import backend.product_service.model.Product;
+import backend.product_service.repository.ProductRepository;
 import backend.product_service.shared.events.UserCreatedEvent;
 import backend.product_service.shared.events.UserDeleteEvent;
 import backend.product_service.shared.events.UserRoleUpdated;
-import backend.product_service.repository.ProductRepository;
-import org.springframework.stereotype.Service;
-
-import backend.product_service.service.KafkaService;
-import backend.product_service.model.Product;
 
 
 @Service
@@ -40,7 +38,7 @@ public class UserEventConsumer {
     @KafkaListener(topics = "user-updated-topic")
     public void handleUserRoleUpdated(UserRoleUpdated event) {
         // Handle user role update logic here   
-        if(event.getNewRole().equals("SELLER")) {
+        if(event.getNewRole().equals("seller")) {
             // Add to seller list
             this.userSellerList.add(new UserCreatedEvent(event.getUserId(), "", event.getNewRole()));
             System.out.println(this.userSellerList);

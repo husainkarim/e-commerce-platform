@@ -48,7 +48,6 @@ export class SellerDashboardComponent {
       },
       error: (error) => {
         console.error('Failed to fetch user products:', error);
-        this.router.navigate(['/not-found']);
       }
     });
   }

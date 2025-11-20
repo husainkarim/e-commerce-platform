@@ -25,3 +25,12 @@ remove:
 	else \
 		echo "Cancelled."; \
 	fi
+
+images:
+	$(COMPOSE) images
+
+status:
+	$(COMPOSE) ps
+
+jar:
+	bash jar-files.sh

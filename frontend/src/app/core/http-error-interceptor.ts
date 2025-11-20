@@ -16,16 +16,16 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
           break;
         case 400:
           console.warn('Bad request:', error.error);
-          router.navigate(['/bad-request']);
+          // router.navigate(['/bad-request']);
           break;
         case 401:
           console.warn('Unauthorized — logging out...');
-          router.navigate(['/unauthorized']);
-          authService.logout();
+          // router.navigate(['/unauthorized']);
+          // authService.logout();
           break;
         case 403:
           console.warn('Forbidden');
-          router.navigate(['/forbidden']);
+          // router.navigate(['/forbidden']);
           break;
         case 404:
           console.warn('Not found');

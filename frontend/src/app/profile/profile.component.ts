@@ -23,7 +23,6 @@ export class ProfileComponent {
   isAllowedToDelete: boolean = false;
   constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService, private authServiceService: AuthServiceService) {
     let currentUser = this.authServiceService.getUser();
-    this.isAllowedToDelete = currentUser && (currentUser.role === 'admin' || currentUser.id === this.user.id);
     if (!this.authServiceService.isLoggedIn()) {
       console.error('User is not logged in.');
       this.router.navigate(['/login']);
@@ -46,6 +45,8 @@ export class ProfileComponent {
     } else {
       this.user = this.authServiceService.getUser();
     }
+    this.isAllowedToDelete = currentUser && (currentUser.role === 'admin' || currentUser.id === this.user.id);
+
   }
 
   openEditProfileModal() {

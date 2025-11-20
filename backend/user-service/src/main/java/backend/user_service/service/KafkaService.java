@@ -17,7 +17,8 @@ public class KafkaService {
     
     // Send created user event to Kafka topic
     public void sendUserCreatedEvent(User user) {
-        if(user.getRole().equals("SELLER")) {
+        System.out.println("Sending user created event for user: " + user);
+        if(user.getRole().equals("seller")) {
             UserCreatedEvent event = new UserCreatedEvent(user.getId(), user.getEmail(), user.getRole());
             kafkaTemplate.send("user-created-topic", event);
         }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import backend.user_service.dto.LoginRequest;
 import backend.user_service.dto.RegisterRequest;
@@ -69,6 +70,7 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<Map<String, Object>> signup(@RequestBody RegisterRequest request) {
         Map<String, Object> response = new HashMap<>();
+        System.out.println("Registering user with email: " + request);
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             response.put("error", "Email is already in use!");
             return new ResponseEntity<>(response, HttpStatus.CONFLICT); // 409
@@ -81,9 +83,9 @@ public class UserController {
         newUser.setPassword(hashedPassword);
         newUser.setRole(request.getUserType().toString());
         newUser.setAvatar(request.getAvatar());
-        userRepository.save(newUser);
+        User user = userRepository.save(newUser);
 
-        kafkaService.sendUserCreatedEvent(newUser);
+        kafkaService.sendUserCreatedEvent(user);
 
         this.admins = userRepository.findByRole("admin");
         response.put("message", "User registered successfully");
@@ -134,7 +136,7 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    @PatchMapping("/role-update")
+    @PutMapping("/role-update")
     public ResponseEntity<Map<String, Object>> updateUserRole(@RequestParam String userId, @RequestBody UpdateRole updateRoleRequest) {
         Map<String, Object> response = new HashMap<>();
         Optional<User> user = userRepository.findById(updateRoleRequest.getUserId());
@@ -160,7 +162,7 @@ public class UserController {
 
 
     //delete the user account
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<Map<String, Object>> deleteUser(@RequestParam String userId, @RequestBody User userRequested) {
         Map<String, Object> response = new HashMap<>();
         Optional<User> user = userRepository.findById(userId);

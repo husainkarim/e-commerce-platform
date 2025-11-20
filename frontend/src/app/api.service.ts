@@ -30,7 +30,7 @@ export class ApiService {
   }
 
   updateRole(id: string, data: any): Observable<any> {
-    return this.http.patch(`${this.baseUrl}/users/role-update?userId=${id}`, data, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+    return this.http.put(`${this.baseUrl}/users/role-update?userId=${id}`, data, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
   }
 
   deleteAccount(id: string): Observable<any> {

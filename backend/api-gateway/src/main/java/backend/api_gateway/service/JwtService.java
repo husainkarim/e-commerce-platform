@@ -3,21 +3,27 @@ package backend.api_gateway.service;
 import java.security.Key;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class JwtService {
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final Key key;
     private final HttpServletRequest request;
 
-    public JwtService(HttpServletRequest request) {
+    public JwtService(HttpServletRequest request, @Value("${jwt.secret}") String secret) {
+        if (secret == null || secret.isEmpty()) {
+            throw new IllegalArgumentException("JWT_SECRET is missing!");
+        }
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        this.key = Keys.hmacShaKeyFor(keyBytes);
         this.request = request;
     }
 

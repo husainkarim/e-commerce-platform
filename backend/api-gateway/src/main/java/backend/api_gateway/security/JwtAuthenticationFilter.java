@@ -20,18 +20,48 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    
+    // Define the list of public paths that should *bypass* this JWT filter entirely
+    private static final List<String> PUBLIC_PATHS = List.of(
+        "/",
+        "/api/users/login",
+        "/api/users/signup",
+        "/api/products/list"
+    );
 
     public JwtAuthenticationFilter(JwtService jwtService) {
         this.jwtService = jwtService;
     }
 
+    /**
+     * The recommended way to skip a filter. If this returns true, 
+     * doFilterInternal() is never called, and the request proceeds to the next filter.
+     */
+    @Override
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
+        final String path = request.getRequestURI();
+        final String method = request.getMethod();
+        
+        // 1. Always skip Pre-flight OPTIONS requests (CORS handling)
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            return true;
+        }
+
+        // 2. Skip for explicitly defined public paths
+        return PUBLIC_PATHS.contains(path);
+    }
+    
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-        String token = jwtService.getTokenFromHeader();
+        
+        // Note: If this method is called, the path is considered PROTECTED.
 
+        String token = jwtService.getTokenFromHeader();
+        
+        // If a token is present and valid, set the security context.
         if (token != null && jwtService.validateToken(token)) {
             String email = jwtService.getEmailFromToken(token);
             String role = jwtService.getRoleFromToken(token);
@@ -41,12 +71,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            
+            // Authentication successful, proceed with the rest of the security chain
+            filterChain.doFilter(request, response);
+            
         } else {
+            // Protected resource access without a valid token. Return 401.
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
+            // Do NOT call filterChain.doFilter() after setting 401
         }
-
-        filterChain.doFilter(request, response);
     }
 }
-

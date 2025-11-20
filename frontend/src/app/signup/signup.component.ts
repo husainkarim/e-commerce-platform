@@ -26,7 +26,7 @@ export class SignupComponent {
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', [Validators.required, Validators.minLength(8)]),
       confirmPassword: new FormControl('', [Validators.required]),
-      role: new FormControl('client', [Validators.required, roleValidator]),
+      userType: new FormControl('client', [Validators.required, roleValidator]),
       avatar: new FormControl('1.png', [Validators.required, avatarValidator])
     }, { validators: passwordMatchValidator });
   }
