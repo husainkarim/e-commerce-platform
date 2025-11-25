@@ -25,7 +25,6 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
-      KAFKA_PROCESS_ROLES: ''
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
       - internal
@@ -39,7 +38,7 @@ services:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
     ports:
-      - "8086:8086"
+      - "8086:8080"
     depends_on:
       - kafka
     environment:
@@ -51,10 +50,6 @@ services:
   user-service:
     build: ./user-service
     container_name: user-service
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - MONGO_URI=${MONGODB_URI}
     depends_on:
       - kafka
     networks:
@@ -65,10 +60,6 @@ services:
   product-service:
     build: ./product-service
     container_name: product-service
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - MONGO_URI=${MONGODB_URI}
     depends_on:
       - kafka
     networks:
@@ -79,10 +70,6 @@ services:
   media-service:
     build: ./media-service
     container_name: media-service
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - MONGO_URI=${MONGODB_URI}
     depends_on:
       - kafka
     networks:
@@ -100,7 +87,6 @@ services:
       - USER_SERVICE_URL=http://user-service:8100
       - PRODUCT_SERVICE_URL=http://product-service:8200
       - MEDIA_SERVICE_URL=http://media-service:8300
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       - user-service
       - product-service
