@@ -41,7 +41,7 @@ public class MediaController {
         Map<String, Object> response = new HashMap<>();
         // check if the product exists in the consumed products list
         boolean productExists = productEventConsumer.getProducts().stream()
-                .anyMatch(p -> p.getProductId().equals(productId));
+                .anyMatch(p -> p.get("productId").equals(productId));
         if (!productExists) {
             response.put("message", "Product does not exist");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -76,7 +76,7 @@ public class MediaController {
     public ResponseEntity<Map<String, Object>> getMediaByProductId(@RequestParam("productId") String productId) {
         Map<String, Object> response = new HashMap<>();
         boolean productExists = productEventConsumer.getProducts().stream()
-                .anyMatch(p -> p.getProductId().equals(productId));
+                .anyMatch(p -> p.get("productId").equals(productId));
         if (!productExists) {
             response.put("message", "Product does not exist");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -97,7 +97,7 @@ public class MediaController {
     public ResponseEntity<Map<String, Object>> deleteMedia(@RequestBody Media media) {
         Map<String, Object> response = new HashMap<>();
         boolean productExists = productEventConsumer.getProducts().stream()
-                .anyMatch(p -> p.getProductId().equals(media.getProductId()));
+                .anyMatch(p -> p.get("productId").equals(media.getProductId()));
         if (!productExists) {
             response.put("message", "Product does not exist");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
