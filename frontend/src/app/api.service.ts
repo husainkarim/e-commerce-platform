@@ -7,7 +7,7 @@ import { AuthServiceService } from './auth-service.service';
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:8080/api'; // need to be confirmed
+  private baseUrl = 'https://localhost:8443/api'; // need to be confirmed
 
   constructor(private http: HttpClient, private authServiceService: AuthServiceService) {}
 

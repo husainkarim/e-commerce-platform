@@ -24,7 +24,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'profile', component: ProfileComponent },
-  { path: 'edit-profile/:id', component: EditProfileComponent }, // need to create EditProfileComponent
+  { path: 'edit-profile/:id', component: EditProfileComponent },
   { path: 'profile/:id', component: ProfileComponent },
   { path: 'seller/dashboard', component: SellerDashboardComponent },
   { path: 'seller/dashboard/create-product', component: ProductFormComponent },
