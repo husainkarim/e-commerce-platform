@@ -26,6 +26,13 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LOG_RETENTION_MS: 2592000000   # 1 month
+      KAFKA_LOG_CLEANUP_POLICY: delete
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    configs:
+      - source: kafka-config
+        target: /etc/kafka/kafka.properties
     networks:
       - internal
     healthcheck:
@@ -100,3 +107,6 @@ networks:
     internal: true
   external:
     driver: bridge
+
+volumes:
+  kafka-data:

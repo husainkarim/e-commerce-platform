@@ -26,7 +26,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "/",
         "/api/users/login",
         "/api/users/signup",
-        "/api/products/list"
+        "/api/products/list",
+        "/api/media/getImagesByProductId"
     );
 
     public JwtAuthenticationFilter(JwtService jwtService) {

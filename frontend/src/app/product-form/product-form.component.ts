@@ -95,5 +95,6 @@ export class ProductFormComponent {
         }
       });
     }
+    this.router.navigate(['/seller/dashboard']);
   }
 }

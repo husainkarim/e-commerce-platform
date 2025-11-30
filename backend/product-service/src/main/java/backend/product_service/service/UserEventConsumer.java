@@ -26,6 +26,16 @@ public class UserEventConsumer {
     public List<Map<String, Object>> getUserSellerList() {
         return userSellerList;
     }
+
+    public String getUserNameById(String userId) {
+        for (Map<String, Object> user : userSellerList) {
+            if (user.get("userId").equals(userId)) {
+                return (String) user.get("email");
+            }
+        }
+        return "Unknown Seller";
+    }
+    
     @KafkaListener(topics = "user-created-topic")
     public void handleSellerCreated(Map<String, Object> event) {
         // Allow this seller to use product service

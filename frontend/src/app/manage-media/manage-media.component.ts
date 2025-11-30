@@ -59,6 +59,7 @@ export class ManageMediaComponent {
     const formData = new FormData();
     formData.append('file', this.selectedFile);   // file
     formData.append('productId', this.productId);  // string or number
+    console.log('Uploading file for product ID:', formData);
     this.apiService.addmedia(formData).subscribe(response => {
       console.log('Image uploaded successfully', response);
       this.uploadError = false;

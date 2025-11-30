@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/users/login").permitAll() // Public
                 .requestMatchers(HttpMethod.POST, "/api/users/signup").permitAll() // Public
                 .requestMatchers(HttpMethod.GET, "/api/products/list").permitAll() // Public
+                .requestMatchers(HttpMethod.GET, "/api/media/getImagesByProductId").permitAll() // Public
                 .anyRequest().authenticated() // Require auth for everything else
             )
             // 4. Place JWT filter before default auth

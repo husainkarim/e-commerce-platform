@@ -7,7 +7,7 @@
 		<p class="product-detail-description">{{ product?.description }}</p>
 		<p class="product-detail-price">Price: ${{ product?.price }}</p>
 		<p class="product-detail-quantity">Quantity: {{ product?.quantity }}</p>
-		<p class="product-detail-seller">Seller: {{ product?.userId }}</p>
+		<p class="product-detail-seller">Seller: <a href="/profile/{{ product?.userId }}">{{ product?.userId }}</a></p>
 	</div>
 </div>
 

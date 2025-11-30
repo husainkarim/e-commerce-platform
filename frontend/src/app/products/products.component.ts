@@ -42,7 +42,6 @@ export class ProductsComponent {
               }
             },
             error: (error) => {
-              console.error(`Failed to fetch images for product ${product.id}:`, error);
               product.image = 'assets/product-images/default-product-image.jpg'; // default image on error
             }
           });

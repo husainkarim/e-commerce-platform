@@ -59,3 +59,7 @@
 .submit-btn:hover {
 	background: #1565c0;
 }
+
+#description {
+  resize: none;
+}

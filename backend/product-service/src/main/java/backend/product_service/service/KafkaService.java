@@ -17,7 +17,7 @@ public class KafkaService {
 
     public void sendProductCreatedEvent(Product product) {
         Map<String, Object> event = new HashMap<>();
-        event.put("id", product.getId());
+        event.put("productId", product.getId());
         event.put("name", product.getName());
         event.put("type", "created");
         kafkaTemplate.send("product-created-topic", event);
@@ -26,7 +26,7 @@ public class KafkaService {
     // ✔ product-updated
     public void sendProductUpdatedEvent(Product product) {
         Map<String, Object> event = new HashMap<>();
-        event.put("id", product.getId());
+        event.put("productId", product.getId());
         event.put("name", product.getName());
         event.put("type", "updated");
         kafkaTemplate.send("product-updated-topic", event);
@@ -35,7 +35,7 @@ public class KafkaService {
     // ✔ product-deleted
     public void sendProductDeletedEvent(Product product) {
         Map<String, Object> event = new HashMap<>();
-        event.put("id", product.getId());
+        event.put("productId", product.getId());
         event.put("type", "deleted");
         kafkaTemplate.send("product-deleted-topic", event);
     }

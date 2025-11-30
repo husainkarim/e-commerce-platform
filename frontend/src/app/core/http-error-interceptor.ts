@@ -42,7 +42,11 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
           console.warn('Too many requests — please slow down');
           break;
         case 500:
-          console.error('Server error');
+          if (error.error.path === '/api/media/getImagesByProductId') {
+            // pass silently for product image errors
+            break;
+          }
+          console.error('Server error', error.error);
           router.navigate(['/server-error']);
           break;
         default:

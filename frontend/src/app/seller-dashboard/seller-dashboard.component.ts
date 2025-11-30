@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RouterModule } from '@angular/router';
 import { ApiService } from '../api.service';
 import { AuthServiceService } from '../auth-service.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-seller-dashboard',
@@ -19,6 +20,12 @@ export class SellerDashboardComponent {
       this.router.navigate(['/login']);
       return;
     }
+    // Subscribe to router events to detect when user navigates to this route
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.getUserProducts();
+    });
   }
 
   ngOnInit() {
@@ -40,7 +47,6 @@ export class SellerDashboardComponent {
               }
             },
             error: (error) => {
-              console.error(`Failed to fetch images for product ${product.id}:`, error);
               product.image = 'assets/product-images/default-product-image.jpg';
             }
           });
