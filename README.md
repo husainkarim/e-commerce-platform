@@ -174,26 +174,3 @@ make remove
 
 ---
 
-### Example Makefile for Backend (Optional in README)
-
-```Makefile
-.PHONY: up down logs build
-
-up:
-	docker-compose up -d
-
-down:
-	docker-compose down
-
-logs:
-	docker-compose logs -f
-
-build:
-	docker-compose build $(SERVICE)
-```
-
----
-
-If you want, I can rewrite the **full README** including **Makefile usage**, **Docker instructions**, and **frontend routes**, all in a clean, professional format ready for your GitHub repo.
-
-Do you want me to do that?
