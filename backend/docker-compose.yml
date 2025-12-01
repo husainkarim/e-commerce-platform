@@ -110,3 +110,7 @@ networks:
 
 volumes:
   kafka-data:
+
+configs:
+  kafka-config:
+    file: ./kafka-config.properties
