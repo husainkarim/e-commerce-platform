@@ -12,7 +12,7 @@ for service in "${services[@]}"; do
   
   if [ -d "$service" ]; then
     cd "$service"
-    sudo mvn clean package -DskipTests
+    mvn clean package -DskipTests
     echo "$service built successfully."
     cd ..
   else
