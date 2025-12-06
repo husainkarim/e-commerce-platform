@@ -29,7 +29,7 @@ pipeline {
                 sh '''
                     cd backend
                     make jar
-                    make build
+                    docker-compose build
                 '''
             }
         }
@@ -58,8 +58,8 @@ pipeline {
             steps {
                 sh '''
                     echo "Deploying with Docker Compose..."
-                    make down
-                    make up
+                    docker-compose down
+                    docker-compose up -d
                 '''
             }
         }
