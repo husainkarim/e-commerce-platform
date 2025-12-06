@@ -1,6 +1,6 @@
 pipeline {
     // 1. Agent should specify where Docker tools are available, or use the node configured with Docker capabilities
-    agent { label 'docker-enabled-agent' } // Assuming you set up a separate agent (recommended)
+    agent any
 
     // 2. Tools should be configured globally in Jenkins, and simply referenced here.
     tools {
