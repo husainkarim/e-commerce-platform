@@ -1,4 +1,4 @@
-COMPOSE = sudo docker-compose
+COMPOSE = docker compose
 
 .PHONY: build up down logs restart remove
 
