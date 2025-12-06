@@ -6,6 +6,10 @@ pipeline {
         jdk 'Java-21'
     }
 
+    parameters {
+        choice(name: 'DEPLOY_ENV', choices: ['local','prod'], description: 'Select environment')
+    }
+
     environment {
         DOCKER_HOST = "unix:///var/run/docker.sock"
     }
