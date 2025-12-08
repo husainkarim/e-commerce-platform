@@ -16,11 +16,17 @@ pipeline {
 
         stage('Backend Tests') {
             steps {
-                dir('backend') {
-                    // 1. Run Maven/Gradle tests before building the final JAR
-                    // This includes Unit Tests and, ideally, Integration Tests using Testcontainers.
-                    sh 'mvn clean verify' 
+                // Change the directory to the root of the services
+                dir('backend/user-service') {
+                    sh 'mvn clean verify'
                 }
+                dir('backend/product-service') {
+                    sh 'mvn clean verify'
+                }
+                dir('backend/media-service') {
+                    sh 'mvn clean verify'
+                }
+                // Add any other backend services here...
             }
         }
 
