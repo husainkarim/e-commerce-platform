@@ -28,6 +28,7 @@ pipeline {
         stage('Build Backend Services') {
             steps {
                 dir('backend') {
+                    sh 'make jar'
                     sh 'make build'
                 }
             }
