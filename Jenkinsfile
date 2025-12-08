@@ -27,14 +27,18 @@ pipeline {
 
         stage('Build Backend Services') {
             steps {
-                sh 'docker compose -f backend/docker-compose.yml build'
+                dir('backend') {
+                    sh 'make build'
+                }
             }
         }
 
         stage('Deploy Backend') {
             steps {
-                sh 'docker compose -f backend/docker-compose.yml down'
-                sh 'docker compose -f backend/docker-compose.yml up -d'
+                dir('backend') {
+                    sh 'make down'
+                    sh 'make up'
+                }
             }
         }
     }
