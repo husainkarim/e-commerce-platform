@@ -44,10 +44,26 @@ pipeline {
         stage('Frontend Tests') {
             steps {
                 dir('frontend') {
-                    // 3. Run tests
                     sh 'npm install'
-                    withEnv(['CHROME_BIN=/usr/bin/chromium']) {
-                        sh 'npm test -- --watch=false --browsers=ChromeHeadless'
+                    
+                    // 1. Install Puppeteer and necessary dependencies
+                    // The post-install script of puppeteer downloads the Chromium binary here.
+                    sh 'npm install puppeteer --prefix ./node_modules' 
+                    
+                    // 2. Locate the path of the downloaded Chrome/Chromium binary
+                    //    This is usually relative to the node_modules.
+                    script {
+                        // This path is where Puppeteer typically stores its downloaded binary
+                        def chromeBinaryPath = sh(
+                            script: 'echo `npm explore puppeteer -- pwd`/node_modules/puppeteer/.local-chromium/*/chrome-linux/chrome',
+                            returnStdout: true
+                        ).trim()
+                        
+                        // 3. Set the environment variable CHROME_BIN for Karma
+                        withEnv(["CHROME_BIN=${chromeBinaryPath}"]) {
+                            // Run tests using the custom launcher
+                            sh 'npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox'
+                        }
                     }
                 }
             }
