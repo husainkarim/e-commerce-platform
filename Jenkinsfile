@@ -26,7 +26,7 @@ pipeline {
         stage('Start Frontend Server') {
             steps {
                 sh 'pkill -f "ng serve" || true'       // stop old frontend
-                sh 'cd frontend && npm start --host 0.0.0.0 --port 4200 &'       // run new build
+                sh 'nohup sh -c "cd frontend && npm start --host 0.0.0.0 --port 4200" &'       // run new build
             }
         }
 
