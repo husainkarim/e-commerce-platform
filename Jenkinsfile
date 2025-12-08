@@ -14,6 +14,25 @@ pipeline {
         //     }
         // }
 
+        stage('Clean Workspace') {
+            steps {
+                echo 'Cleaning up previous build artifacts...'
+                
+                // Define the service directories you need to clean
+                def serviceDirs = ['user-service', 'product-service', 'media-service', 'api-gateway'] // <-- Adjust this list to match your actual service folders
+                
+                // Iterate through each service folder and remove the 'target' directory
+                dir('backend') {
+                    script {
+                        for (dir in serviceDirs) {
+                            sh "rm -rf ${dir}/target || true" // '|| true' ensures the pipeline doesn't fail if the directory doesn't exist
+                            echo "Cleaned target directory in: ${dir}"
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Backend Tests') {
             steps {
                 // Change the directory to the root of the services
@@ -26,7 +45,9 @@ pipeline {
                 dir('backend/media-service') {
                     sh 'mvn clean verify'
                 }
-                // Add any other backend services here...
+                dir('backend/api-gateway') {
+                    sh 'mvn clean verify'
+                }
             }
         }
 
