@@ -46,7 +46,9 @@ pipeline {
                 dir('frontend') {
                     // 3. Run tests
                     sh 'npm install'
-                    sh 'npm test -- --watch=false --browsers=ChromeHeadless'
+                    withEnv(['CHROME_BIN=/usr/bin/chromium']) {
+                        sh 'npm test -- --watch=false --browsers=ChromeHeadless'
+                    }
                 }
             }
         }
