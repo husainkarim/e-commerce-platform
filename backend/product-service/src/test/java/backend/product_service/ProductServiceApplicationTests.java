@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import backend.product_service.service.KafkaService;
 
 @SpringBootTest
 @EnableAutoConfiguration(exclude = {KafkaAutoConfiguration.class})
@@ -13,6 +15,9 @@ import org.springframework.test.context.TestPropertySource;
     "spring.kafka.listener.auto-startup=false" 
 })
 class ProductServiceApplicationTests {
+
+	@MockBean
+	private KafkaService kafkaService;
 
 	@Test
 	void contextLoads() {
