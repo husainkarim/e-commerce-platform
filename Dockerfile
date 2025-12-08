@@ -1,57 +1,43 @@
 FROM jenkins/jenkins:lts
 
+#---------------------------------------
 # Switch to root for installations
+#---------------------------------------
 USER root
 
-# ----------------------------------------
-# 1. Install Basic Required Tools & Docker Client
-# ----------------------------------------
+# Install necessary tools
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    curl \
-    wget \
-    make \
-    unzip \
-    zip \
-    build-essential \
-    # Install Docker client/CLI:
-    docker.io \
-    git \
-    ca-certificates \
-    gnupg \
-    lsb-release
+    apt-get install -y ca-certificates curl gnupg lsb-release git unzip wget make sudo
 
-# ----------------------------------------
-# 2. Install NodeJS 20
-# ----------------------------------------
+#---------------------------------------
+# Install Docker Engine + CLI + Compose
+#---------------------------------------
+RUN install -m 0755 -d /etc/apt/keyrings && \
+    curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+    https://download.docker.com/linux/debian $(lsb_release -cs) stable" \
+    | tee /etc/apt/sources.list.d/docker.list > /dev/null && \
+    apt-get update && \
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Ensure docker-compose is accessible
+RUN mkdir -p /usr/libexec/docker/cli-plugins && \
+    ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose || true
+
+#---------------------------------------
+# Install NodeJS 20
+#---------------------------------------
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
+    apt-get install -y nodejs
 
-# ----------------------------------------
-# 3. Install Docker Compose v2 (as a plugin for 'docker compose')
-# ----------------------------------------
-RUN DOCKER_CLI_PLUGINS_DIR=/usr/local/lib/docker/cli-plugins && \
-    mkdir -p ${DOCKER_CLI_PLUGINS_DIR} && \
-    curl -SL https://github.com/docker/compose/releases/download/v2.23.1/docker-compose-linux-x86_64 \
-    -o ${DOCKER_CLI_PLUGINS_DIR}/docker-compose && \
-    chmod +x ${DOCKER_CLI_PLUGINS_DIR}/docker-compose
-
-# ----------------------------------------
-# 4. Configure Jenkins User and Cleanup
-# ----------------------------------------
-# Add Jenkins user to the Docker group
-# (This grants permission to the mounted /var/run/docker.sock)
-RUN groupadd -g 999 docker || true && \
-    usermod -aG docker jenkins && \
-    # Final cleanup of package lists
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+#---------------------------------------
+# Configure Jenkins user for Docker access
+#---------------------------------------
+# IMPORTANT: Replace 991 with your host Docker GID if needed
+RUN groupadd -g 991 docker || true && \
+    usermod -aG docker jenkins
 
 # Switch back to Jenkins user
 USER jenkins
-
-# Set working directory
 WORKDIR /var/jenkins_home
-
-# Expose Jenkins port
 EXPOSE 8080
