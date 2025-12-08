@@ -100,6 +100,17 @@ services:
       - internal
       - external
 
+  frontend:
+    build:
+      context: ../frontend  # Tell Compose to look for the Dockerfile in the parent directory
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "4200:4200"           # Map host port 4200 to container's Nginx port 4200
+    networks:
+      - external            # Use the network that is exposed/accessible to the host
+    restart: always
+
 networks:
   internal:
     internal: true
