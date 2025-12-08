@@ -14,25 +14,6 @@ pipeline {
         //     }
         // }
 
-        stage('Clean Workspace') {
-            steps {
-                echo 'Cleaning up previous build artifacts...'
-                
-                script {
-                    // This Groovy variable definition must be inside the script block
-                    def serviceDirs = ['user-service', 'product-service', 'media-service', 'api-gateway'] 
-                    
-                    dir('backend') {
-                        // The loop and sh commands remain inside the script block
-                        for (dir in serviceDirs) {
-                            sh "rm -rf ${dir}/target || true"
-                            echo "Cleaned target directory in: ${dir}"
-                        }
-                    }
-                }
-            }
-        }
-
         stage('Backend Tests') {
             steps {
                 // Change the directory to the root of the services
