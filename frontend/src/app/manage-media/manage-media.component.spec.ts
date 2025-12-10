@@ -36,15 +36,9 @@ describe('ManageMediaComponent', () => {
       imports: [ManageMediaComponent, HttpClientTestingModule],
 
       providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: mockActivatedRoute
-        },
-        // <--- FIX: Provide the mock ApiService
-        {
-          provide: ApiService,
-          useValue: mockApiService
-        }
+        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        // 🐛 FIX: Provide the mock ApiService
+        { provide: ApiService, useValue: mockApiService }
       ]
     })
     .compileComponents();

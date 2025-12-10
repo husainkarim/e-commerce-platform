@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SellerDashboardComponent } from './seller-dashboard.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute } from '@angular/router'; // <--- NEW IMPORT
+import { of } from 'rxjs';
+import { AuthServiceService } from '../auth-service.service';
 
 describe('SellerDashboardComponent', () => {
   let component: SellerDashboardComponent;
@@ -20,17 +22,27 @@ describe('SellerDashboardComponent', () => {
     }
   };
 
+  const mockUserService = {
+    // Assuming the component reads the user object synchronously
+    currentUser: {
+      id: 1,
+      username: 'testseller'
+    },
+    // If the component uses an async method (like getCurrentUser().subscribe)
+    getCurrentUser: () => of({ id: 1, username: 'testseller' }),
+    // You might need to add mocks for other methods like login, logout, etc.
+  };
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
         SellerDashboardComponent,
         HttpClientTestingModule
       ],
-      providers: [ // <--- ADDED PROVIDER ARRAY
-        {
-          provide: ActivatedRoute, // <--- FIX: Provide the mock route
-          useValue: mockActivatedRoute
-        }
+      providers: [
+        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        // 🐛 FIX: Provide the mock UserService
+        { provide: AuthServiceService, useValue: mockUserService }
       ]
     })
     .compileComponents();
