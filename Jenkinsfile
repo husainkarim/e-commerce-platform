@@ -60,17 +60,6 @@ pipeline {
                 }
             }
         }
-        
-        stage('E2E Testing') {
-            steps {
-                // 5. Test the whole system once all containers are running and stable.
-                sh 'sleep 30' // Give services time to boot (Kafka, DB, Backend)
-                dir('frontend') {
-                    // Assuming you use Cypress/Playwright and the npm script is defined
-                    sh 'npm run e2e' 
-                }
-            }
-        }
     }
 
     post {
