@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProductDetailComponent } from './product-detail.component';
 import { ActivatedRoute } from '@angular/router'; // <--- NEW IMPORT
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('ProductDetailComponent', () => {
   let component: ProductDetailComponent;
@@ -26,7 +27,7 @@ describe('ProductDetailComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProductDetailComponent],
+      imports: [ProductDetailComponent, HttpClientTestingModule],
       providers: [ // <--- NEW: Add the Providers array
         {
           provide: ActivatedRoute,
