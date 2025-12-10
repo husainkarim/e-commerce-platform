@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ManageMediaComponent } from './manage-media.component';
-import { ActivatedRoute } from '@angular/router'; // <-- NEW: Import the service you need to mock
+import { ActivatedRoute } from '@angular/router';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { of } from 'rxjs'; // <--- NEW: Import 'of' to create mock Observables
+import { ApiService } from '../api.service'; // <--- Import the service being mocked (Adjust path if needed)
 
 describe('ManageMediaComponent', () => {
   let component: ManageMediaComponent;
@@ -9,29 +11,39 @@ describe('ManageMediaComponent', () => {
 
   // Define a minimal mock for the ActivatedRoute service
   const mockActivatedRoute = {
-    // This mocks the common scenario where a component reads a parameter from the route snapshot
     snapshot: {
       paramMap: {
-        get: (key: string) => '123' // Always returns a mock ID
+        get: (key: string) => '123'
       }
     },
-    // This mocks the common scenario where a component subscribes to route params
     params: {
         subscribe: () => ({})
     }
   };
 
+  // NEW MOCK: Define a mock for ApiService that returns an Observable
+  const mockApiService = {
+    // Assuming the component calls a method like getMedia() in ngOnInit
+    // This mock ensures that call returns a valid Observable with .subscribe()
+    getMedia: () => of([]), // Returns an Observable of an empty array
+    // Add any other methods from ApiService that ManageMediaComponent uses
+    deleteMedia: () => of(null)
+  };
+
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      // 1. Keep the component import for Standalone components
       imports: [ManageMediaComponent, HttpClientTestingModule],
 
       providers: [
-        // 2. NEW: Provide the mock object for ActivatedRoute
         {
           provide: ActivatedRoute,
           useValue: mockActivatedRoute
+        },
+        // <--- FIX: Provide the mock ApiService
+        {
+          provide: ApiService,
+          useValue: mockApiService
         }
       ]
     })

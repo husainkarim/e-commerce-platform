@@ -25,7 +25,6 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    const renderedText = compiled.querySelector('h1')?.textContent;
-    expect(renderedText).toContain('E-Commerce Platform');
+    expect(compiled.querySelector('h1')?.textContent).toContain('E-Commerce Platform');
   });
 });
