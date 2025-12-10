@@ -72,4 +72,17 @@ pipeline {
             }
         }
     }
+
+    post {
+        success {
+            mail to: 'husain.akarim@gmail.com',
+                 subject: 'Build Success ✔',
+                 body: 'The Jenkins build succeeded.'
+        }
+        failure {
+            mail to: 'husain.akarim@gmail.com',
+                 subject: 'Build Failed ❌',
+                 body: 'The Jenkins build has failed — please check logs.'
+        }
+    }
 }
