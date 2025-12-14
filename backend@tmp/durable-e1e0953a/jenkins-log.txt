@@ -1,0 +1,183 @@
++ make build
+docker compose build
+time="2025-12-14T17:42:10Z" level=warning msg="/var/jenkins_home/workspace/ecommerce-pipeline/backend/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+ Image backend-frontend Building 
+ Image backend-api-gateway Building 
+ Image backend-media-service Building 
+ Image backend-user-service Building 
+ Image backend-product-service Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 2.68kB done
+#1 DONE 0.0s
+
+#2 [frontend internal] load build definition from Dockerfile
+#2 transferring dockerfile: 547B done
+#2 ...
+
+#3 [product-service internal] load build definition from Dockerfile
+#3 transferring dockerfile: 212B done
+#3 DONE 0.1s
+
+#4 [api-gateway internal] load build definition from Dockerfile
+#4 transferring dockerfile: 204B 0.0s done
+#4 DONE 0.2s
+
+#5 [product-service internal] load metadata for docker.io/library/eclipse-temurin:21-jdk-alpine
+#5 DONE 0.0s
+
+#6 [user-service internal] load build definition from Dockerfile
+#6 transferring dockerfile: 206B 0.0s done
+#6 DONE 0.2s
+
+#2 [frontend internal] load build definition from Dockerfile
+#2 DONE 0.2s
+
+#5 [user-service internal] load metadata for docker.io/library/eclipse-temurin:21-jdk-alpine
+#5 DONE 0.0s
+
+#7 [media-service internal] load build definition from Dockerfile
+#7 transferring dockerfile: 287B 0.0s done
+#7 DONE 0.3s
+
+#8 [user-service internal] load .dockerignore
+#8 ...
+
+#5 [media-service internal] load metadata for docker.io/library/eclipse-temurin:21-jdk-alpine
+#5 DONE 0.0s
+
+#8 [user-service internal] load .dockerignore
+#8 transferring context:
+#8 transferring context: 2B done
+#8 DONE 0.3s
+
+#9 [api-gateway internal] load .dockerignore
+#9 transferring context: 2B done
+#9 DONE 0.2s
+
+#10 [api-gateway 1/3] FROM docker.io/library/eclipse-temurin:21-jdk-alpine
+#10 DONE 0.0s
+
+#11 [product-service internal] load .dockerignore
+#11 transferring context: 2B done
+#11 DONE 0.3s
+
+#12 [media-service internal] load .dockerignore
+#12 transferring context: 2B done
+#12 DONE 0.3s
+
+#10 [media-service 1/3] FROM docker.io/library/eclipse-temurin:21-jdk-alpine
+#10 DONE 0.0s
+
+#13 [product-service internal] load build context
+#13 ...
+
+#14 [api-gateway internal] load build context
+#14 transferring context: 44.66MB 0.6s done
+#14 DONE 0.8s
+
+#15 [media-service 2/3] WORKDIR /app
+#15 CACHED
+
+#13 [product-service internal] load build context
+#13 transferring context: 49.99MB 0.7s done
+#13 DONE 0.8s
+
+#16 [user-service internal] load build context
+#16 transferring context: 54.06MB 0.7s done
+#16 DONE 0.8s
+
+#17 [product-service 3/3] COPY ./target/product-service-0.0.1-SNAPSHOT.jar /app
+#17 DONE 0.3s
+
+#18 [api-gateway 3/3] COPY ./target/api-gateway-0.0.1-SNAPSHOT.jar /app
+#18 DONE 0.5s
+
+#19 [frontend internal] load metadata for docker.io/library/node:20-alpine
+#19 DONE 1.5s
+
+#20 [user-service 3/3] COPY ./target/user-service-0.0.1-SNAPSHOT.jar /app
+#20 DONE 0.3s
+
+#21 [product-service] exporting to image
+#21 exporting layers
+#21 ...
+
+#22 [media-service internal] load build context
+#22 transferring context: 98.66MB 1.2s done
+#22 DONE 1.2s
+
+#23 [frontend internal] load metadata for docker.io/library/nginx:alpine
+#23 DONE 1.7s
+
+#24 [frontend internal] load .dockerignore
+#24 transferring context: 2B done
+#24 DONE 0.0s
+
+#25 [frontend build 1/6] FROM docker.io/library/node:20-alpine@sha256:643e7036aa985317ebfee460005e322aa550c6b6883000d01daefb58689a58e2
+#25 DONE 0.0s
+
+#26 [frontend stage-1 1/2] FROM docker.io/library/nginx:alpine@sha256:052b75ab72f690f33debaa51c7e08d9b969a0447a133eb2b99cc905d9188cb2b
+#26 CACHED
+
+#27 [media-service 3/3] COPY ./target/media-service-0.0.1-SNAPSHOT.jar /app
+#27 DONE 0.2s
+
+#28 [frontend internal] load build context
+#28 ...
+
+#29 [api-gateway] exporting to image
+#29 exporting layers 0.3s done
+#29 writing image sha256:4cd79ed99b704afbc3593c25b7c57b80e4107296da29096ad3f49e72566244c8 done
+#29 naming to docker.io/library/backend-api-gateway done
+#29 DONE 0.3s
+
+#30 [api-gateway] resolving provenance for metadata file
+#30 DONE 0.0s
+
+#31 [user-service] exporting to image
+#31 exporting layers 0.4s done
+#31 writing image sha256:db40337f87dc168a145635d7997cc0baa5d5986c185736e50b6cb8925fd899fb done
+#31 naming to docker.io/library/backend-user-service done
+#31 DONE 0.4s
+
+#21 [product-service] exporting to image
+#21 exporting layers 0.4s done
+#21 writing image sha256:df9ee4a74f9140f343b76817a85be26c1ba35b9f65ad62fefad9452c897f84be done
+#21 naming to docker.io/library/backend-product-service done
+#21 DONE 0.4s
+
+#28 [frontend internal] load build context
+#28 ...
+
+#32 [user-service] resolving provenance for metadata file
+#32 DONE 0.0s
+
+#33 [product-service] resolving provenance for metadata file
+#33 DONE 0.0s
+
+#28 [frontend internal] load build context
+#28 ...
+
+#34 [media-service] exporting to image
+#34 exporting layers 0.6s done
+#34 writing image sha256:16f1a05d60598f91fb649ca4a07b6e866561106aa02af970c9e30367fb083617 done
+#34 naming to docker.io/library/backend-media-service done
+#34 DONE 0.6s
+
+#35 [media-service] resolving provenance for metadata file
+#35 DONE 0.0s
+
+#28 [frontend internal] load build context
+#28 transferring context: 4.67MB 2.8s done
+#28 DONE 2.9s
+
+#36 [frontend build 2/6] WORKDIR /app
+#36 CACHED
+
+#37 [frontend build 3/6] COPY package.json package-lock.json ./
+#37 CACHED
+
+#38 [frontend build 4/6] RUN npm install
+#38 CACHED
+
+#39 [frontend build 5/6] COPY . .

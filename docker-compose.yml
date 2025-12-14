@@ -11,6 +11,7 @@ services:
       - /home/halabbood/e-commerce-platform:/var/jenkins_home/workspace/ecommerce-pipeline
     environment:
       - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+    user: "1000:991"
     restart: unless-stopped
 
 volumes:
