@@ -5,6 +5,15 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of } from 'rxjs'; // <--- NEW: Import 'of' to create mock Observables
 import { ApiService } from '../api.service'; // <--- Import the service being mocked (Adjust path if needed)
 
+// NEW MOCK: Define a mock for ApiService that returns an Observable
+const mockApiService = {
+  // Assuming the component calls a method like getMedia() in ngOnInit
+  // This mock ensures that call returns a valid Observable with .subscribe()
+  getMedia: () => of([]), // Returns an Observable of an empty array
+  // Add any other methods from ApiService that ManageMediaComponent uses
+  deleteMedia: () => of(null)
+};
+
 describe('ManageMediaComponent', () => {
   let component: ManageMediaComponent;
   let fixture: ComponentFixture<ManageMediaComponent>;
@@ -20,16 +29,6 @@ describe('ManageMediaComponent', () => {
         subscribe: () => ({})
     }
   };
-
-  // NEW MOCK: Define a mock for ApiService that returns an Observable
-  const mockApiService = {
-    // Assuming the component calls a method like getMedia() in ngOnInit
-    // This mock ensures that call returns a valid Observable with .subscribe()
-    getMedia: () => of([]), // Returns an Observable of an empty array
-    // Add any other methods from ApiService that ManageMediaComponent uses
-    deleteMedia: () => of(null)
-  };
-
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
