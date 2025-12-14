@@ -106,7 +106,7 @@ services:
       dockerfile: Dockerfile
     container_name: frontend
     ports:
-      - "4200:4200"           # Map host port 4200 to container's Nginx port 4200
+      - "4200:80"           # Map host port 4200 to container's Nginx port 4200
     networks:
       - external            # Use the network that is exposed/accessible to the host
     restart: always
