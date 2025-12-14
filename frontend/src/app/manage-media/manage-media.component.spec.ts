@@ -2,49 +2,50 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ManageMediaComponent } from './manage-media.component';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { of } from 'rxjs'; // <--- NEW: Import 'of' to create mock Observables
-import { ApiService } from '../api.service'; // <--- Import the service being mocked (Adjust path if needed)
-
-// NEW MOCK: Define a mock for ApiService that returns an Observable
-const mockApiService = {
-  // Assuming the component calls a method like getMedia() in ngOnInit
-  // This mock ensures that call returns a valid Observable with .subscribe()
-  getMedia: () => of([]), // Returns an Observable of an empty array
-  // Add any other methods from ApiService that ManageMediaComponent uses
-  deleteMedia: () => of(null)
-};
+import { of } from 'rxjs'; // To create mock Observables
+import { ApiService } from '../api.service'; // Import the service being mocked
 
 describe('ManageMediaComponent', () => {
   let component: ManageMediaComponent;
   let fixture: ComponentFixture<ManageMediaComponent>;
 
-  // Define a minimal mock for the ActivatedRoute service
+  // 1. Mock ActivatedRoute to provide the 'id' param and a subscriber
   const mockActivatedRoute = {
-    snapshot: {
-      paramMap: {
-        get: (key: string) => '123'
-      }
-    },
-    params: {
-        subscribe: () => ({})
-    }
+    // Mimic the paramMap observable stream
+    paramMap: of({
+      get: (key: string) => (key === 'id' ? '123' : null),
+    }),
+  };
+
+  // 2. FIX: Mock ApiService methods used by the component
+  const mockApiService = {
+    // 🐛 FIX 1: Mock the method called in loadProductImages()
+    getImagesByProductId: (id: string) => of({ images: [] }),
+    // 🐛 FIX 2: Mock the method called in addImage()
+    addmedia: (formData: FormData) => of({ success: true }),
+    // 🐛 FIX 3: Mock the method called in deleteFile()
+    deleteImage: (data: any) => of({ success: true }),
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ManageMediaComponent, HttpClientTestingModule],
-
       providers: [
-        { provide: ActivatedRoute, useValue: mockActivatedRoute },
-        // 🐛 FIX: Provide the mock ApiService
-        { provide: ApiService, useValue: mockApiService }
-      ]
-    })
-    .compileComponents();
+        {
+          provide: ActivatedRoute,
+          useValue: mockActivatedRoute, // Use the correct mock
+        },
+        {
+          // 🐛 FIX: Provide the complete mock for ApiService
+          provide: ApiService,
+          useValue: mockApiService,
+        },
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ManageMediaComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    fixture.detectChanges(); // Triggers ngOnInit and the faulty loadProductImages call
   });
 
   it('should create', () => {
