@@ -1,7 +1,6 @@
 package backend.media_service.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,43 +8,46 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import backend.media_service.model.Media;
+import backend.media_service.model.ProductAllowed;
 import backend.media_service.repository.MediaRepository;
+import backend.media_service.repository.ProductAllowedRepository;
 
 @Service
 public class ProductEventConsumer {
-    private List<Map<String, Object>> products = new ArrayList<>();
+    private List<ProductAllowed> products = new ArrayList<>();
 
     private final MediaRepository mediaRepository;
+    private final ProductAllowedRepository productAllowedRepository;
     private final FileStorageService fileStorageService;
-    public ProductEventConsumer(MediaRepository mediaRepository, FileStorageService fileStorageService) {
+
+    public ProductEventConsumer(MediaRepository mediaRepository, ProductAllowedRepository productAllowedRepository, FileStorageService fileStorageService) {
         this.mediaRepository = mediaRepository;
+        this.productAllowedRepository = productAllowedRepository;
         this.fileStorageService = fileStorageService;
     }
 
-    public List<Map<String, Object>> getProducts() {
+    public List<ProductAllowed> getProducts() {
         return products;
     }
 
     @KafkaListener(topics = "product-created-topic")
     public void handleProductCreated(Map<String, Object> event) {
-        System.out.println("Received ProductCreatedEvent: " + event);
-        products.add(event);
+        ProductAllowed productAllowed = new ProductAllowed((String) event.get("productId"), (String) event.get("name"));
+        this.productAllowedRepository.save(productAllowed);
+        this.products = productAllowedRepository.findAll();
     }
 
     @KafkaListener(topics = "product-updated-topic")
     public void handleProductUpdated(Map<String, Object> event) {
-        System.out.println("Received ProductUpdatedEvent: " + event);
-        products.removeIf(p -> p.get("productId").equals(event.get("productId")));
-        Map<String, Object> eventProduct = new HashMap<>();
-        eventProduct.put("productId", event.get("productId"));
-        eventProduct.put("name", event.get("name"));
-        products.add(eventProduct);
+        // update product allowed info
+        this.productAllowedRepository.deleteById((String) event.get("productId"));
+        ProductAllowed updatedProductAllowed = new ProductAllowed((String) event.get("productId"), (String) event.get("name"));
+        this.productAllowedRepository.save(updatedProductAllowed);
+        this.products = productAllowedRepository.findAll();
     }
 
     @KafkaListener(topics = "product-deleted-topic")
     public void handleProductDeleted(Map<String, Object> event) {
-        System.out.println("Received ProductDeletedEvent: " + event);
-        products.removeIf(p -> p.get("productId").equals(event.get("productId")));
         // delete all media related to this product
         List<Media> mediaList = mediaRepository.findByProductId((String) event.get("productId"));
         for (Media media : mediaList) {
@@ -57,6 +59,9 @@ public class ProductEventConsumer {
                 System.err.println("Error deleting media for product " + event.get("productId") + ": " + e.getMessage());
             }
         }
+        // delete product allowed info
+        this.productAllowedRepository.deleteById((String) event.get("productId"));
+        this.products = productAllowedRepository.findAll();
     }
 
 }
