@@ -2,17 +2,14 @@ package backend.user_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest
-@TestPropertySource(properties = {
-	"spring.data.mongodb.uri=mongodb://localhost:27017/testdb",
-	"jwt.secret=testsecretkey"
-})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@ActiveProfiles("test")
 class UserServiceApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
-
+    @Test
+    void contextLoads() {
+        // Just ensures Spring context starts without real Mongo/Kafka
+    }
 }

@@ -2,17 +2,14 @@ package backend.api_gateway;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest
-@TestPropertySource(properties = {
-	"jwt.secret=testsecretkey",
-	"keystore.password=testkeystorepassword"
-})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@ActiveProfiles("test")
 class ApiGatewayApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
-
+    @Test
+    void contextLoads() {
+        // Ensures Spring context starts without real SSL or secrets
+    }
 }
