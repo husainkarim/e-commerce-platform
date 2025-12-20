@@ -11,7 +11,8 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(properties = {
     // Also explicitly disable listeners to be safe
     "spring.kafka.listener.auto-startup=false", 
-	"spring.data.mongodb.uri=mongodb://localhost:27017/testdb"
+	"spring.data.mongodb.uri=mongodb://localhost:27017/testdb",
+	"jwt.secret=testsecretkey"
 })
 class MediaServiceApplicationTests {
 
