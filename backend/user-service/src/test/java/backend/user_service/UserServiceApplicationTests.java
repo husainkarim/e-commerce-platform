@@ -9,8 +9,13 @@ import backend.user_service.service.KafkaService;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 
-@SpringBootTest
-@ActiveProfiles("test")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
+                properties = {
+                  "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration",
+                  "spring.kafka.listener.auto-startup=false",
+                  "spring.data.mongodb.uri=mongodb://localhost:27017/testdb",
+                  "jwt.secret=testsecretkey"
+                })
 @EnableAutoConfiguration(exclude = {KafkaAutoConfiguration.class})
 class UserServiceApplicationTests {
 
