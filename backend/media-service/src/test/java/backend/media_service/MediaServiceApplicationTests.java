@@ -10,7 +10,8 @@ import org.springframework.test.context.TestPropertySource;
 @EnableAutoConfiguration(exclude = {KafkaAutoConfiguration.class})
 @TestPropertySource(properties = {
     // Also explicitly disable listeners to be safe
-    "spring.kafka.listener.auto-startup=false" 
+    "spring.kafka.listener.auto-startup=false", 
+	"spring.data.mongodb.uri=mongodb://localhost:27017/testdb"
 })
 class MediaServiceApplicationTests {
 
