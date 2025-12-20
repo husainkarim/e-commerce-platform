@@ -32,6 +32,9 @@ public class ProductEventConsumer {
 
     @KafkaListener(topics = "product-created-topic")
     public void handleProductCreated(Map<String, Object> event) {
+        if (this.productAllowedRepository.existsById((String) event.get("productId"))) {
+            return; // already exists
+        }
         ProductAllowed productAllowed = new ProductAllowed((String) event.get("productId"), (String) event.get("name"));
         this.productAllowedRepository.save(productAllowed);
         this.products = productAllowedRepository.findAll();
@@ -39,6 +42,9 @@ public class ProductEventConsumer {
 
     @KafkaListener(topics = "product-updated-topic")
     public void handleProductUpdated(Map<String, Object> event) {
+        if (!this.productAllowedRepository.existsById((String) event.get("productId"))) {
+            return; // does not exist
+        }
         // update product allowed info
         this.productAllowedRepository.deleteById((String) event.get("productId"));
         ProductAllowed updatedProductAllowed = new ProductAllowed((String) event.get("productId"), (String) event.get("name"));
@@ -48,6 +54,9 @@ public class ProductEventConsumer {
 
     @KafkaListener(topics = "product-deleted-topic")
     public void handleProductDeleted(Map<String, Object> event) {
+        if (!this.productAllowedRepository.existsById((String) event.get("productId"))) {
+            return; // does not exist
+        }
         // delete all media related to this product
         List<Media> mediaList = mediaRepository.findByProductId((String) event.get("productId"));
         for (Media media : mediaList) {

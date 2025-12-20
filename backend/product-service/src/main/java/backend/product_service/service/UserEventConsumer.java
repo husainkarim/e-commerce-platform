@@ -8,8 +8,8 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import backend.product_service.model.Product;
-import backend.product_service.repository.ProductRepository;
 import backend.product_service.model.Seller;
+import backend.product_service.repository.ProductRepository;
 import backend.product_service.repository.SellerRepository;
 
 @Service
@@ -41,6 +41,9 @@ public class UserEventConsumer {
     
     @KafkaListener(topics = "user-created-topic")
     public void handleSellerCreated(Map<String, Object> event) {
+        if (this.sellerRepository.existsById((String) event.get("userId"))) {
+            return; // already exists
+        }
         // Allow this seller to use product service
         Seller seller = new Seller((String) event.get("userId"), (String) event.get("email"), (String) event.get("role"));
         this.sellerRepository.save(seller);
@@ -49,6 +52,9 @@ public class UserEventConsumer {
 
     @KafkaListener(topics = "user-updated-topic")
     public void handleUserRoleUpdated(Map<String, Object> event) {
+        if (!this.sellerRepository.existsById((String) event.get("userId"))) {
+            return; // does not exist
+        }
         // Handle user role update logic here   
         if(event.get("newRole").equals("seller")) {
             // Add to seller list
@@ -71,7 +77,9 @@ public class UserEventConsumer {
 
     @KafkaListener( topics = "user-deleted-topic")
     public void handleUserDeleted(Map<String, Object> event) {
-        // Handle user deletion logic here
+        if (!this.sellerRepository.existsById((String) event.get("userId"))) {
+            return; // does not exist
+        }
         // remove all products from database by get all products with userId
         List<Product> products = productRepository.findByUserId((String) event.get("userId"));
         //send to media to remove images
