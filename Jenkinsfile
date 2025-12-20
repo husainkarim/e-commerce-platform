@@ -5,7 +5,7 @@ pipeline {
         maven 'Maven-3.9'
         jdk 'Java-21'
     }
-    
+
     stages {
 
         stage('Checkout Code') {
@@ -15,19 +15,34 @@ pipeline {
         }
 
         stage('Backend Tests') {
-            steps {
-                // Change the directory to the root of the services
-                dir('backend/user-service') {
-                    sh 'mvn clean verify'
+            parallel {
+                stage('User Service') {
+                    steps {
+                        dir('backend/user-service') {
+                            sh 'mvn -B -ntp clean verify'
+                        }
+                    }
                 }
-                dir('backend/product-service') {
-                    sh 'mvn clean verify'
+                stage('Product Service') {
+                    steps {
+                        dir('backend/product-service') {
+                            sh 'mvn -B -ntp clean verify'
+                        }
+                    }
                 }
-                dir('backend/media-service') {
-                    sh 'mvn clean verify'
+                stage('Media Service') {
+                    steps {
+                        dir('backend/media-service') {
+                            sh 'mvn -B -ntp clean verify'
+                        }
+                    }
                 }
-                dir('backend/api-gateway') {
-                    sh 'mvn clean verify'
+                stage('API Gateway') {
+                    steps {
+                        dir('backend/api-gateway') {
+                            sh 'mvn -B -ntp clean verify'
+                        }
+                    }
                 }
             }
         }
@@ -35,34 +50,40 @@ pipeline {
         stage('Install & Build Backend') {
             steps {
                 dir('backend') {
-                    // 2. Build the final JAR after tests pass
                     sh 'make jar'
                 }
             }
         }
-        
+
         stage('Frontend Tests') {
             steps {
                 dir('frontend') {
-                    sh 'npm install'
+                    sh 'npm ci'
                     sh 'npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox'
                 }
             }
         }
 
         stage('Deploy Application') {
+            when {
+                branch 'main'
+            }
             steps {
                 dir('backend') {
                     withCredentials([
-                        string(credentialsId: 'MONGODB_URI', variable: 'MONGODB_URI'),
-                        string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
-                        string(credentialsId: 'KEYSTORE_PASSWORD', variable: 'KEYSTORE_PASSWORD')
+                        string(credentialsId: 'mongo-uri-prod', variable: 'MONGODB_URI'),
+                        string(credentialsId: 'gateway-jwt-secret', variable: 'JWT_SECRET'),
+                        string(credentialsId: 'gateway-keystore-password', variable: 'KEYSTORE_PASSWORD')
                     ]) {
-                        // Export environment variables for Docker Compose
-                        // 4. Build and start all services (Backend JARs + Frontend image)
-                        sh 'make down'
-                        sh 'make build'  
-                        sh 'make up'     
+                        sh '''
+                            export MONGODB_URI=$MONGODB_URI
+                            export JWT_SECRET=$JWT_SECRET
+                            export KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD
+
+                            make down
+                            make build
+                            make up
+                        '''
                     }
                 }
             }
@@ -70,15 +91,18 @@ pipeline {
     }
 
     post {
+        always {
+            cleanWs()
+        }
         success {
             mail to: 'husain.akarim@gmail.com',
-                 subject: 'Build Success ✔',
-                 body: 'The Jenkins build succeeded.'
+                    subject: 'Build Success ✔',
+                    body: 'The Jenkins build succeeded.'
         }
         failure {
             mail to: 'husain.akarim@gmail.com',
-                 subject: 'Build Failed ❌',
-                 body: 'The Jenkins build has failed — please check logs.'
+                    subject: 'Build Failed ❌',
+                    body: 'The Jenkins build has failed — please check logs.'
         }
     }
 }
