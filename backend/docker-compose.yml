@@ -55,6 +55,9 @@ services:
   user-service:
     build: ./user-service
     container_name: user-service
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      MONGODB_URI: ${MONGODB_URI}
     depends_on:
       - kafka
     networks:
@@ -65,6 +68,8 @@ services:
   product-service:
     build: ./product-service
     container_name: product-service
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
     depends_on:
       - kafka
     networks:
@@ -75,6 +80,8 @@ services:
   media-service:
     build: ./media-service
     container_name: media-service
+    environment:
+      MONGODB_URI: ${MONGODB_URI}
     depends_on:
       - kafka
     networks:
@@ -88,10 +95,9 @@ services:
     ports:
       - "8443:8443"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - USER_SERVICE_URL=http://user-service:8100
-      - PRODUCT_SERVICE_URL=http://product-service:8200
-      - MEDIA_SERVICE_URL=http://media-service:8300
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET: ${JWT_SECRET}
+      KEYSTORE_PASSWORD: ${KEYSTORE_PASSWORD}
     depends_on:
       - user-service
       - product-service

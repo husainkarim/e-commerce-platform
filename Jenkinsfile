@@ -8,11 +8,11 @@ pipeline {
     
     stages {
 
-        // stage('Checkout Code') {
-        //     steps {
-        //         git branch: 'main', url: 'https://github.com/husainkarim/e-commerce-platform.git'
-        //     }
-        // }
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/husainkarim/e-commerce-platform.git'
+            }
+        }
 
         stage('Backend Tests') {
             steps {
@@ -52,7 +52,11 @@ pipeline {
 
         stage('Deploy Application') {
             steps {
-                dir('backend') {
+                dir('backend') withCredentials([
+                    string(credentialsId: 'MONGODB_URI', variable: 'MONGODB_URI'),
+                    string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
+                    string(credentialsId: 'KEYSTORE_PASSWORD', variable: 'KEYSTORE_PASSWORD')
+                ]) {
                     // 4. Build and start all services (Backend JARs + Frontend image)
                     sh 'make down'
                     sh 'make build'  
