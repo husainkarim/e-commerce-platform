@@ -1,15 +1,22 @@
 package backend.media_service;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@ActiveProfiles("test")
+@SpringBootTest
+@EnableAutoConfiguration(exclude = {KafkaAutoConfiguration.class})
+@TestPropertySource(properties = {
+    // Also explicitly disable listeners to be safe
+    "spring.kafka.listener.auto-startup=false", 
+	"spring.data.mongodb.uri=mongodb://localhost:27017/testdb",
+})
 class MediaServiceApplicationTests {
 
-    @Test
-    void contextLoads() {
-        // Ensures Spring context starts without real Mongo/Kafka
-    }
+	@Test
+	void contextLoads() {
+	}
+
 }
