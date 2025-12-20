@@ -9,7 +9,7 @@ import backend.user_service.service.KafkaService;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest
 @ActiveProfiles("test")
 @EnableAutoConfiguration(exclude = {KafkaAutoConfiguration.class})
 class UserServiceApplicationTests {
