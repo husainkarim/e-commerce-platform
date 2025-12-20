@@ -19,28 +19,28 @@ pipeline {
                 stage('User Service') {
                     steps {
                         dir('backend/user-service') {
-                            sh 'mvn -B -ntp clean verify'
+                            sh 'mvn clean verify'
                         }
                     }
                 }
                 stage('Product Service') {
                     steps {
                         dir('backend/product-service') {
-                            sh 'mvn -B -ntp clean verify'
+                            sh 'mvn clean verify'
                         }
                     }
                 }
                 stage('Media Service') {
                     steps {
                         dir('backend/media-service') {
-                            sh 'mvn -B -ntp clean verify'
+                            sh 'mvn clean verify'
                         }
                     }
                 }
                 stage('API Gateway') {
                     steps {
                         dir('backend/api-gateway') {
-                            sh 'mvn -B -ntp clean verify'
+                            sh 'mvn clean verify'
                         }
                     }
                 }
