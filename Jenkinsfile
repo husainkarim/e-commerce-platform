@@ -52,15 +52,18 @@ pipeline {
 
         stage('Deploy Application') {
             steps {
-                dir('backend') withCredentials([
-                    string(credentialsId: 'MONGODB_URI', variable: 'MONGODB_URI'),
-                    string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
-                    string(credentialsId: 'KEYSTORE_PASSWORD', variable: 'KEYSTORE_PASSWORD')
-                ]) {
-                    // 4. Build and start all services (Backend JARs + Frontend image)
-                    sh 'make down'
-                    sh 'make build'  
-                    sh 'make up'     
+                dir('backend') {
+                    withCredentials([
+                        string(credentialsId: 'MONGODB_URI', variable: 'MONGODB_URI'),
+                        string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
+                        string(credentialsId: 'KEYSTORE_PASSWORD', variable: 'KEYSTORE_PASSWORD')
+                    ]) {
+                        // Export environment variables for Docker Compose
+                        // 4. Build and start all services (Backend JARs + Frontend image)
+                        sh 'make down'
+                        sh 'make build'  
+                        sh 'make up'     
+                    }
                 }
             }
         }
