@@ -64,9 +64,9 @@ pipeline {
             steps {
                 dir('backend') {
                     withCredentials([
-                        string(credentialsId: 'mongo-uri-prod', variable: 'MONGODB_URI'),
-                        string(credentialsId: 'gateway-jwt-secret', variable: 'JWT_SECRET'),
-                        string(credentialsId: 'gateway-keystore-password', variable: 'KEYSTORE_PASSWORD'),
+                        string(credentialsId: 'MONGODB_URI', variable: 'MONGODB_URI'),
+                        string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
+                        string(credentialsId: 'KEYSTORE_PASSWORD', variable: 'KEYSTORE_PASSWORD'),
                         file(credentialsId: 'media-service-gcp-key', variable: 'GCP_KEY_FILE')
                     ]) {
                         sh '''
