@@ -2,13 +2,15 @@ package backend.media_service.service;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
 
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,9 +23,6 @@ import com.google.common.collect.Lists;
 
 import backend.media_service.util.ImageCompressionUtil;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 @Service
 public class FileStorageService {
 
@@ -31,10 +30,20 @@ public class FileStorageService {
     private final String bucketName = "social-network-d4ea8.appspot.com";
 
     public FileStorageService() throws IOException {
-        ClassPathResource resource = new ClassPathResource(
-            "serviceAccountKey.json"
-        );
-        InputStream serviceAccount = resource.getInputStream();
+
+        InputStream serviceAccount;
+
+        // Use env variable if set (e.g., in Jenkins/Docker)
+        String gcpKeyPath = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+        if (gcpKeyPath != null && !gcpKeyPath.isEmpty()) {
+            serviceAccount = new FileInputStream(gcpKeyPath);
+        } else {
+            // Fallback for local development or tests
+            serviceAccount = getClass().getClassLoader().getResourceAsStream("serviceAccountKey.json");
+            if (serviceAccount == null) {
+                throw new IOException("Firebase service account key not found. Set GOOGLE_APPLICATION_CREDENTIALS or place serviceAccountKey.json in resources.");
+            }
+        }
 
         GoogleCredentials credentials = GoogleCredentials.fromStream(
             serviceAccount
