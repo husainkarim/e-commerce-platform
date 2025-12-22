@@ -15,7 +15,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable()) // ❌ Disable CSRF for REST APIs
-            .cors(cors -> {}) // ✅ Enable CORS (gateway handles it)
+            // .cors(cors -> {}) // ✅ Enable CORS (gateway handles it)
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // ✅ No sessions
             )

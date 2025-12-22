@@ -2,13 +2,10 @@ package backend.api_gateway;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@TestPropertySource(properties = {
-	"jwt.secret=testsecretkey",
-	"server.ssl.key-store-password=testkeystorepassword"
-})
+@ActiveProfiles("test")
 class ApiGatewayApplicationTests {
 
 	@Test
