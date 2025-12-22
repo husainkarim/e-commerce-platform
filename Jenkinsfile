@@ -6,6 +6,10 @@ pipeline {
         jdk 'Java-21'
     }
 
+    environment {
+        GOOGLE_APPLICATION_CREDENTIALS = "${WORKSPACE}/serviceAccountKey.json"
+    }
+
     stages {
 
         stage('Checkout Code') {
@@ -47,14 +51,6 @@ pipeline {
             }
         }
 
-        stage('Install & Build Backend') {
-            steps {
-                dir('backend') {
-                    sh 'make jar'
-                }
-            }
-        }
-
         stage('Frontend Tests') {
             steps {
                 dir('frontend') {
@@ -64,7 +60,7 @@ pipeline {
             }
         }
 
-        stage('Deploy Application') {
+        stage('Install & Build & Deploy Application') {
             when {
                 branch 'main'
             }
@@ -73,15 +69,17 @@ pipeline {
                     withCredentials([
                         string(credentialsId: 'mongo-uri-prod', variable: 'MONGODB_URI'),
                         string(credentialsId: 'gateway-jwt-secret', variable: 'JWT_SECRET'),
-                        string(credentialsId: 'gateway-keystore-password', variable: 'KEYSTORE_PASSWORD')
+                        string(credentialsId: 'gateway-keystore-password', variable: 'KEYSTORE_PASSWORD'),
+                        file(credentialsId: 'media-service-gcp-key', variable: 'GCP_KEY_FILE')
                     ]) {
                         sh '''
                             export MONGODB_URI=$MONGODB_URI
                             export JWT_SECRET=$JWT_SECRET
                             export KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD
-
+                            make jar
                             make down
                             make build
+                            export GOOGLE_APPLICATION_CREDENTIALS=$GCP_KEY_FILE
                             make up
                         '''
                     }
