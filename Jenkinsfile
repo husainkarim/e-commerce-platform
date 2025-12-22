@@ -61,9 +61,6 @@ pipeline {
         }
 
         stage('Install & Build & Deploy Application') {
-            when {
-                branch 'main'
-            }
             steps {
                 dir('backend') {
                     withCredentials([
