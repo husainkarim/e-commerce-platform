@@ -1,6 +1,5 @@
 package backend.media_service.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +13,6 @@ import backend.media_service.repository.ProductAllowedRepository;
 
 @Service
 public class ProductEventConsumer {
-    private List<ProductAllowed> products = new ArrayList<>();
 
     private final MediaRepository mediaRepository;
     private final ProductAllowedRepository productAllowedRepository;
@@ -26,10 +24,6 @@ public class ProductEventConsumer {
         this.fileStorageService = fileStorageService;
     }
 
-    public List<ProductAllowed> getProducts() {
-        return products;
-    }
-
     @KafkaListener(topics = "product-created-topic")
     public void handleProductCreated(Map<String, Object> event) {
         if (this.productAllowedRepository.existsById((String) event.get("productId"))) {
@@ -37,7 +31,6 @@ public class ProductEventConsumer {
         }
         ProductAllowed productAllowed = new ProductAllowed((String) event.get("productId"), (String) event.get("name"));
         this.productAllowedRepository.save(productAllowed);
-        this.products = productAllowedRepository.findAll();
     }
 
     @KafkaListener(topics = "product-updated-topic")
@@ -49,7 +42,6 @@ public class ProductEventConsumer {
         this.productAllowedRepository.deleteById((String) event.get("productId"));
         ProductAllowed updatedProductAllowed = new ProductAllowed((String) event.get("productId"), (String) event.get("name"));
         this.productAllowedRepository.save(updatedProductAllowed);
-        this.products = productAllowedRepository.findAll();
     }
 
     @KafkaListener(topics = "product-deleted-topic")
@@ -70,7 +62,5 @@ public class ProductEventConsumer {
         }
         // delete product allowed info
         this.productAllowedRepository.deleteById((String) event.get("productId"));
-        this.products = productAllowedRepository.findAll();
     }
-
 }

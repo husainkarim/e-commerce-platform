@@ -1,6 +1,5 @@
 package backend.product_service.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,20 +17,14 @@ public class UserEventConsumer {
     private final KafkaService kafkaService;
     private final SellerRepository sellerRepository;
 
-    private List<Seller> userSellerList = new ArrayList<>();
-
     public UserEventConsumer(ProductRepository productRepository, KafkaService kafkaService, SellerRepository sellerRepository) {
         this.productRepository = productRepository;
         this.kafkaService = kafkaService;
         this.sellerRepository = sellerRepository;
     }
 
-    public List<Seller> getUserSellerList() {
-        return userSellerList;
-    }
-
     public String getUserNameById(String userId) {
-        for (Seller user : userSellerList) {
+        for (Seller user : sellerRepository.findAll()) {
             if (user.getUserId().equals(userId)) {
                 return user.getEmail();
             }
@@ -47,7 +40,6 @@ public class UserEventConsumer {
         // Allow this seller to use product service
         Seller seller = new Seller((String) event.get("userId"), (String) event.get("email"), (String) event.get("role"));
         this.sellerRepository.save(seller);
-        this.userSellerList = this.sellerRepository.findAll();
     }
 
     @KafkaListener(topics = "user-updated-topic")
@@ -60,7 +52,6 @@ public class UserEventConsumer {
             // Add to seller list
             Seller seller = new Seller((String) event.get("userId"), (String) event.get("email"), (String) event.get("newRole"));
             this.sellerRepository.save(seller);
-            this.userSellerList = this.sellerRepository.findAll();
         } else {
             // Remove from seller list
             // remove all products from database by get all products with userId
@@ -71,7 +62,6 @@ public class UserEventConsumer {
             }
             productRepository.deleteAll(products);
             this.sellerRepository.deleteById((String) event.get("userId"));
-            this.userSellerList = this.sellerRepository.findAll();
         }
     }
 
@@ -88,6 +78,5 @@ public class UserEventConsumer {
         }
         productRepository.deleteAll(products);
         this.sellerRepository.deleteById((String) event.get("userId"));
-        this.userSellerList = this.sellerRepository.findAll();
     }
 }

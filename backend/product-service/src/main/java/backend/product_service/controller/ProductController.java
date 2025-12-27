@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import backend.product_service.model.Product;
 import backend.product_service.model.Seller;
 import backend.product_service.repository.ProductRepository;
+import backend.product_service.repository.SellerRepository;
 import backend.product_service.service.KafkaService;
-import backend.product_service.service.UserEventConsumer;
 
 @RestController
 @RequestMapping("/api/products")
@@ -27,12 +27,12 @@ public class ProductController {
 
     private final ProductRepository productRepository;
     private final KafkaService kafkaService;
-    private final UserEventConsumer userEventConsumer;
+    private final SellerRepository sellerRepository;
 
-    public ProductController(ProductRepository productRepository, KafkaService kafkaService, UserEventConsumer userEventConsumer) {
+    public ProductController(ProductRepository productRepository, KafkaService kafkaService, SellerRepository sellerRepository) {
         this.productRepository = productRepository;
         this.kafkaService = kafkaService;
-        this.userEventConsumer = userEventConsumer;
+        this.sellerRepository = sellerRepository;
     }
 
     // product list
@@ -51,7 +51,7 @@ public class ProductController {
     @GetMapping("/user-products")
     public ResponseEntity<Map<String, Object>> getUserProducts(@RequestParam String userId) {
         Map<String, Object> response = new HashMap<>();
-        List<Seller> userSellerList = userEventConsumer.getUserSellerList();
+        List<Seller> userSellerList = sellerRepository.findAll();
         if (userSellerList.stream().noneMatch(user -> user.getUserId().equals(userId))) {
             response.put("message", "User is not a seller or does not exist");
             return new ResponseEntity<>(response, HttpStatus.FORBIDDEN); // 403
@@ -90,7 +90,7 @@ public class ProductController {
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> createProduct(@RequestBody Product product) {
         Map<String, Object> response = new HashMap<>();
-        List<Seller> userSellerList = userEventConsumer.getUserSellerList();
+        List<Seller> userSellerList = sellerRepository.findAll();
         if (userSellerList.stream().noneMatch(user -> user.getUserId().equals(product.getUserId()))) {
             response.put("message", "User is not a seller or does not exist");
             return new ResponseEntity<>(response, HttpStatus.FORBIDDEN); // 403
@@ -109,7 +109,7 @@ public class ProductController {
     @PutMapping("/update")
     public ResponseEntity<Map<String, Object>> updateProduct(@RequestBody Product product, @RequestParam String productId) {
         Map<String, Object> response = new HashMap<>();
-        List<Seller> userSellerList = userEventConsumer.getUserSellerList();
+        List<Seller> userSellerList = sellerRepository.findAll();
         if (userSellerList.stream().noneMatch(user -> user.getUserId().equals(product.getUserId()))) {
             response.put("message", "User is not a seller or does not exist");
             return new ResponseEntity<>(response, HttpStatus.FORBIDDEN); // 403
@@ -139,7 +139,7 @@ public class ProductController {
     public ResponseEntity<Map<String, Object>> deleteProduct(@RequestParam String productId) {
         Map<String, Object> response = new HashMap<>();
 
-        List<Seller> userSellerList = userEventConsumer.getUserSellerList();
+        List<Seller> userSellerList = sellerRepository.findAll();
         if (userSellerList.stream().noneMatch(user -> user.getUserId().equals(
             productRepository.findById(productId).map(Product::getUserId).orElse(null)))) {
             response.put("message", "User is not a seller or does not exist");
