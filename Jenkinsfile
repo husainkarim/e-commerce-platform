@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        GOOGLE_APPLICATION_CREDENTIALS = "${WORKSPACE}/serviceAccountKey.json"
+        GCP_KEY_FILE = '/var/jenkins_home/keys/serviceAccountKey.json'
     }
 
     stages {
@@ -69,6 +69,7 @@ pipeline {
                         string(credentialsId: 'KEYSTORE_PASSWORD', variable: 'KEYSTORE_PASSWORD'),
                         file(credentialsId: 'media-service-gcp-key', variable: 'GCP_KEY_FILE')
                     ]) {
+                        writeFile file: 'media-service/src/main/resources/serviceAccountKey.json', text: readFile(GCP_KEY_FILE)
                         sh '''
                             export MONGODB_URI=$MONGODB_URI
                             export JWT_SECRET=$JWT_SECRET
