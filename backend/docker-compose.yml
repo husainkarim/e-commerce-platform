@@ -82,9 +82,6 @@ services:
     container_name: media-service
     environment:
       MONGODB_URI: ${MONGODB_URI}
-      GOOGLE_APPLICATION_CREDENTIALS: /keys/serviceAccountKey.json
-    volumes:
-      - ${GCP_KEY_FILE}:/keys/serviceAccountKey.json:ro
     depends_on:
       - kafka
     networks:
