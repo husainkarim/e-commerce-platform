@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # 🧩 Kafka + Zookeeper (internal only)
   zookeeper:
@@ -30,7 +28,7 @@ services:
       KAFKA_LOG_CLEANUP_POLICY: delete
     volumes:
       - kafka-data:/var/lib/kafka/data
-      - ./kafka-config.properties:/etc/kafka/kafka.properties
+      - kafka-config.properties:/etc/kafka/kafka.properties
     networks:
       - internal
     healthcheck:
@@ -70,6 +68,7 @@ services:
     container_name: product-service
     environment:
       MONGODB_URI: ${MONGODB_URI}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
       - kafka
     networks:
@@ -82,6 +81,7 @@ services:
     container_name: media-service
     environment:
       MONGODB_URI: ${MONGODB_URI}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
       - kafka
     networks:
