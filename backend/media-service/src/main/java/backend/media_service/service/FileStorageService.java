@@ -2,7 +2,6 @@ package backend.media_service.service;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
@@ -31,18 +30,9 @@ public class FileStorageService {
 
     public FileStorageService() throws IOException {
 
-        InputStream serviceAccount;
-
-        // Use env variable if set (e.g., in Jenkins/Docker)
-        String gcpKeyPath = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
-        if (gcpKeyPath != null && !gcpKeyPath.isEmpty()) {
-            serviceAccount = new FileInputStream(gcpKeyPath);
-        } else {
-            // Fallback for local development or tests
-            serviceAccount = getClass().getClassLoader().getResourceAsStream("serviceAccountKey.json");
-            if (serviceAccount == null) {
-                throw new IOException("Firebase service account key not found. Set GOOGLE_APPLICATION_CREDENTIALS or place serviceAccountKey.json in resources.");
-            }
+        InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("serviceAccountKey.json");
+        if (serviceAccount == null) {
+            throw new IOException("Firebase service account key not found. Set GOOGLE_APPLICATION_CREDENTIALS or place serviceAccountKey.json in resources.");
         }
 
         GoogleCredentials credentials = GoogleCredentials.fromStream(

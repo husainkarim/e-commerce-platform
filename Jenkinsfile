@@ -77,7 +77,6 @@ pipeline {
                             make jar
                             make down
                             make build
-                            export GOOGLE_APPLICATION_CREDENTIALS=$GCP_KEY_FILE
                             make up
                         '''
                     }
