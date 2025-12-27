@@ -29,8 +29,9 @@ public class FileStorageService {
     private final String bucketName = "social-network-d4ea8.appspot.com";
 
     public FileStorageService() throws IOException {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        InputStream serviceAccount = classLoader.getResourceAsStream("serviceAccountKey.json");
 
-        InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("serviceAccountKey.json");
         if (serviceAccount == null) {
             throw new IOException("Firebase service account key not found. Set GOOGLE_APPLICATION_CREDENTIALS or place serviceAccountKey.json in resources.");
         }
