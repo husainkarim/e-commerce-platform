@@ -28,7 +28,7 @@ services:
       KAFKA_LOG_CLEANUP_POLICY: delete
     volumes:
       - kafka-data:/var/lib/kafka/data
-      - /kafka-config.properties:/etc/kafka/kafka.properties
+      - ${WORKSPACE}/kafka-config.properties:/etc/kafka/kafka.properties
     networks:
       - internal
     healthcheck:

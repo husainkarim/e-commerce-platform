@@ -69,8 +69,15 @@ pipeline {
                         string(credentialsId: 'KEYSTORE_PASSWORD', variable: 'KEYSTORE_PASSWORD'),
                         file(credentialsId: 'media-service-gcp-key', variable: 'GCP_KEY_FILE')
                     ]) {
-                        writeFile file: 'media-service/src/main/resources/serviceAccountKey.json', text: readFile(GCP_KEY_FILE)
                         sh '''
+                            # 1. Fix Firebase: Copy the secret file into the resources folder before building the JAR
+                            cp "$GCP_KEY_FILE" media-service/src/main/resources/serviceAccountKey.json
+                            
+                            # 2. Fix Kafka: Clean up the "accidental directory" if it exists from a failed run
+                            # This prevents the [Errno 21] error
+                            if [ -d "../kafka-config.properties" ]; then
+                                rm -rf "../kafka-config.properties"
+                            fi
                             export MONGODB_URI=$MONGODB_URI
                             export JWT_SECRET=$JWT_SECRET
                             export KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD
