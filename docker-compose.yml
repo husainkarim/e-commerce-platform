@@ -13,7 +13,7 @@ services:
       - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
     user: "1000:991"
     networks:
-      - devsecops-net
+      - safezone-net
     restart: unless-stopped
 
   # --- SonarQube Service ---
@@ -23,7 +23,7 @@ services:
     ports:
       - "9000:9000"
     networks:
-      - devsecops-net
+      - safezone-net
     environment:
       - SONAR_JDBC_URL=jdbc:postgresql://db:5432/sonar
       - SONAR_JDBC_USERNAME=sonar
@@ -41,7 +41,7 @@ services:
     image: postgres:15
     container_name: postgres-sonar
     networks:
-      - devsecops-net
+      - safezone-net
     environment:
       - POSTGRES_USER=sonar
       - POSTGRES_PASSWORD=sonar
@@ -60,9 +60,14 @@ services:
       - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
     ports:
       - "4040:4040"
+    networks:
+      - safezone-net
+    depends_on:
+      - jenkins
 
 networks:
-  devsecops-net:
+  safezone-net:
+    driver: bridge
 
 volumes:
   jenkins_home:

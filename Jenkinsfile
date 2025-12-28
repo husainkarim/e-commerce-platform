@@ -11,10 +11,24 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout Code') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Initialize GitHub Status') {
+            steps {
+                // Set status to PENDING as soon as the build starts
+                withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
+                    sh """
+                        curl -H "Authorization: token ${TOKEN}" \
+                             -H "Content-Type: application/json" \
+                             -X POST \
+                             -d '{"state": "pending", "context": "Jenkins CI/SafeZone", "description": "Build is in progress...", "target_url": "${env.BUILD_URL}"}' \
+                             https://api.github.com/repos/husainkarim/e-commerce-platform/statuses/${env.GIT_COMMIT}
+                    """
+                }
             }
         }
 
@@ -62,12 +76,6 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                stage('Initialize GitHub Status') {
-                    steps {
-                        // Set status to PENDING as soon as the build starts
-                        githubNotify context: 'Jenkins CI/SafeZone', description: 'Build is in progress...', status: 'PENDING'
-                    }
-                }
                 // 'SonarQube' must match the name you give in Jenkins Global Configuration
                 withSonarQubeEnv('SonarQube') { 
                     script {
@@ -90,6 +98,15 @@ pipeline {
                                 -Dsonar.login=${SONAR_AUTH_TOKEN}"
                         }
                     }
+                }
+            }
+        }
+
+        stage("Quality Gate") {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    // Jenkins will pause here until SonarQube sends a webhook back
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
@@ -131,18 +148,30 @@ pipeline {
             cleanWs() // Good: Prevents disk space issues and "dirty" builds
         }
         success {
-            githubNotify context: 'Jenkins CI/SafeZone', 
-                         description: 'All tests and SonarQube Quality Gates passed! ✅', 
-                         status: 'SUCCESS'
+            withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
+                sh """
+                    curl -H "Authorization: token ${TOKEN}" \
+                         -H "Content-Type: application/json" \
+                         -X POST \
+                         -d '{"state": "success", "context": "Jenkins CI/SafeZone", "description": "Build Succeeded!", "target_url": "${env.BUILD_URL}"}' \
+                         https://api.github.com/repos/husainkarim/e-commerce-platform/statuses/${env.GIT_COMMIT}
+                """
+            }
             
             mail to: 'husain.akarim@gmail.com',
                  subject: "SUCCESS: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                  body: "Great news! The build passed all quality checks. Review it here: ${env.BUILD_URL}"
         }
         failure {
-            githubNotify context: 'Jenkins CI/SafeZone', 
-                         description: 'Build failed or Quality Gate rules were violated. ❌', 
-                         status: 'FAILURE'
+            withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
+                sh """
+                    curl -H "Authorization: token ${TOKEN}" \
+                         -H "Content-Type: application/json" \
+                         -X POST \
+                         -d '{"state": "failure", "context": "Jenkins CI/SafeZone", "description": "Build Failed!", "target_url": "${env.BUILD_URL}"}' \
+                         https://api.github.com/repos/husainkarim/e-commerce-platform/statuses/${env.GIT_COMMIT}
+                """
+            }
             
             mail to: 'husain.akarim@gmail.com',
                  subject: "FAILURE: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
