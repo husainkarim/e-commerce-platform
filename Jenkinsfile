@@ -14,7 +14,7 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/husainkarim/e-commerce-platform.git'
+                checkout scm
             }
         }
 
@@ -62,6 +62,12 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
+                stage('Initialize GitHub Status') {
+                    steps {
+                        // Set status to PENDING as soon as the build starts
+                        githubNotify context: 'Jenkins CI/SafeZone', description: 'Build is in progress...', status: 'PENDING'
+                    }
+                }
                 // 'SonarQube' must match the name you give in Jenkins Global Configuration
                 withSonarQubeEnv('SonarQube') { 
                     script {
@@ -122,17 +128,25 @@ pipeline {
 
     post {
         always {
-            cleanWs()
+            cleanWs() // Good: Prevents disk space issues and "dirty" builds
         }
         success {
+            githubNotify context: 'Jenkins CI/SafeZone', 
+                         description: 'All tests and SonarQube Quality Gates passed! ✅', 
+                         status: 'SUCCESS'
+            
             mail to: 'husain.akarim@gmail.com',
-                    subject: 'Build Success ✔',
-                    body: 'The Jenkins build succeeded.'
+                 subject: "SUCCESS: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                 body: "Great news! The build passed all quality checks. Review it here: ${env.BUILD_URL}"
         }
         failure {
+            githubNotify context: 'Jenkins CI/SafeZone', 
+                         description: 'Build failed or Quality Gate rules were violated. ❌', 
+                         status: 'FAILURE'
+            
             mail to: 'husain.akarim@gmail.com',
-                    subject: 'Build Failed ❌',
-                    body: 'The Jenkins build has failed — please check logs.'
+                 subject: "FAILURE: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                 body: "The build or security scan failed. Please check the logs immediately: ${env.BUILD_URL}"
         }
     }
 }
