@@ -53,6 +53,63 @@ The backend is built using **microservices architecture**. Each service is indep
 
 ---
 
+## 🛠️ CI/CD & Quality Assurance
+
+The project employs a robust automation pipeline to ensure code quality, security, and seamless integration.
+
+* **Jenkins**: Orchestrates the entire CI/CD lifecycle, automated via a `Jenkinsfile`.
+* **SonarQube**: Performs static code analysis to detect bugs, vulnerabilities, and code smells across all microservices and the frontend.
+* **ngrok**: Provides a secure tunnel to expose the local Jenkins instance, enabling **GitHub Webhooks** to trigger builds in real-time on every push.
+
+---
+
+## 🏗️ Infrastructure & Local Setup
+
+### DevOps Stack (Dockerized)
+
+The entire development and monitoring stack is containerized. You can spin up the DevOps environment using the `docker-compose` file located in the root/tools directory:
+
+```bash
+# Start Jenkins, SonarQube and Ngrok
+make up
+
+# stop them
+make down
+
+```
+
+| Service | Port | Description |
+| --- | --- | --- |
+| **Jenkins** | `8080` | Pipeline orchestration & GitHub integration. |
+| **SonarQube** | `9000` | Code quality dashboard & static analysis. |
+| **Postgres** | `5432` | Database backend for SonarQube. |
+| **Ngrok** | '4040' | Connect local Jenkins server with Github |
+
+### Setting up the Webhook Tunnel
+
+Since Jenkins is running inside a local Docker container, **ngrok** is required to bridge the connection from GitHub:
+
+1. **Start the tunnel**:
+```bash
+ngrok http 8080
+
+```
+
+
+2. **Update GitHub**: Use the generated URL (e.g., `https://your-id.ngrok-free.app/github-webhook/`) in your Repository Webhook settings.
+
+---
+
+## 🛡️ Quality Gate & Branch Protection
+
+To maintain high standards, the `main` and `production` branches utilize **Mandatory Code Reviews** and **Status Checks**.
+
+* **Review and Approval**: Establishes a mandatory review process before merging pull requests.
+* **Issue Resolution**: Requires all identified bugs or vulnerabilities to be resolved or justified before approval.
+* **SonarQube Tracking**: Improvements and technical debt are tracked over time via SonarQube reports to ensure long-term maintainability.
+
+---
+
 ## Frontend
 
 The frontend is developed with **Angular** and provides a responsive interface for both buyers and sellers.
@@ -82,21 +139,6 @@ export const routes: Routes = [
   { path: '**', component: NotFoundComponent }
 ];
 ```
-
----
-
-## Getting Started
-
-### Prerequisites
-
-* **Docker & Docker Compose**
-* **Make** (for running Makefile commands)
-* Node.js >= 22 (for frontend)
-* Angular CLI >= 16 (for frontend)
-
----
-
-Great! You already have a **very clear Makefile** for managing all backend services via Docker Compose. We can now integrate it cleanly into your README so users can easily understand how to use it. Here's a polished version of the **Backend section with Makefile instructions**:
 
 ---
 
@@ -174,3 +216,24 @@ make remove
 
 ---
 
+Adding a **License** section is a crucial final step for a public repository. It clearly defines how others can use, modify, and distribute your e-commerce platform code.
+
+Since this is a full-stack project, the **MIT License** is the most common choice—it is short, simple, and allows for both personal and commercial use while protecting you from liability.
+
+Here is the section to add to the bottom of your **README.md**:
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**.
+
+### Summary:
+
+* **Permissions**: You can use, copy, modify, merge, publish, and even sell copies of the software.
+* **Conditions**: The original copyright notice and this permission notice must be included in all copies or substantial portions of the software.
+* **Liability**: The software is provided "as is," without warranty of any kind.
+
+For the full legal text, please refer to the [LICENSE](https://github.com/husainkarim/e-commerce-platform/blob/main/LICENSE) file in the root of this repository.
+
+---
