@@ -20,16 +20,14 @@ pipeline {
         stage('Initialize GitHub Status') {
             steps {
                 // Set status to PENDING as soon as the build starts
-                withCredentials([string(credentialsId: 'github-token', variable: 'github-token')]) {
-                    githubNotify(
-                        account: 'husainkarim',
-                        repo: 'e-commerce-platform',
-                        credentialsId: 'github-token',
-                        status: 'PENDING',
-                        context: 'Jenkins CI/SafeZone',
-                        description: 'Build is in progress...',
-                        sha: "${env.GIT_COMMIT}"
-                    )
+                withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
+                    sh """
+                        curl -H "Authorization: token ${TOKEN}" \
+                             -H "Content-Type: application/json" \
+                             -X POST \
+                             -d '{"state": "pending", "context": "Jenkins CI/SafeZone", "description": "Build is in progress...", "target_url": "${env.BUILD_URL}"}' \
+                             https://api.github.com/repos/husainkarim/e-commerce-platform/statuses/${env.GIT_COMMIT}
+                    """
                 }
             }
         }
@@ -150,16 +148,14 @@ pipeline {
             cleanWs() // Good: Prevents disk space issues and "dirty" builds
         }
         success {
-            withCredentials([string(credentialsId: 'github-token', variable: 'github-token')]) {
-                githubNotify(
-                    account: 'husainkarim',
-                    repo: 'e-commerce-platform',
-                    credentialsId: 'github-token',
-                    status: 'SUCCESS',
-                    context: 'Jenkins CI/SafeZone',
-                    description: 'All tests and SonarQube Quality Gates passed! ✅',
-                    sha: "${env.GIT_COMMIT}"
-                )
+            withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
+                sh """
+                    curl -H "Authorization: token ${TOKEN}" \
+                         -H "Content-Type: application/json" \
+                         -X POST \
+                         -d '{"state": "success", "context": "Jenkins CI/SafeZone", "description": "Build Succeeded!", "target_url": "${env.BUILD_URL}"}' \
+                         https://api.github.com/repos/husainkarim/e-commerce-platform/statuses/${env.GIT_COMMIT}
+                """
             }
             
             mail to: 'husain.akarim@gmail.com',
@@ -167,16 +163,14 @@ pipeline {
                  body: "Great news! The build passed all quality checks. Review it here: ${env.BUILD_URL}"
         }
         failure {
-            withCredentials([string(credentialsId: 'github-token', variable: 'github-token')]) {
-                githubNotify(
-                    account: 'husainkarim',
-                    repo: 'e-commerce-platform',
-                    credentialsId: 'github-token',
-                    status: 'FAILURE',
-                    context: 'Jenkins CI/SafeZone',
-                    description: 'Build failed or Quality Gate rules were violated. ❌',
-                    sha: "${env.GIT_COMMIT}"
-                )
+            withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
+                sh """
+                    curl -H "Authorization: token ${TOKEN}" \
+                         -H "Content-Type: application/json" \
+                         -X POST \
+                         -d '{"state": "failure", "context": "Jenkins CI/SafeZone", "description": "Build Failed!", "target_url": "${env.BUILD_URL}"}' \
+                         https://api.github.com/repos/husainkarim/e-commerce-platform/statuses/${env.GIT_COMMIT}
+                """
             }
             
             mail to: 'husain.akarim@gmail.com',
