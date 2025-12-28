@@ -34,7 +34,8 @@
     "karma-coverage": "~2.2.1",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "^5.9.3",
-    "puppeteer": "^24.32.0"
+    "puppeteer": "^24.32.0",
+    "sonar-scanner": "^3.1.0",
+    "typescript": "^5.9.3"
   }
 }
