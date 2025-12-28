@@ -14,7 +14,15 @@ pipeline {
         stage('Initialize GitHub Status') {
             steps {
                 // Set status to PENDING as soon as the build starts
-                githubNotify context: 'Jenkins CI/SafeZone', description: 'Build is in progress...', status: 'PENDING'
+                githubNotify(
+                    account: 'husainkarim',
+                    repo: 'e-commerce-platform',
+                    credentialsId: 'github-token',
+                    status: 'PENDING',
+                    context: 'Jenkins CI/SafeZone',
+                    description: 'Build is in progress...',
+                    sha: "${env.GIT_COMMIT}"
+                )
             }
         }
 
@@ -140,18 +148,30 @@ pipeline {
             cleanWs() // Good: Prevents disk space issues and "dirty" builds
         }
         success {
-            githubNotify context: 'Jenkins CI/SafeZone', 
-                         description: 'All tests and SonarQube Quality Gates passed! ✅', 
-                         status: 'SUCCESS'
+            githubNotify(
+                    account: 'husainkarim',
+                    repo: 'e-commerce-platform',
+                    credentialsId: 'github-token',
+                    status: 'SUCCESS',
+                    context: 'Jenkins CI/SafeZone',
+                    description: 'All tests and SonarQube Quality Gates passed! ✅',
+                    sha: "${env.GIT_COMMIT}"
+                )
             
             mail to: 'husain.akarim@gmail.com',
                  subject: "SUCCESS: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                  body: "Great news! The build passed all quality checks. Review it here: ${env.BUILD_URL}"
         }
         failure {
-            githubNotify context: 'Jenkins CI/SafeZone', 
-                         description: 'Build failed or Quality Gate rules were violated. ❌', 
-                         status: 'FAILURE'
+            githubNotify(
+                    account: 'husainkarim',
+                    repo: 'e-commerce-platform',
+                    credentialsId: 'github-token',
+                    status: 'FAILURE',
+                    context: 'Jenkins CI/SafeZone',
+                    description: 'Build failed or Quality Gate rules were violated. ❌',
+                    sha: "${env.GIT_COMMIT}"
+                )
             
             mail to: 'husain.akarim@gmail.com',
                  subject: "FAILURE: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
