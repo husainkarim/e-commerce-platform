@@ -11,6 +11,12 @@ pipeline {
     }
 
     stages {
+        stage('Initialize GitHub Status') {
+            steps {
+                // Set status to PENDING as soon as the build starts
+                githubNotify context: 'Jenkins CI/SafeZone', description: 'Build is in progress...', status: 'PENDING'
+            }
+        }
 
         stage('Checkout Code') {
             steps {
@@ -62,12 +68,6 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                stage('Initialize GitHub Status') {
-                    steps {
-                        // Set status to PENDING as soon as the build starts
-                        githubNotify context: 'Jenkins CI/SafeZone', description: 'Build is in progress...', status: 'PENDING'
-                    }
-                }
                 // 'SonarQube' must match the name you give in Jenkins Global Configuration
                 withSonarQubeEnv('SonarQube') { 
                     script {
