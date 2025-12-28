@@ -11,24 +11,26 @@ pipeline {
     }
 
     stages {
-        stage('Initialize GitHub Status') {
-            steps {
-                // Set status to PENDING as soon as the build starts
-                githubNotify(
-                    account: 'husainkarim',
-                    repo: 'e-commerce-platform',
-                    credentialsId: 'github-token',
-                    status: 'PENDING',
-                    context: 'Jenkins CI/SafeZone',
-                    description: 'Build is in progress...',
-                    sha: "${env.GIT_COMMIT}"
-                )
-            }
-        }
-
         stage('Checkout Code') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Initialize GitHub Status') {
+            steps {
+                // Set status to PENDING as soon as the build starts
+                withCredentials([string(credentialsId: 'github-token', variable: 'github-token')]) {
+                    githubNotify(
+                        account: 'husainkarim',
+                        repo: 'e-commerce-platform',
+                        credentialsId: 'github-token',
+                        status: 'PENDING',
+                        context: 'Jenkins CI/SafeZone',
+                        description: 'Build is in progress...',
+                        sha: "${env.GIT_COMMIT}"
+                    )
+                }
             }
         }
 
@@ -148,7 +150,8 @@ pipeline {
             cleanWs() // Good: Prevents disk space issues and "dirty" builds
         }
         success {
-            githubNotify(
+            withCredentials([string(credentialsId: 'github-token', variable: 'github-token')]) {
+                githubNotify(
                     account: 'husainkarim',
                     repo: 'e-commerce-platform',
                     credentialsId: 'github-token',
@@ -157,13 +160,15 @@ pipeline {
                     description: 'All tests and SonarQube Quality Gates passed! ✅',
                     sha: "${env.GIT_COMMIT}"
                 )
+            }
             
             mail to: 'husain.akarim@gmail.com',
                  subject: "SUCCESS: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                  body: "Great news! The build passed all quality checks. Review it here: ${env.BUILD_URL}"
         }
         failure {
-            githubNotify(
+            withCredentials([string(credentialsId: 'github-token', variable: 'github-token')]) {
+                githubNotify(
                     account: 'husainkarim',
                     repo: 'e-commerce-platform',
                     credentialsId: 'github-token',
@@ -172,6 +177,7 @@ pipeline {
                     description: 'Build failed or Quality Gate rules were violated. ❌',
                     sha: "${env.GIT_COMMIT}"
                 )
+            }
             
             mail to: 'husain.akarim@gmail.com',
                  subject: "FAILURE: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
