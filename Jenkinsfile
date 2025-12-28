@@ -94,6 +94,15 @@ pipeline {
             }
         }
 
+        stage("Quality Gate") {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    // Jenkins will pause here until SonarQube sends a webhook back
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
         stage('Install & Build & Deploy Application') {
             steps {
                 dir('backend') {
