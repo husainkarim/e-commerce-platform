@@ -1,5 +1,6 @@
 package backend.product_service.controller;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,12 @@ public class ProductController {
     private final ProductRepository productRepository;
     private final KafkaService kafkaService;
     private final SellerRepository sellerRepository;
+
+    private static final String[] CATEGORIES = {
+        "General", "Electronics", "Fashion", "Home", "Sports", "Books", "Toys",
+        "Health", "Automotive", "Garden", "Music", "Movies", "Groceries",
+        "Jewelry", "Beauty"
+    };
 
     public ProductController(ProductRepository productRepository, KafkaService kafkaService, SellerRepository sellerRepository) {
         this.productRepository = productRepository;
@@ -95,7 +102,11 @@ public class ProductController {
             response.put("message", "User is not a seller or does not exist");
             return new ResponseEntity<>(response, HttpStatus.FORBIDDEN); // 403
         }
-
+        // validation for catogory
+        if (!Arrays.asList(CATEGORIES).contains(product.getCategory())) {
+            response.put("message", "Invalid category");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST); // 400
+        }
         // Logic to save product to database
         product.setId(null); // ensure id is null for new product
         Product savedProduct = productRepository.save(product);
@@ -113,6 +124,12 @@ public class ProductController {
         if (userSellerList.stream().noneMatch(user -> user.getUserId().equals(product.getUserId()))) {
             response.put("message", "User is not a seller or does not exist");
             return new ResponseEntity<>(response, HttpStatus.FORBIDDEN); // 403
+        }
+
+        // validation for catogory
+        if (!Arrays.asList(CATEGORIES).contains(product.getCategory())) {
+            response.put("message", "Invalid category");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST); // 400
         }
 
         // Logic to update product in database

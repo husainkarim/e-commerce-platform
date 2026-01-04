@@ -1,16 +1,117 @@
 
 <div class="products-container">
-	<h2>Product Listings</h2>
-	<div class="product-list">
-			<a class="product-card" *ngFor="let product of products" [routerLink]="['/products', product.id]">
-				<img [src]="product.image" alt="Product Image" class="product-image" />
+	<div class="page-header">
+		<h2>Product Listings</h2>
+		<p class="subtitle">Discover amazing products tailored for you</p>
+	</div>
+
+	<div class="search-bar">
+		<input
+			type="text"
+			[(ngModel)]="searchKeyword"
+			(input)="applyFilters()"
+			placeholder="Search products by name or description..."
+			class="search-input"
+		/>
+		<button class="search-btn" (click)="applyFilters()">Search</button>
+	</div>
+
+	<div class="controls">
+		<div class="filters">
+			<div class="filter-group">
+				<label>Category</label>
+				<select [(ngModel)]="selectedCategory" (change)="applyFilters()" class="filter-select">
+					<option value="">All Categories</option>
+					<option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+				</select>
+			</div>
+
+			<div class="filter-group">
+				<label>Price Range</label>
+				<div class="price-range">
+					<input
+						type="number"
+						[(ngModel)]="minPrice"
+						(input)="applyFilters()"
+						placeholder="Min"
+						class="price-input"
+						min="0"
+					/>
+					<span class="range-sep">-</span>
+					<input
+						type="number"
+						[(ngModel)]="maxPrice"
+						(input)="applyFilters()"
+						placeholder="Max"
+						class="price-input"
+						min="0"
+					/>
+				</div>
+			</div>
+
+			<button class="clear-btn" (click)="clearFilters()">Clear Filters</button>
+		</div>
+
+		<div class="sort-group">
+			<label>Sort By</label>
+			<select [(ngModel)]="sortOption" (change)="applyFilters()" class="sort-select">
+				<option value="">Default</option>
+				<option value="name-asc">Name (A-Z)</option>
+				<option value="name-desc">Name (Z-A)</option>
+				<option value="price-asc">Price (Low to High)</option>
+				<option value="price-desc">Price (High to Low)</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="results-info">
+		<p>Showing {{ startIndex + 1 }}-{{ endIndex }} of {{ filteredProducts.length }} products</p>
+	</div>
+
+	<div class="product-list" *ngIf="paginatedProducts.length; else noResults">
+		<div class="product-card" *ngFor="let product of paginatedProducts">
+			<a [routerLink]="['/products', product.id]" class="product-link">
+				<img [src]="product.image" alt="{{ product.name }}" class="product-image" />
 				<div class="product-info">
 					<h3>{{ product.name }}</h3>
+					<p class="product-category">{{ product.category || 'General' }}</p>
 					<p class="product-description">{{ product.description }}</p>
-					<p class="product-price">Price: ${{ product.price }}</p>
-					<p class="product-quantity">Quantity: {{ product.quantity }}</p>
-					<p class="product-seller">Seller ID: {{ product.userId }}</p>
+					<p class="product-price">${{ product.price | number:'1.2-2' }}</p>
+					<p class="product-quantity" [class.low-stock]="product.quantity < 10">Stock: {{ product.quantity }}</p>
 				</div>
 			</a>
+			<button
+				class="add-to-cart-btn"
+				(click)="addToCart(product)"
+				[disabled]="product.quantity === 0"
+				[title]="product.quantity === 0 ? 'Out of stock' : 'Add to cart'"
+			>
+				{{ product.quantity === 0 ? 'Out of Stock' : 'Add to Cart' }}
+			</button>
+		</div>
+	</div>
+
+	<ng-template #noResults>
+		<div class="no-results">
+			<h3>No products found</h3>
+			<p>Try adjusting your search or filters</p>
+		</div>
+	</ng-template>
+
+	<div class="pagination" *ngIf="totalPages > 1">
+		<button class="page-btn" (click)="goToPage(1)" [disabled]="currentPage === 1">First</button>
+		<button class="page-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Prev</button>
+
+		<button
+			*ngFor="let page of getPageNumbers()"
+			class="page-btn"
+			[class.active]="page === currentPage"
+			(click)="goToPage(page)"
+		>
+			{{ page }}
+		</button>
+
+		<button class="page-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+		<button class="page-btn" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">Last</button>
 	</div>
 </div>

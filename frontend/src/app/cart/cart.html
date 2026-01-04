@@ -1,0 +1,52 @@
+
+<div class="cart-page">
+	<h2>Your Cart</h2>
+
+	<div class="cart-layout" *ngIf="items.length; else emptyState">
+		<div class="cart-list">
+			<div class="cart-card" *ngFor="let item of items; trackBy: trackById">
+				<img [src]="item.image" alt="{{ item.name }}" class="cart-image" />
+				<div class="cart-info">
+					<div class="cart-title">{{ item.name }}</div>
+					<div class="cart-meta">${{ item.price | number:'1.2-2' }} each</div>
+					<div class="cart-quantity">
+						<button type="button" class="qty-btn" (click)="decrement(item)">-</button>
+						<input
+							type="number"
+							min="1"
+							max="99"
+							[(ngModel)]="item.quantity"
+							(ngModelChange)="updateQuantity(item, $event)"
+							class="qty-input"
+						/>
+						<button type="button" class="qty-btn" (click)="increment(item)">+</button>
+					</div>
+					<div class="cart-line-total">Subtotal: ${{ (item.price * item.quantity) | number:'1.2-2' }}</div>
+				</div>
+				<button type="button" class="remove-btn" (click)="removeItem(item.id)">Remove</button>
+			</div>
+		</div>
+
+		<div class="cart-summary">
+			<h3>Order Summary</h3>
+			<div class="summary-row">
+				<span>Subtotal</span>
+				<span>${{ subtotal | number:'1.2-2' }}</span>
+			</div>
+			<div class="summary-row total-row">
+				<span>Total</span>
+				<span>${{ total | number:'1.2-2' }}</span>
+			</div>
+			<button class="checkout-btn" routerLink="/checkout" type="button">Proceed to Checkout</button>
+			<a class="continue-link" routerLink="/products">Continue shopping</a>
+		</div>
+	</div>
+
+	<ng-template #emptyState>
+		<div class="empty-cart">
+			<h3>Your cart is empty</h3>
+			<p>Add products to see them here.</p>
+			<a class="continue-link" routerLink="/products">Browse products</a>
+		</div>
+	</ng-template>
+</div>

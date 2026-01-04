@@ -1,0 +1,103 @@
+<div class="order-details-container">
+	<div class="back-button">
+		<button (click)="goBack()" class="btn-back">← Back to Orders</button>
+	</div>
+
+	<div *ngIf="loading" class="loading">
+		<p>Loading order details...</p>
+	</div>
+
+	<div *ngIf="!loading && order" class="order-details">
+		<!-- Order Header -->
+		<div class="order-header-section">
+			<div class="header-left">
+				<h1>{{ order.orderNumber }}</h1>
+				<p class="order-date">Ordered on {{ order.orderDate }}</p>
+			</div>
+			<div class="header-right">
+				<div class="order-status-badge" [class]="order.status.toLowerCase()">
+					{{ order.status }}
+				</div>
+			</div>
+		</div>
+
+		<!-- Timeline -->
+		<div class="timeline-section">
+			<h2>Order Timeline</h2>
+			<div class="timeline">
+				<div class="timeline-item" *ngFor="let event of order.timeline; let last = last" [class.completed]="event.completed">
+					<div class="timeline-marker" [class.active]="event.completed"></div>
+					<div class="timeline-connector" *ngIf="!last"></div>
+					<div class="timeline-content">
+						<h3>{{ event.status }}</h3>
+						<p class="timeline-date">{{ event.date }} at {{ event.time }}</p>
+						<p class="timeline-description">{{ event.description }}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Main Content -->
+		<div class="order-content">
+			<!-- Order Items -->
+			<div class="order-items-section">
+				<h2>Order Items</h2>
+				<div class="items-list">
+					<div class="item-card" *ngFor="let item of order.items">
+						<img [src]="item.image" alt="{{ item.name }}" class="item-image" />
+						<div class="item-details">
+							<h3>{{ item.name }}</h3>
+							<p class="item-qty">Quantity: {{ item.quantity }}</p>
+							<p class="item-price">${{ item.price | number: '1.2-2' }}</p>
+						</div>
+						<div class="item-subtotal">
+							${{ (item.quantity * item.price) | number: '1.2-2' }}
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Order Summary and Shipping -->
+			<div class="order-summary-section">
+				<!-- Shipping Address -->
+				<div class="shipping-card">
+					<h3>Shipping Address</h3>
+					<div class="address-content">
+						<p><strong>{{ order.shippingAddress.name }}</strong></p>
+						<p>{{ order.shippingAddress.street }}</p>
+						<p>{{ order.shippingAddress.city }}, {{ order.shippingAddress.state }} {{ order.shippingAddress.zip }}</p>
+						<p>{{ order.shippingAddress.phone }}</p>
+					</div>
+				</div>
+
+				<!-- Order Summary -->
+				<div class="summary-card">
+					<h3>Order Summary</h3>
+					<div class="summary-row">
+						<span>Subtotal</span>
+						<span>${{ order.subtotal | number: '1.2-2' }}</span>
+					</div>
+					<div class="summary-row">
+						<span>Shipping</span>
+						<span>${{ order.shipping | number: '1.2-2' }}</span>
+					</div>
+					<div class="summary-row total">
+						<span>Total</span>
+						<span>${{ order.total | number: '1.2-2' }}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Actions -->
+		<div class="actions-section">
+			<button class="btn-primary" routerLink="/orders">View All Orders</button>
+			<button class="btn-secondary" routerLink="/products">Continue Shopping</button>
+		</div>
+	</div>
+
+	<div *ngIf="!loading && !order" class="not-found">
+		<p>Order not found</p>
+		<button (click)="goBack()" class="btn-primary">Back to Orders</button>
+	</div>
+</div>

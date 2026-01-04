@@ -5,6 +5,13 @@ import { ApiService } from '../api.service';
 import { AuthServiceService } from '../auth-service.service';
 import { filter } from 'rxjs/operators';
 
+interface TopSellingProduct {
+  id: number;
+  name: string;
+  unitsSold: number;
+  revenue: number;
+}
+
 @Component({
   selector: 'app-seller-dashboard',
   standalone: true,
@@ -14,6 +21,20 @@ import { filter } from 'rxjs/operators';
 })
 export class SellerDashboardComponent {
   products: any[] = [];
+  totalRevenue: number = 0;
+  totalUnitsSold: number = 0;
+  topSellingProducts: TopSellingProduct[] = [];
+  chartColors: string[] = [
+    '#FF6384',
+    '#36A2EB',
+    '#FFCE56',
+    '#4BC0C0',
+    '#9966FF',
+    '#FF9F40',
+    '#FF6384',
+    '#C9CBCF',
+  ];
+
   constructor(private apiService: ApiService, private authServiceService: AuthServiceService, private router: Router, private route: ActivatedRoute) {
     if (!this.authServiceService.isLoggedIn()) {
       console.error('User is not logged in.');
@@ -51,11 +72,44 @@ export class SellerDashboardComponent {
             }
           });
         }
+        this.calculateAnalytics();
       },
       error: (error) => {
         console.error('Failed to fetch user products:', error);
       }
     });
+  }
+
+  calculateAnalytics() {
+    // Generate sample sales data (in real app, this would come from backend orders)
+    this.topSellingProducts = this.products
+      .map((product: any) => ({
+        id: product.id,
+        name: product.name,
+        unitsSold: Math.floor(Math.random() * 100) + 10,
+        revenue: 0,
+      }))
+      .sort((a, b) => b.unitsSold - a.unitsSold)
+      .slice(0, 5);
+
+    // Calculate revenue for each product
+    this.topSellingProducts = this.topSellingProducts.map((item) => {
+      const product = this.products.find((p: any) => p.id === item.id);
+      return {
+        ...item,
+        revenue: item.unitsSold * (product?.price || 0),
+      };
+    });
+
+    // Calculate total metrics
+    this.totalUnitsSold = this.topSellingProducts.reduce(
+      (sum, item) => sum + item.unitsSold,
+      0
+    );
+    this.totalRevenue = this.topSellingProducts.reduce(
+      (sum, item) => sum + item.revenue,
+      0
+    );
   }
 
   deleteProduct(productId: string) {
@@ -71,4 +125,5 @@ export class SellerDashboardComponent {
     });
   }
 }
+
 

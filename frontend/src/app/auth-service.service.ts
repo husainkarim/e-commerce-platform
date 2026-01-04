@@ -1,6 +1,5 @@
-import { Component, ChangeDetectionStrategy, signal, computed, Input, Injectable, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
