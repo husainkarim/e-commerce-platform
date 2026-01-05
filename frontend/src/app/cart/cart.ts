@@ -63,6 +63,7 @@ export class Cart {
     const stored = localStorage.getItem('cartItems');
     if (stored) {
       try {
+        //TODO
         this.items = JSON.parse(stored) as CartItem[];
         return;
       } catch (error) {
@@ -75,6 +76,7 @@ export class Cart {
   }
 
   private persistCart(): void {
+    //TODO
     localStorage.setItem('cartItems', JSON.stringify(this.items));
   }
 

@@ -104,6 +104,7 @@ export class Checkout {
       try {
         this.items = JSON.parse(stored) as CartItem[];
         if (this.items.length) {
+          //TODO
           return;
         }
       } catch (error) {

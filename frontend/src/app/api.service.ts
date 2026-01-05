@@ -79,4 +79,13 @@ export class ApiService {
   deleteImage(data: any): Observable<any> {
     return this.http.delete(`${this.baseUrl}/media/delete`, { body: data, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
   }
+
+  // Order APIs
+  GetCartByUserId(userId: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/orders/cart?userId=${userId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+  }
+
+  UpdateCart(userId: string, data: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/orders/update-cart?userId=${userId}`, data, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+  }
 }

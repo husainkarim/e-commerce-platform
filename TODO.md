@@ -11,4 +11,14 @@
 
 ### backend
 
-- [ ] task
+#### order-service
+- [X] get cart
+- [X] update cart
+- [ ] save order
+
+#### product-service
+- [X] add categories to model
+
+#### user-service
+
+#### media-service
