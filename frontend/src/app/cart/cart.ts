@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { ApiService } from '../api.service';
+import { AuthServiceService } from '../auth-service.service';
 
 interface CartItem {
   id: string;
@@ -21,7 +23,7 @@ interface CartItem {
 export class Cart {
   items: CartItem[] = [];
 
-  constructor() {
+  constructor(private apiService: ApiService, private authServiceService: AuthServiceService) {
     this.loadCart();
   }
 
@@ -61,48 +63,34 @@ export class Cart {
 
   private loadCart(): void {
     const stored = localStorage.getItem('cartItems');
-    if (stored) {
+    if (!stored) {
       try {
-        //TODO
-        this.items = JSON.parse(stored) as CartItem[];
+        this.apiService.GetCartByUserId(this.authServiceService.getUser().id).subscribe({
+          next: (response) => {
+            this.items = response.items;
+            this.persistCart();
+          },
+          error: (error) => {
+            console.error('Failed to fetch cart data:', error);
+          }
+        });
         return;
       } catch (error) {
         console.warn('Falling back to sample cart items because stored data is invalid.', error);
       }
     }
-
-    this.items = this.sampleItems();
     this.persistCart();
   }
 
   private persistCart(): void {
-    //TODO
+    this.apiService.UpdateCart(this.authServiceService.getUser().id, this.items).subscribe({
+      next: (response) => {
+        console.log('Cart updated successfully on server:', response);
+      },
+      error: (error) => {
+        console.error('Failed to update cart on server:', error);
+      }
+    });
     localStorage.setItem('cartItems', JSON.stringify(this.items));
-  }
-
-  private sampleItems(): CartItem[] {
-    return [
-      {
-        id: 'sample-1',
-        name: 'Wireless Headphones',
-        image: 'assets/product-images/default-product-image.jpg',
-        price: 129.99,
-        quantity: 1,
-      },
-      {
-        id: 'sample-2',
-        name: 'Smart Watch',
-        image: 'assets/product-images/default-product-image.jpg',
-        price: 199.0,
-        quantity: 2,
-      },
-      {
-        id: 'sample-3',
-        name: 'Leather Backpack',
-        image: 'assets/product-images/default-product-image.jpg',
-        price: 89.5,
-        quantity: 1,
-      },
-    ];
   }
 }

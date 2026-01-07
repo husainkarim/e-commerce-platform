@@ -2,7 +2,7 @@
 set -e  # Stop script if any command fails
 
 # Array of service directories
-services=("user-service" "product-service" "media-service" "api-gateway")
+services=("user-service" "product-service" "media-service" "api-gateway" "order-service")
 
 # Loop through services and build each
 for service in "${services[@]}"; do
