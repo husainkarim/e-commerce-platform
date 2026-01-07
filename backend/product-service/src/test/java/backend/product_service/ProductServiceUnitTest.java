@@ -1,19 +1,19 @@
 package backend.product_service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import backend.product_service.model.Product;
-import backend.product_service.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import backend.product_service.model.Product;
+import backend.product_service.repository.ProductRepository;
 import backend.product_service.service.ProductService;
 
 // Activates Mockito annotations for JUnit 5
@@ -33,7 +33,7 @@ public class ProductServiceUnitTest {
     @BeforeEach
     void setUp() {
         // Prepare a product object for use in tests
-        productToSave = new Product("123", "Laptop Pro", "A high-end laptop.", 1999.99, 10, "user-a1");
+        productToSave = new Product("123", "Laptop Pro", "A high-end laptop.", "General", 1999.99, 10, "user-a1");
     }
 
     @Test
