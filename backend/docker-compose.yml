@@ -110,6 +110,7 @@ services:
       - user-service
       - product-service
       - media-service
+      - order-service
     networks:
       - internal
       - external
