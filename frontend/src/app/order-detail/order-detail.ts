@@ -56,10 +56,10 @@ export class OrderDetail implements OnInit {
   ) {}
 
   ngOnInit() {
-    // if (!this.authService.isLoggedIn()) {
-    //   this.router.navigate(['/login']);
-    //   return;
-    // }
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
 
     this.route.params.subscribe((params) => {
       const orderId = params['id'];

@@ -32,10 +32,10 @@ export class Orders implements OnInit {
   ) {}
 
   ngOnInit() {
-    // if (!this.authService.isLoggedIn()) {
-    //   this.router.navigate(['/login']);
-    //   return;
-    // }
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
     this.loadOrders();
   }
 

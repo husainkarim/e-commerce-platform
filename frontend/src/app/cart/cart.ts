@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ApiService } from '../api.service';
 import { AuthServiceService } from '../auth-service.service';
 
@@ -23,7 +23,11 @@ interface CartItem {
 export class Cart {
   items: CartItem[] = [];
 
-  constructor(private apiService: ApiService, private authServiceService: AuthServiceService) {
+  constructor(private apiService: ApiService, private authService: AuthServiceService, private router: Router) {
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
     this.loadCart();
   }
 

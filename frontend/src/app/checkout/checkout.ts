@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { AuthServiceService } from '../auth-service.service';
 
 interface CartItem {
   id: string;
@@ -42,7 +43,11 @@ export class Checkout {
     notes: '',
   };
 
-  constructor() {
+  constructor(private authService: AuthServiceService, private router: Router) {
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
     this.loadCart();
   }
 
