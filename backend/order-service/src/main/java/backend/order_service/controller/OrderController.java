@@ -153,7 +153,12 @@ public class OrderController {
     public ResponseEntity<Map<String, Object>> deleteOrder(@RequestParam String orderId) {
         Map<String, Object> response = new HashMap<>();
         if (orderRepository.existsById(orderId)) {
+            Order order = orderRepository.findById(orderId).orElse(null);
+            if (order != null) {
+                kafkaService.sendOrderDeletedEvent(order);
+            }
             orderRepository.deleteById(orderId);
+            
             response.put("message", "Order deleted successfully");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
