@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../api.service';
+import { AuthServiceService } from '../auth-service.service';
 
 interface Product {
   id: string;
@@ -13,6 +14,19 @@ interface Product {
   userId: string;
   image: string;
   category?: string;
+}
+
+interface CartItem {
+  sellerId: string;
+  productId: string;
+  productName: string;
+  price: number;
+  quantity: number;
+}
+
+interface Cart {
+  userId: string;
+  items: CartItem[];
 }
 
 @Component({
@@ -41,7 +55,7 @@ export class ProductsComponent {
 
   categories: string[] = ['Automotive', 'Beauty', 'Books', 'Electronics', 'Fashion', 'Garden', 'General', 'Groceries', 'Health', 'Home', 'Jewelry', 'Movies', 'Music', 'Sports', 'Toys'];
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService, private authService: AuthServiceService) {}
 
   ngOnInit() {
     this.fetchProducts();
@@ -182,15 +196,26 @@ export class ProductsComponent {
       existingItem.quantity += 1;
     } else {
       cartItems.push({
-        id: product.id,
-        name: product.name,
-        image: product.image,
+        sellerId: product.userId,
+        productId: product.id,
+        productName: product.name,
         price: product.price,
         quantity: 1
       });
     }
-
-    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    let userCart: Cart = {
+      userId: this.authService.getUser().id,
+      items: cartItems
+    }
+    this.apiService.UpdateCart(this.authService.getUser().id, userCart).subscribe({
+      next: (response) => {
+        console.log('Cart updated successfully:', response);
+      },
+      error: (error) => {
+        console.error('Failed to update cart:', error);
+      }
+    });
+    localStorage.setItem('cartItems', JSON.stringify(userCart.items));
     alert(`${product.name} added to cart!`);
   }
 }

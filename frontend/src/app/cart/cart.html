@@ -4,7 +4,7 @@
 
 	<div class="cart-layout" *ngIf="items.length; else emptyState">
 		<div class="cart-list">
-			<div class="cart-card" *ngFor="let item of items; trackBy: trackById">
+			<div class="cart-card" *ngFor="let item of items;">
 				<img [src]="item.image" alt="{{ item.name }}" class="cart-image" />
 				<div class="cart-info">
 					<div class="cart-title">{{ item.name }}</div>

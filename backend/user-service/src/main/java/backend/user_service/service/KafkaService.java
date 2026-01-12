@@ -17,13 +17,11 @@ public class KafkaService {
     
     // Send created user event to Kafka topic
     public void sendUserCreatedEvent(User user) {
-        if ("seller".equals(user.getRole())) {
-            Map<String, Object> event = new HashMap<>();
-            event.put("userId", user.getId());
-            event.put("email", user.getEmail());
-            event.put("role", user.getRole());
-            kafkaTemplate.send("user-created-topic", event);
-        }
+        Map<String, Object> event = new HashMap<>();
+        event.put("userId", user.getId());
+        event.put("email", user.getEmail());
+        event.put("role", user.getRole());
+        kafkaTemplate.send("user-created-topic", event);
     }
 
     public void sendUserUpdatedEvent(User user) {

@@ -5,12 +5,28 @@ import { Router, RouterModule } from '@angular/router';
 import { ApiService } from '../api.service';
 import { AuthServiceService } from '../auth-service.service';
 
-interface CartItem {
+interface Product {
   id: string;
   name: string;
-  image: string;
+  description: string;
   price: number;
   quantity: number;
+  userId: string;
+  image: string;
+  category?: string;
+}
+
+interface CartItem {
+  sellerId: string;
+  productId: string;
+  productName: string;
+  price: number;
+  quantity: number;
+}
+
+interface userCart {
+  userId: string;
+  items: CartItem[];
 }
 
 @Component({
@@ -21,7 +37,7 @@ interface CartItem {
   styleUrl: './cart.css',
 })
 export class Cart {
-  items: CartItem[] = [];
+  items: any[] = [];
 
   constructor(private apiService: ApiService, private authService: AuthServiceService, private router: Router) {
     if (!this.authService.isLoggedIn()) {
@@ -61,17 +77,33 @@ export class Cart {
     this.persistCart();
   }
 
-  trackById(_: number, item: CartItem): string {
-    return item.id;
-  }
-
   private loadCart(): void {
     const stored = localStorage.getItem('cartItems');
     if (!stored) {
       try {
         this.apiService.GetCartByUserId(this.authService.getUser().id).subscribe({
           next: (response) => {
-            this.items = response.items;
+            let cartItems: CartItem[] = response.items || [];
+            this.items = cartItems.map((cartItem) =>
+              this.apiService.getProductById(cartItem.productId).subscribe({
+                next: (productResponse) => {
+                  return {
+                    id: productResponse.id,
+                    name: productResponse.name,
+                    description: productResponse.description,
+                    price: productResponse.price,
+                    quantity: cartItem.quantity,
+                    userId: productResponse.userId,
+                    image: productResponse.image,
+                    category: productResponse.category,
+                  } as Product;
+                },
+                error: (error: any) => {
+                  console.error('Failed to fetch product data:', error);
+                  return null;
+                }
+              })
+            ),
             this.persistCart();
           },
           error: (error) => {

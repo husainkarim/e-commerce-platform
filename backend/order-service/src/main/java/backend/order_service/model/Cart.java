@@ -1,8 +1,10 @@
 package backend.order_service.model;
 
 import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -31,6 +33,9 @@ public class Cart {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CartItem {
+
+        @Id
+        private String id;
         
         @NotBlank(message = "Product ID is required")
         private String productId;

@@ -34,6 +34,9 @@ public class UserEventConsumer {
     
     @KafkaListener(topics = "user-created-topic")
     public void handleSellerCreated(Map<String, Object> event) {
+        if (event.get("role") == null || !event.get("role").equals("seller")) {
+            return; // not a seller
+        }
         if (this.sellerRepository.existsById((String) event.get("userId"))) {
             return; // already exists
         }

@@ -1,6 +1,4 @@
-package backend.order_service.model;
-
-import java.util.Date;
+package backend.product_service.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,11 +10,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "order_statuses")
-public class OrderStatus {
+@Document(collection = "ordered")
+public class Ordered {
     @Id
     private String id;
     private String orderId;
-    private String status;
-    private Date updatedAt = new Date();
+    private String productId;
+    private String clientId;
+    private String sellerId;
+    private int quantity;
+    private double price;
 }
