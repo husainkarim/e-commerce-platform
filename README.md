@@ -149,28 +149,17 @@ This e-commerce platform demonstrates modern software architecture principles wi
 - GitHub (for webhooks)
 
 ### Environment Setup
-Create a `.env` file in the `backend/` directory:
+Create a `.env` file in the `backend/` directory and add `serviceAccountKey.json` from your Firebase account into your `media-service`.
 
 ```env
-# Kafka Configuration
-KAFKA_BROKER=kafka:29092
-KAFKA_PORT=9092
-
 # MongoDB Configuration
 MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>?retryWrites=true&w=majority
 
-# Firebase Configuration
-FIREBASE_API_KEY=<your-api-key>
-FIREBASE_AUTH_DOMAIN=<your-auth-domain>
-FIREBASE_PROJECT_ID=<your-project-id>
-FIREBASE_STORAGE_BUCKET=<your-storage-bucket>
-
 # JWT Configuration
 JWT_SECRET=<your-jwt-secret-key>
-JWT_EXPIRATION=86400000
 
-# Server Port
-SERVER_PORT=8080
+# Https Certificate password
+KEYSTORE_PASSWORD=<password>
 ```
 
 ---
@@ -196,7 +185,7 @@ make down
 
 ### Option 2: Manual Local Setup
 
-#### Backend Services
+#### Backend Services & Frontend
 
 ```bash
 cd backend
@@ -209,20 +198,6 @@ make up
 
 # Check service status
 make logs
-```
-
-#### Frontend
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start development server
-npm start
-# or
-ng serve --open
 
 # Application will be available at http://localhost:4200
 ```
@@ -234,7 +209,7 @@ ng serve --open
 ### Service Details
 
 #### API Gateway
-- **Port**: 8000
+- **Port**: 8443
 - **Role**: Central entry point, request routing, authentication
 - **Key Endpoints**:
   - `POST /auth/login` - User login
@@ -242,7 +217,7 @@ ng serve --open
   - All requests are routed to respective microservices
 
 #### User Service
-- **Port**: 8001
+- **Port**: 8100
 - **Role**: User management and authentication
 - **Key Responsibilities**:
   - User registration and authentication
@@ -251,7 +226,7 @@ ng serve --open
   - User preferences
 
 #### Product Service
-- **Port**: 8002
+- **Port**: 8200
 - **Role**: Product catalog management
 - **Key Responsibilities**:
   - Product CRUD operations
@@ -260,7 +235,7 @@ ng serve --open
   - Search and filtering
 
 #### Media Service
-- **Port**: 8003
+- **Port**: 8300
 - **Role**: Media file management
 - **Key Responsibilities**:
   - File upload/download
@@ -269,7 +244,7 @@ ng serve --open
   - File metadata management
 
 #### Order Service
-- **Port**: 8004
+- **Port**: 8400
 - **Role**: Order and transaction management
 - **Key Responsibilities**:
   - Order creation and tracking
@@ -515,22 +490,19 @@ docker compose logs -f
 #### Environment Variables for Production
 
 ```env
-# Kafka
-KAFKA_BROKER=kafka:29092
 
 # MongoDB (Production cluster)
 MONGODB_URI=mongodb+srv://<prod-user>:<prod-password>@<prod-cluster>.mongodb.net/ecommerce?retryWrites=true&w=majority
 
 # Firebase
-FIREBASE_API_KEY=<prod-api-key>
-FIREBASE_PROJECT_ID=<prod-project-id>
+serviceAccountKey.json
 
 # Security
 JWT_SECRET=<strong-random-secret>
-JWT_EXPIRATION=86400000
 
-# Server
-SERVER_PORT=8080
+# Https Certificate password
+KEYSTORE_PASSWORD=<password>
+
 ```
 
 #### Health Checks
@@ -618,40 +590,6 @@ curl -s http://localhost:8002/actuator/health
 echo "Checking Media Service..."
 curl -s http://localhost:8003/actuator/health
 ```
-
----
-
-## Contributing
-
-We welcome contributions! Please follow these guidelines:
-
-1. **Create a feature branch**:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-2. **Make your changes** and write tests
-
-3. **Push to your branch**:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-
-4. **Create a Pull Request** with:
-   - Clear description of changes
-   - Reference to related issues
-   - Screenshots (for UI changes)
-
-5. **Pass all checks**:
-   - Jenkins build passes
-   - SonarQube quality gate passes
-   - Code review approved
-   - No merge conflicts
-
-### Branch Protection Rules
-
-- `main`: Staging branch, requires all checks + 1 approval
-- `production`: Release branch, requires all checks + 2 approvals + passing tests
 
 ---
 
