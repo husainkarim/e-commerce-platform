@@ -5,6 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { AuthServiceService } from '../auth-service.service';
+import { ApiService } from '../api.service';
 
 describe('Cart', () => {
   let component: Cart;
@@ -14,26 +15,41 @@ describe('Cart', () => {
     await TestBed.configureTestingModule({
       imports: [Cart, HttpClientTestingModule, RouterTestingModule],
       providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            params: of({}),
-            queryParams: of({}),
-            snapshot: {
-              paramMap: {
-                get: () => null
-              }
+      {
+        provide: ActivatedRoute,
+        useValue: {
+          params: of({}),
+          queryParams: of({}),
+          snapshot: {
+            paramMap: {
+              get: () => null
             }
           }
-        },
-        {
-          provide: AuthServiceService,
-          useValue: {
-            isLoggedIn: () => true,
-            getUser: () => ({ id: 1, name: 'Test User' })
-          }
         }
-      ]
+      },
+      {
+        provide: AuthServiceService,
+        useValue: {
+          isLoggedIn: () => true,
+          getUser: () => ({ id: 1, name: 'Test User' }),
+          getToken: () => 'fake-jwt-token'
+        }
+      },
+      {
+        provide: ApiService,
+        useValue: {
+          GetCartByUserId: () =>
+            of({
+              items: []
+            }),
+          UpdateCart: () =>
+            of({
+              success: true
+            })
+        }
+      }
+    ]
+
     })
     .compileComponents();
 
