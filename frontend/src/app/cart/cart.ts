@@ -69,7 +69,7 @@ export class Cart {
     const stored = localStorage.getItem('cartItems');
     if (!stored) {
       try {
-        this.apiService.GetCartByUserId(this.authServiceService.getUser().id).subscribe({
+        this.apiService.GetCartByUserId(this.authService.getUser().id).subscribe({
           next: (response) => {
             this.items = response.items;
             this.persistCart();
@@ -87,7 +87,7 @@ export class Cart {
   }
 
   private persistCart(): void {
-    this.apiService.UpdateCart(this.authServiceService.getUser().id, this.items).subscribe({
+    this.apiService.UpdateCart(this.authService.getUser().id, this.items).subscribe({
       next: (response) => {
         console.log('Cart updated successfully on server:', response);
       },
