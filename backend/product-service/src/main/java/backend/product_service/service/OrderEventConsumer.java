@@ -1,6 +1,16 @@
 package backend.product_service.service;
 
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+
+import backend.product_service.model.Ordered;
+import backend.product_service.model.Product;
+import backend.product_service.repository.OrderedRepository;
+import backend.product_service.repository.ProductRepository;
+
 
 @Service
 public class OrderEventConsumer {
