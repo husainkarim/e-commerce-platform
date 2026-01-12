@@ -16,7 +16,7 @@ pipeline {
                 checkout scm
             }
         }
-/**
+
         stage('Initialize GitHub Status') {
             steps {
                 // Set status to PENDING as soon as the build starts
@@ -110,7 +110,7 @@ pipeline {
                 }
             }
         }
-**/
+
         stage('Install & Build & Deploy Application') {
             steps {
                 dir('backend') {
@@ -142,7 +142,7 @@ pipeline {
             }
         }
     }
-/**
+
     post {
         always {
             cleanWs() // Good: Prevents disk space issues and "dirty" builds
@@ -177,5 +177,5 @@ pipeline {
                  subject: "FAILURE: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
                  body: "The build or security scan failed. Please check the logs immediately: ${env.BUILD_URL}"
         }
-    }**/
+    }
 }
