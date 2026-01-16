@@ -32,7 +32,6 @@ This e-commerce platform demonstrates modern software architecture principles wi
 - [CI/CD & DevOps](#-cicd--devops)
 - [Deployment](#-deployment)
 - [Troubleshooting](#-troubleshooting)
-- [Contributing](#contributing)
 - [License](#-license)
 
 ---
