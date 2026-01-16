@@ -207,7 +207,7 @@ export class ProductsComponent {
       userId: this.authService.getUser().id,
       items: cartItems
     }
-    this.apiService.UpdateCart(this.authService.getUser().id, userCart).subscribe({
+    this.apiService.updateCart(this.authService.getUser().id, userCart).subscribe({
       next: (response) => {
         console.log('Cart updated successfully:', response);
       },

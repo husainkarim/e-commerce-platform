@@ -35,11 +35,15 @@ public class Order {
     @Valid // This is crucial to trigger validation on the OrderItem list
     private List<OrderItem> items;
 
-    @Pattern(regexp = "PENDING|SHIPPED|DELIVERED|CANCELLED", message = "Invalid status")
+    //shipping Fees
+    @PositiveOrZero(message = "Shipping fee cannot be negative")
+    private double shippingFees;
+
+    @Pattern(regexp = "PENDING|CONFIRMED|DELIVERED|CANCELLED", message = "Invalid status")
     private String status = "PENDING";
 
     @NotBlank(message = "Payment method is required")
-    private String paymentMethod = "PAY_ON_DELIVERY";
+    private String paymentMethod = "PAY ON DELIVERY";
 
     @NotNull(message = "Shipping address cannot be null")
     @Valid // Triggers validation on the ShippingAddress inner class

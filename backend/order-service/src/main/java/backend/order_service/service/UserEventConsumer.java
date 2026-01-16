@@ -5,14 +5,18 @@ import java.util.Map;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import backend.order_service.model.Cart;
 import backend.order_service.model.Client;
+import backend.order_service.repository.CartRepository;
 import backend.order_service.repository.ClientRepository;
 
 @Service
 public class UserEventConsumer {
     private final ClientRepository clientRepository;
-    public UserEventConsumer(ClientRepository clientRepository) {
+    private final CartRepository cartRepository;
+    public UserEventConsumer(ClientRepository clientRepository, CartRepository cartRepository) {
         this.clientRepository = clientRepository;
+        this.cartRepository = cartRepository;
     }
 
     @KafkaListener(topics = "user-created-topic")
@@ -26,6 +30,9 @@ public class UserEventConsumer {
         // Allow this client to use order service
         Client client = new Client((String) event.get("userId"), (String) event.get("email"), (String) event.get("role"));
         this.clientRepository.save(client);
+        Cart cart = new Cart();
+        cart.setUserId(client.getUserId());
+        this.cartRepository.save(cart);
     }
 
     @KafkaListener(topics = "user-updated-topic")

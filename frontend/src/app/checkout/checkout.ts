@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthServiceService } from '../auth-service.service';
+import { ApiService } from '../api.service';
 
 interface CartItem {
   id: string;
@@ -22,6 +23,14 @@ interface Address {
   notes: string;
 }
 
+interface Order {
+  userId: string;
+  items: CartItem[];
+  shippingAddress: Address;
+  shippingFees: number;
+  paymentMethod: string;
+}
+
 @Component({
   selector: 'app-checkout',
   standalone: true,
@@ -33,7 +42,9 @@ export class Checkout {
   step = 0;
   confirmed = false;
   items: CartItem[] = [];
-  address: Address = {
+  shippingFee = 0;
+  paymentMethod = 'PAY ON DELIVERY';
+  shippingAddress: Address = {
     fullName: '',
     phone: '',
     street: '',
@@ -43,7 +54,7 @@ export class Checkout {
     notes: '',
   };
 
-  constructor(private authService: AuthServiceService, private router: Router) {
+  constructor(private authService: AuthServiceService, private router: Router, private apiService: ApiService) {
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
       return;
@@ -56,11 +67,11 @@ export class Checkout {
   }
 
   get shipping(): number {
-    return this.subtotal < 100 ? 20 : 0;
+    return this.subtotal < 100 ? this.shippingFee = 20 : this.shippingFee = 0;
   }
 
   get total(): number {
-    return this.subtotal + this.shipping;
+    return this.subtotal + this.shippingFee;
   }
 
   goTo(step: number): void {
@@ -89,16 +100,33 @@ export class Checkout {
     }
     this.confirmed = true;
     this.step = 2;
+    const order: Order = {
+      userId: this.authService.getUser().id,
+      items: this.items,
+      shippingAddress: this.shippingAddress,
+      shippingFees: this.shipping,
+      paymentMethod: this.paymentMethod,
+    };
+    this.apiService.placeOrder(this.authService.getUser().id, order).subscribe({
+      next: (response) => {
+        console.log('Order placed successfully:', response);
+        localStorage.removeItem('cartItems');
+        this.items = [];
+      },
+      error: (error) => {
+        console.error('Failed to place order:', error);
+      }
+    });
   }
 
   private isAddressValid(): boolean {
     const required = [
-      this.address.fullName,
-      this.address.phone,
-      this.address.street,
-      this.address.city,
-      this.address.state,
-      this.address.zip,
+      this.shippingAddress.fullName,
+      this.shippingAddress.phone,
+      this.shippingAddress.street,
+      this.shippingAddress.city,
+      this.shippingAddress.state,
+      this.shippingAddress.zip,
     ];
     return required.every((field) => field.trim().length > 0);
   }
@@ -107,31 +135,14 @@ export class Checkout {
     const stored = localStorage.getItem('cartItems');
     if (stored) {
       try {
-        this.items = JSON.parse(stored) as CartItem[];
-        if (this.items.length) {
-          //TODO
-          return;
-        }
+        this.apiService.getCartByUserId(this.authService.getUser().id).subscribe({
+          next: (response) => {
+            this.items = response.items || [];
+          }
+        });
       } catch (error) {
         console.warn('Falling back to sample checkout items because stored data is invalid.', error);
       }
     }
-
-    this.items = [
-      {
-        id: 'sample-1',
-        name: 'Wireless Headphones',
-        image: 'assets/product-images/default-product-image.jpg',
-        price: 129.99,
-        quantity: 1,
-      },
-      {
-        id: 'sample-2',
-        name: 'Smart Watch',
-        image: 'assets/product-images/default-product-image.jpg',
-        price: 199.0,
-        quantity: 2,
-      },
-    ];
   }
 }

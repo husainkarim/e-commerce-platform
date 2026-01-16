@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ApiService } from '../api.service';
 import { AuthServiceService } from '../auth-service.service';
 
@@ -38,6 +40,8 @@ interface userCart {
 })
 export class Cart {
   items: any[] = [];
+  cartItems: CartItem[] = [];
+  userCartData: userCart | null = null;
 
   constructor(private apiService: ApiService, private authService: AuthServiceService, private router: Router) {
     if (!this.authService.isLoggedIn()) {
@@ -81,10 +85,10 @@ export class Cart {
     const stored = localStorage.getItem('cartItems');
     if (!stored) {
       try {
-        this.apiService.GetCartByUserId(this.authService.getUser().id).subscribe({
+        this.apiService.getCartByUserId(this.authService.getUser().id).subscribe({
           next: (response) => {
-            let cartItems: CartItem[] = response.items || [];
-            this.items = cartItems.map((cartItem) =>
+            this.cartItems = response.items || [];
+            this.items = this.cartItems.map((cartItem) =>
               this.apiService.getProductById(cartItem.productId).subscribe({
                 next: (productResponse) => {
                   return {
@@ -119,11 +123,22 @@ export class Cart {
   }
 
   private persistCart(): void {
-    this.apiService.UpdateCart(this.authService.getUser().id, this.items).subscribe({
+    this.userCartData = {
+      userId: this.authService.getUser().id,
+      items: this.items.map((item) => ({
+        sellerId: item.userId,
+        productId: item.id,
+        productName: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      })),
+    };
+    this.apiService.updateCart(this.authService.getUser().id, this.userCartData).subscribe({
       next: (response) => {
         console.log('Cart updated successfully on server:', response);
       },
       error: (error) => {
+
         console.error('Failed to update cart on server:', error);
       }
     });

@@ -5,19 +5,20 @@
 <nav class="main-navbar">
 	<a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
   <a routerLink="/products" routerLinkActive="active">Products</a>
-	<a routerLink="/cart" routerLinkActive="active">Cart</a>
-  <a routerLink="/orders" routerLinkActive="active">Orders</a>
   @if (isLoggedInSignal()) {
 	  <a routerLink="/profile" routerLinkActive="active">Profile</a>
+    @if (isClientSignal()) {
+      <a routerLink="/cart" routerLinkActive="active">Cart</a>
+      <a routerLink="/orders" routerLinkActive="active">Orders</a>
+      <a routerLink="/client/dashboard" routerLinkActive="active">Client Dashboard</a>
+    }
     @if (isSellerOrAdminSignal()) {
       <a routerLink="/seller/dashboard" routerLinkActive="active">Seller Dashboard</a>
     }
-  }
-  @if (!isLoggedInSignal()) {
+    <a (click)="logout()" routerLinkActive="active">Logout</a>
+  } @else {
     <a routerLink="/signup" routerLinkActive="active">Signup</a>
     <a routerLink="/login" routerLinkActive="active">Login</a>
-  } @else {
-    <a (click)="logout()" routerLinkActive="active">Logout</a>
   }
 </nav>
 

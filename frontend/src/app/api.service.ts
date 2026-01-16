@@ -81,11 +81,30 @@ export class ApiService {
   }
 
   // Order APIs
-  GetCartByUserId(userId: string): Observable<any> {
+  getCartByUserId(userId: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/orders/cart?userId=${userId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
   }
 
-  UpdateCart(userId: string, data: any): Observable<any> {
+  updateCart(userId: string, data: any): Observable<any> {
     return this.http.put(`${this.baseUrl}/orders/update-cart?userId=${userId}`, data, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+  }
+
+  placeOrder(userId: string, data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/orders/place-order?userId=${userId}`, data, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+  }
+
+  getOrderById(orderId: string, userId: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/orders/order-details?orderId=${orderId}&userId=${userId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+  }
+  getOrdersByUserId(userId: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/orders/user-orders?userId=${userId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+  }
+
+  updateOrderStatus(userId: string, data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/orders/update-order-status?userId=${userId}`, data, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+  }
+
+  deleteOrder(orderId: string, userId: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/orders/delete-order?orderId=${orderId}&userId=${userId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
   }
 }

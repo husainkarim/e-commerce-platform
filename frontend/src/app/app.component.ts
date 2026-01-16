@@ -5,7 +5,6 @@ import { CommonModule } from '@angular/common';
 import { inject, signal, computed } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { routerMock } from './router-mock';
-import { AppNavLink } from './app-nav-link';
 
 @Component({
   selector: 'app-root',
@@ -31,6 +30,8 @@ export class AppComponent {
     const role = this.userRoleSignal();
     return role === 'seller' || role === 'admin';
   });
+
+  isClientSignal = computed(() => this.userRoleSignal() === 'client');
 
   constructor() {
     // 1. Subscribe to the Observables to automatically update local Signals

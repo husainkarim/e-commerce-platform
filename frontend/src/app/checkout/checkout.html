@@ -29,36 +29,36 @@
 				<div class="form-grid">
 					<label>
 						<span>Full Name</span>
-						<input type="text" [(ngModel)]="address.fullName" placeholder="Jane Doe" />
+						<input type="text" [(ngModel)]="shippingAddress.fullName" placeholder="Jane Doe" />
 					</label>
 					<label>
 						<span>Phone</span>
-						<input type="text" [(ngModel)]="address.phone" placeholder="(555) 123-4567" />
+						<input type="text" [(ngModel)]="shippingAddress.phone" placeholder="(555) 123-4567" />
 					</label>
 					<label class="wide">
 						<span>Street</span>
-						<input type="text" [(ngModel)]="address.street" placeholder="123 Main St" />
+						<input type="text" [(ngModel)]="shippingAddress.street" placeholder="123 Main St" />
 					</label>
 					<label>
 						<span>City</span>
-						<input type="text" [(ngModel)]="address.city" placeholder="Springfield" />
+						<input type="text" [(ngModel)]="shippingAddress.city" placeholder="Springfield" />
 					</label>
 					<label>
 						<span>State</span>
-						<input type="text" [(ngModel)]="address.state" placeholder="CA" />
+						<input type="text" [(ngModel)]="shippingAddress.state" placeholder="CA" />
 					</label>
 					<label>
 						<span>ZIP</span>
-						<input type="text" [(ngModel)]="address.zip" placeholder="90210" />
+						<input type="text" [(ngModel)]="shippingAddress.zip" placeholder="90210" />
 					</label>
 					<label class="wide">
 						<span>Notes (optional)</span>
-						<textarea rows="3" [(ngModel)]="address.notes" placeholder="Gate code, delivery instructions..."></textarea>
+						<textarea rows="3" [(ngModel)]="shippingAddress.notes" placeholder="Gate code, delivery instructions..."></textarea>
 					</label>
 				</div>
 				<div class="actions">
 					<a routerLink="/cart" class="link">Back to cart</a>
-					<button class="primary" (click)="next()" [disabled]="!address.fullName || !address.phone || !address.street || !address.city || !address.state || !address.zip">Review order</button>
+					<button class="primary" (click)="next()" [disabled]="!shippingAddress.fullName || !shippingAddress.phone || !shippingAddress.street || !shippingAddress.city || !shippingAddress.state || !shippingAddress.zip">Review order</button>
 				</div>
 			</section>
 
@@ -106,11 +106,11 @@
 				<h3>Order Confirmed!</h3>
 				<p>Your Pay on Delivery order is confirmed. We will deliver to:</p>
 				<div class="address-block">
-					<div>{{ address.fullName }}</div>
-					<div>{{ address.phone }}</div>
-					<div>{{ address.street }}</div>
-					<div>{{ address.city }}, {{ address.state }} {{ address.zip }}</div>
-					<div *ngIf="address.notes">Note: {{ address.notes }}</div>
+					<div>{{ shippingAddress.fullName }}</div>
+					<div>{{ shippingAddress.phone }}</div>
+					<div>{{ shippingAddress.street }}</div>
+					<div>{{ shippingAddress.city }}, {{ shippingAddress.state }} {{ shippingAddress.zip }}</div>
+					<div *ngIf="shippingAddress.notes">Note: {{ shippingAddress.notes }}</div>
 				</div>
 				<a class="link" routerLink="/products">Continue shopping</a>
 			</section>

@@ -3,6 +3,7 @@ package backend.order_service.model;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import jakarta.validation.Valid;
@@ -23,6 +24,7 @@ public class Cart {
     private String id;
 
     @NotBlank(message = "User ID is required to maintain a cart")
+    @Indexed(unique = true)
     private String userId;
 
     @NotEmpty(message = "Cart cannot be empty")
