@@ -2,7 +2,7 @@
 <div class="dashboard-container">
 	<div class="dashboard-header">
 		<h2>Seller Dashboard</h2>
-		<button class="create-product-btn" routerLink="/seller/dashboard/create-product">Create New Product</button>
+		<button class="create-product-btn" routerLink="/create-product">Create New Product</button>
 	</div>
 
 	<div class="analytics-section">
@@ -75,8 +75,8 @@
 					<p class="product-qty" [class.low]="product.quantity < 10">Stock: {{ product.quantity }}</p>
 				</div>
 				<div class="dashboard-product-actions">
-					<button class="edit-btn" [routerLink]="['/seller/dashboard/edit-product', product.id]">Edit</button>
-					<button class="media-btn" [routerLink]="['/seller/dashboard/media', product.id]">Media</button>
+					<button class="edit-btn" [routerLink]="['/edit-product', product.id]">Edit</button>
+					<button class="media-btn" [routerLink]="['/media-product', product.id]">Media</button>
 					<button class="delete-btn" (click)="deleteProduct(product.id)">Delete</button>
 				</div>
 			</div>

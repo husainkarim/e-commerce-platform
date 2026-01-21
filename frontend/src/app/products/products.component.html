@@ -80,14 +80,6 @@
 					<p class="product-quantity" [class.low-stock]="product.quantity < 10">Stock: {{ product.quantity }}</p>
 				</div>
 			</a>
-			<button
-				class="add-to-cart-btn"
-				(click)="addToCart(product)"
-				[disabled]="product.quantity === 0"
-				[title]="product.quantity === 0 ? 'Out of stock' : 'Add to cart'"
-			>
-				{{ product.quantity === 0 ? 'Out of Stock' : 'Add to Cart' }}
-			</button>
 		</div>
 	</div>
 

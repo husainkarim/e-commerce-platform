@@ -183,39 +183,4 @@ export class ProductsComponent {
     const end = this.endIndex;
     this.paginatedProducts = this.filteredProducts.slice(start, end);
   }
-
-  addToCart(product: Product): void {
-    if (product.quantity === 0) {
-      return;
-    }
-    let cart = localStorage.getItem('cartItems');
-    let cartItems = cart ? JSON.parse(cart) : [];
-
-    const existingItem = cartItems.find((item: any) => item.id === product.id);
-    if (existingItem) {
-      existingItem.quantity += 1;
-    } else {
-      cartItems.push({
-        sellerId: product.userId,
-        productId: product.id,
-        productName: product.name,
-        price: product.price,
-        quantity: 1
-      });
-    }
-    let userCart: Cart = {
-      userId: this.authService.getUser().id,
-      items: cartItems
-    }
-    this.apiService.updateCart(this.authService.getUser().id, userCart).subscribe({
-      next: (response) => {
-        console.log('Cart updated successfully:', response);
-      },
-      error: (error) => {
-        console.error('Failed to update cart:', error);
-      }
-    });
-    localStorage.setItem('cartItems', JSON.stringify(userCart.items));
-    alert(`${product.name} added to cart!`);
-  }
 }

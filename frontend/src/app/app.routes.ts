@@ -17,7 +17,6 @@ import { NotAuthorizedComponent } from './not-authorized/not-authorized.componen
 import { EditProfileComponent } from './edit-profile/edit-profile.component';
 import { Cart } from './cart/cart';
 import { Checkout } from './checkout/checkout';
-import { ClientDashboard } from './client-dashboard/client-dashboard';
 import { Orders } from './orders/orders';
 import { OrderDetail } from './order-detail/order-detail';
 
@@ -31,11 +30,9 @@ export const routes: Routes = [
   { path: 'profile', component: ProfileComponent },
   { path: 'edit-profile/:id', component: EditProfileComponent },
   { path: 'profile/:id', component: ProfileComponent },
-  { path: 'seller/dashboard', component: SellerDashboardComponent },
-  { path: 'seller/dashboard/create-product', component: ProductFormComponent },
-  { path: 'seller/dashboard/edit-product/:id', component: ProductFormComponent },
-  { path: 'seller/dashboard/media/:id', component: ManageMediaComponent },
-  { path: 'client/dashboard', component: ClientDashboard },
+  { path: 'create-product', component: ProductFormComponent },
+  { path: 'edit-product/:id', component: ProductFormComponent },
+  { path: 'media-product/:id', component: ManageMediaComponent },
   { path: 'orders', component: Orders },
   { path: 'orders/:id', component: OrderDetail },
   { path: 'cart', component: Cart },
