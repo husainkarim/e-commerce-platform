@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { AuthServiceService } from './auth-service.service';
 import { CommonModule } from '@angular/common';
 import { inject, signal, computed } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { routerMock } from './router-mock';
 
 @Component({
   selector: 'app-root',
@@ -15,8 +14,6 @@ import { routerMock } from './router-mock';
 })
 export class AppComponent {
   title = 'E-Commerce Platform';
-
-  router = routerMock;
 
   // Inject the REAL AuthServiceService
   private authService = inject(AuthServiceService);
