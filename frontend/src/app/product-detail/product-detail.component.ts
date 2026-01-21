@@ -10,7 +10,9 @@ interface Product {
   name: string;
   description: string;
   price: number;
+  revenue: number;
   quantity: number;
+  soldQuantity: number;
   userId: string;
   image: string;
   category?: string;

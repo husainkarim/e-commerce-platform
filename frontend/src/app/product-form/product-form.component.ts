@@ -102,6 +102,6 @@ export class ProductFormComponent {
         }
       });
     }
-    this.router.navigate(['/seller/dashboard']);
+    this.router.navigate(['/profile']);
   }
 }

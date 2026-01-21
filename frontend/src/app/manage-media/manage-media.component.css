@@ -24,6 +24,7 @@
 }
 
 .media-container {
+  text-align: center;
 	max-width: 600px;
 	margin: 60px auto;
 	background: #fff;
@@ -108,4 +109,22 @@
 
 .add-btn:hover {
 	background: #1565c0;
+}
+
+.back-btn {
+  margin: 20px auto 0 auto;
+	display: inline-block;
+	padding: 12px 32px;
+	font-size: 1rem;
+	border-radius: 6px;
+	background-color: #1976d2;
+	color: #fff;
+	text-decoration: none;
+	transition: background 0.2s;
+	border: none;
+	cursor: pointer;
+}
+
+.back-btn:hover {
+	background-color: #1565c0;
 }

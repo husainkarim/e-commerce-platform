@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import backend.product_service.dto.ProductDetails;
 import backend.product_service.model.Product;
 import backend.product_service.model.Seller;
+import backend.product_service.repository.OrderedRepository;
 import backend.product_service.repository.ProductRepository;
 import backend.product_service.repository.SellerRepository;
 import backend.product_service.service.KafkaService;
@@ -29,6 +31,7 @@ public class ProductController {
     private final ProductRepository productRepository;
     private final KafkaService kafkaService;
     private final SellerRepository sellerRepository;
+    private final OrderedRepository orderedRepository;
 
     private static final String[] CATEGORIES = {
         "General", "Electronics", "Fashion", "Home", "Sports", "Books", "Toys",
@@ -36,10 +39,11 @@ public class ProductController {
         "Jewelry", "Beauty"
     };
 
-    public ProductController(ProductRepository productRepository, KafkaService kafkaService, SellerRepository sellerRepository) {
+    public ProductController(ProductRepository productRepository, KafkaService kafkaService, SellerRepository sellerRepository, OrderedRepository orderedRepository) {
         this.productRepository = productRepository;
         this.kafkaService = kafkaService;
         this.sellerRepository = sellerRepository;
+        this.orderedRepository = orderedRepository;
     }
 
     // product list
@@ -72,7 +76,25 @@ public class ProductController {
 
         // Logic to fetch user products from database
         List<Product> userProducts = productRepository.findByUserId(userId);
-        response.put("products", userProducts);
+        List<ProductDetails> detailedProducts = userProducts.stream().map(product -> {
+            return new ProductDetails(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getCategory(),
+                product.getPrice(),
+                orderedRepository.findByProductId(product.getId()).stream()
+                    .filter(order -> order.getProductId().equals(product.getId()))
+                    .mapToDouble(order -> order.getPrice() * order.getQuantity())
+                    .sum(), // revenue
+                product.getQuantity(),
+                orderedRepository.findByProductId(product.getId()).stream()
+                    .mapToInt(ordered -> ordered.getQuantity())
+                    .sum(), // unitsSold
+                product.getUserId()
+            );
+        }).toList();
+        response.put("products", detailedProducts);
         response.put("message", "User products fetched successfully");
         return new ResponseEntity<>(response, HttpStatus.OK); // 200
     }
@@ -84,7 +106,22 @@ public class ProductController {
         // Logic to fetch product details from database
         Product product = productRepository.findById(productId).orElse(null);
         if (product != null) {
-            response.put("product", product);
+            ProductDetails productDetails = new ProductDetails(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getCategory(),
+                product.getPrice(),
+                orderedRepository.findByProductId(productId).stream()
+                    .mapToDouble(order -> order.getPrice() * order.getQuantity())
+                    .sum(),
+                product.getQuantity(),
+                orderedRepository.findByProductId(productId).stream()
+                    .mapToInt(ordered -> ordered.getQuantity())
+                    .sum(),
+                product.getUserId()
+            );
+            response.put("product", productDetails);
             response.put("message", "Product details fetched successfully");
             return new ResponseEntity<>(response, HttpStatus.OK); // 200
         } else {

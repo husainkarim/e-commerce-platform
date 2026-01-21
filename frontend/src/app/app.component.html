@@ -1,22 +1,31 @@
-<div class="header">
-  <h1>E-Commerce Platform</h1>
+<div class="page-container">
+  <header>
+    <h1>E-Commerce Platform</h1>
+    <nav class="main-navbar">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+      <a routerLink="/products" routerLinkActive="active">Products</a>
+      @if (isLoggedInSignal()) {
+        <a routerLink="/profile" routerLinkActive="active">Profile</a>
+        @if (isClientSignal()) {
+          <a routerLink="/cart" routerLinkActive="active">Cart</a>
+        }
+        <a routerLink="/orders" routerLinkActive="active">Orders</a>
+
+        <a (click)="logout()" routerLinkActive="active">Logout</a>
+      } @else {
+        <a routerLink="/signup" routerLinkActive="active">Signup</a>
+        <a routerLink="/login" routerLinkActive="active">Login</a>
+      }
+    </nav>
+  </header>
+  
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+  
+
+  <footer class="main-footer">
+    <p>&copy; 2024 E-Commerce Platform. All rights reserved.</p>
+  </footer>
 </div>
 
-<nav class="main-navbar">
-	<a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
-  <a routerLink="/products" routerLinkActive="active">Products</a>
-  @if (isLoggedInSignal()) {
-	  <a routerLink="/profile" routerLinkActive="active">Profile</a>
-    @if (isClientSignal()) {
-      <a routerLink="/cart" routerLinkActive="active">Cart</a>
-    }
-    <a routerLink="/orders" routerLinkActive="active">Orders</a>
-
-    <a (click)="logout()" routerLinkActive="active">Logout</a>
-  } @else {
-    <a routerLink="/signup" routerLinkActive="active">Signup</a>
-    <a routerLink="/login" routerLinkActive="active">Login</a>
-  }
-</nav>
-
-<router-outlet></router-outlet>

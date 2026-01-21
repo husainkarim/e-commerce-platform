@@ -86,20 +86,11 @@ export class SellerDashboardComponent {
       .map((product: any) => ({
         id: product.id,
         name: product.name,
-        unitsSold: Math.floor(Math.random() * 100) + 10,
-        revenue: 0,
+        unitsSold: product.unitsSold,
+        revenue: product.revenue,
       }))
-      .sort((a, b) => b.unitsSold - a.unitsSold)
+      .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
-
-    // Calculate revenue for each product
-    this.topSellingProducts = this.topSellingProducts.map((item) => {
-      const product = this.products.find((p: any) => p.id === item.id);
-      return {
-        ...item,
-        revenue: item.unitsSold * (product?.price || 0),
-      };
-    });
 
     // Calculate total metrics
     this.totalUnitsSold = this.topSellingProducts.reduce(

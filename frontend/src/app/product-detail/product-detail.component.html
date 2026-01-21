@@ -74,6 +74,8 @@
           <div class="spec-item">
             <span class="spec-label">Stock</span>
             <span class="spec-value">{{ product?.quantity }} units</span>
+            <span class="spec-label">Sold</span>
+            <span class="spec-value">{{ product?.unitsSold }} units</span>
           </div>
           <div class="spec-item">
             <span class="spec-label">Category</span>
@@ -97,10 +99,10 @@
         <h3>Quantity</h3>
         <div class="quantity-controls">
           <button class="qty-btn" (click)="decreaseQuantity()" [disabled]="selectedQuantity <= 1">−</button>
-          <input 
-            type="number" 
-            class="qty-input" 
-            [(ngModel)]="selectedQuantity" 
+          <input
+            type="number"
+            class="qty-input"
+            [(ngModel)]="selectedQuantity"
             (blur)="updateQuantity($any($event.target).value)"
             [max]="product?.quantity"
             min="1"
@@ -142,21 +144,5 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Product Gallery Section -->
-  <div class="product-images-section" *ngIf="product?.images?.length">
-    <h3>All Product Images</h3>
-    <div class="product-images-list">
-      <div class="image-item" *ngFor="let img of product.images">
-        <img [src]="img" alt="Product Image" class="product-detail-gallery-img" />
-      </div>
-    </div>
-  </div>
-
-  <!-- Related Products Section -->
-  <div class="related-products-section">
-    <h3>Related Products</h3>
-    <p class="coming-soon">Coming Soon</p>
   </div>
 </div>

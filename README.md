@@ -96,11 +96,11 @@ This e-commerce platform demonstrates modern software architecture principles wi
 
 | Service | Port | Responsibility |
 |---------|------|-----------------|
-| **API Gateway** | 8000 | Request routing, load balancing, authentication |
-| **User Service** | 8001 | User authentication, profiles, role management |
-| **Product Service** | 8002 | Product catalog, categories, inventory |
-| **Media Service** | 8003 | File upload/download, image processing |
-| **Order Service** | 8004 | Order management, payment processing |
+| **API Gateway** | 8443 | Request routing, load balancing, authentication |
+| **User Service** | 8100 | User authentication, profiles, role management |
+| **Product Service** | 8200 | Product catalog, categories, inventory |
+| **Media Service** | 8300 | File upload/download, image processing |
+| **Order Service** | 8400 | Order management, payment processing |
 
 ---
 
@@ -121,7 +121,7 @@ This e-commerce platform demonstrates modern software architecture principles wi
 - **Styling**: CSS3
 - **HTTP Client**: Angular HttpClient
 - **Routing**: Angular Router
-- **Auth**: Firebase Authentication
+- **Containerization**: Docker & Docker Compose
 
 ### DevOps & CI/CD
 - **CI/CD**: Jenkins
