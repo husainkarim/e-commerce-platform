@@ -50,7 +50,7 @@ public class Order {
     private ShippingAddress shippingAddress;
 
     @PositiveOrZero(message = "Total price cannot be negative")
-    private double totalPrice;
+    private double totalAmount;
 
     @PastOrPresent(message = "Creation date cannot be in the future")
     private Date createdAt = new Date();
@@ -96,7 +96,7 @@ public class Order {
     }
 
     public void calculateTotal() {
-        this.totalPrice = items.stream()
+        this.totalAmount = items.stream()
             .mapToDouble(i -> i.getPrice() * i.getQuantity())
             .sum();
     }

@@ -47,6 +47,7 @@ export class SignupComponent {
       });
 
       // redirect to dashboard or home page
+      alert('Signup successful!');
       this.router.navigate(['/']);
       this.signupForm.reset();
     }

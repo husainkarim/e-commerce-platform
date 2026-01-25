@@ -3,7 +3,6 @@ package backend.order_service.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import backend.order_service.dto.ClientOrders;
 import backend.order_service.dto.UpdateState;
 import backend.order_service.model.Cart;
+import backend.order_service.model.Cart.CartItem;
 import backend.order_service.model.Client;
 import backend.order_service.model.Order;
 import backend.order_service.model.OrderStatus;
@@ -25,6 +26,7 @@ import backend.order_service.repository.CartRepository;
 import backend.order_service.repository.ClientRepository;
 import backend.order_service.repository.OrderRepository;
 import backend.order_service.repository.OrderStatusRepository;
+import backend.order_service.repository.ProductAllowedRepository;
 import backend.order_service.service.KafkaService;
 
 @RestController
@@ -36,19 +38,22 @@ public class OrderController {
     private final OrderStatusRepository orderStatusRepository;
     private final KafkaService kafkaService;
     private final ClientRepository clientRepository;
+    private final ProductAllowedRepository productAllowedRepository;
 
-    public OrderController(OrderRepository orderRepository, CartRepository cartRepository, OrderStatusRepository orderStatusRepository, KafkaService kafkaService, ClientRepository clientRepository) {
+    public OrderController(OrderRepository orderRepository, CartRepository cartRepository, OrderStatusRepository orderStatusRepository, KafkaService kafkaService, ClientRepository clientRepository, ProductAllowedRepository productAllowedRepository) {
         this.orderRepository = orderRepository;
         this.cartRepository = cartRepository;
         this.orderStatusRepository = orderStatusRepository;
         this.kafkaService = kafkaService;
         this.clientRepository = clientRepository;
+        this.productAllowedRepository = productAllowedRepository;
     }
     
     //update Cart
     @PutMapping("/update-cart")
     public ResponseEntity<Map<String, Object>> updateCart(@RequestParam String userId, @RequestBody Cart updatedCart) {
         Map<String, Object> response = new HashMap<>();
+        System.out.println("Received cart update for userId: " + userId + " with items: " + updatedCart.getItems());
         List<Client> clients = this.clientRepository.findAll();
         // Check if userId belongs to a valid client
         boolean isValidClient = clients.stream().anyMatch(client -> client.getUserId().equals(userId));
@@ -60,8 +65,17 @@ public class OrderController {
             response.put("message", "User ID mismatch");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        cartRepository.save(updatedCart);
-        response.put("cart", updatedCart);
+        
+        List<Cart> existingCarts = cartRepository.findByUserId(userId);
+        Cart existingCart;
+        if (existingCarts.isEmpty()) {
+            existingCart = new Cart(userId);
+        } else {
+            existingCart = existingCarts.get(0);
+        }
+        existingCart.setItems(updatedCart.getItems());
+        cartRepository.save(existingCart);
+        response.put("cart", existingCart);
         response.put("message", "Cart updated successfully");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -77,14 +91,27 @@ public class OrderController {
             response.put("message", "Invalid client user ID");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        Optional<Cart> IsThereCart = cartRepository.findByUserId(userId);
-        Cart cart = new Cart();
-        if (IsThereCart.isEmpty()) {
-            cart.setUserId(userId);
-            cartRepository.save(cart);
+        List<Cart> carts = cartRepository.findByUserId(userId);
+        Cart cart;
+        if (carts.isEmpty()) {
+            cart = new Cart(userId);
         } else {
-            cart = IsThereCart.get();
+            cart = carts.get(0);
         }
+        // keep only one cart per user
+        if (carts.size() > 1) {
+            for (int i = 1; i < carts.size(); i++) {
+                cartRepository.delete(carts.get(i));
+            }
+        }
+        // check for if one of the carts is null or has been deleted
+        for (CartItem c : cart.getItems()) {
+            if (c == null || !this.productAllowedRepository.existsById(c.getProductId())) {
+                cart.getItems().remove(c);
+            }
+        }
+        // save the cleaned cart
+        cartRepository.save(cart);
         response.put("cart", cart);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -195,6 +222,25 @@ public class OrderController {
         }
         var orders = orderRepository.findByUserId(userId);
         response.put("orders", orders);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    //get ordars data for the dashboard
+    @GetMapping("/client-dashboard-data")
+    public ResponseEntity<Map<String, Object>> getClientDashboardData(@RequestParam String userId) {
+        Map<String, Object> response = new HashMap<>();
+        List<Client> clients = this.clientRepository.findAll();
+        // Check if userId belongs to a valid client
+        boolean isValidClient = clients.stream().anyMatch(client -> client.getUserId().equals(userId));
+        if (!isValidClient) {
+            response.put("message", "Invalid client user ID");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+        var orders = orderRepository.findByUserId(userId);
+        int totalOrders = orders.size();
+        double totalSpent = orders.stream().mapToDouble(order -> order.getTotalAmount()).sum();
+        ClientOrders clientOrders = new ClientOrders(userId, orders, totalOrders, totalSpent);
+        response.put("clientOrders", clientOrders);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

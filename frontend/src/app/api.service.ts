@@ -107,4 +107,8 @@ export class ApiService {
   deleteOrder(orderId: string, userId: string): Observable<any> {
     return this.http.delete(`${this.baseUrl}/orders/delete-order?orderId=${orderId}&userId=${userId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
   }
+
+  getClientData(userId: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/orders/client-dashboard-data?userId=${userId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+  }
 }

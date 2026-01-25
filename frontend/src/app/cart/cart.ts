@@ -2,8 +2,6 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { forkJoin } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { ApiService } from '../api.service';
 import { AuthServiceService } from '../auth-service.service';
 
@@ -39,7 +37,7 @@ interface userCart {
   styleUrl: './cart.css',
 })
 export class Cart {
-  items: any[] = [];
+  items: Product[] = [];
   cartItems: CartItem[] = [];
   userCartData: userCart | null = null;
 
@@ -59,17 +57,17 @@ export class Cart {
     return this.subtotal;
   }
 
-  increment(item: CartItem): void {
+  increment(item: Product): void {
     this.updateQuantity(item, item.quantity + 1);
   }
 
-  decrement(item: CartItem): void {
+  decrement(item: Product): void {
     if (item.quantity > 1) {
       this.updateQuantity(item, item.quantity - 1);
     }
   }
 
-  updateQuantity(item: CartItem, value: number | string): void {
+  updateQuantity(item: Product, value: number | string): void {
     const parsed = Number(value);
     const nextQuantity = Number.isFinite(parsed) ? Math.min(Math.max(Math.trunc(parsed), 1), 99) : 1;
     item.quantity = nextQuantity;
@@ -82,47 +80,42 @@ export class Cart {
   }
 
   private loadCart(): void {
-    const stored = localStorage.getItem('cartItems');
-    if (!stored) {
-      try {
-        this.apiService.getCartByUserId(this.authService.getUser().id).subscribe({
-          next: (response) => {
-            this.cartItems = response.items || [];
-            this.items = this.cartItems.map((cartItem) =>
-              this.apiService.getProductById(cartItem.productId).subscribe({
-                next: (productResponse) => {
-                  return {
-                    id: productResponse.id,
-                    name: productResponse.name,
-                    description: productResponse.description,
-                    price: productResponse.price,
-                    quantity: cartItem.quantity,
-                    userId: productResponse.userId,
-                    image: productResponse.image,
-                    category: productResponse.category,
-                  } as Product;
-                },
-                error: (error: any) => {
-                  console.error('Failed to fetch product data:', error);
-                  return null;
-                }
-              })
-            ),
-            this.persistCart();
-          },
-          error: (error) => {
-            console.error('Failed to fetch cart data:', error);
-          }
-        });
-        return;
-      } catch (error) {
-        console.warn('Falling back to sample cart items because stored data is invalid.', error);
+    this.apiService.getCartByUserId(this.authService.getUser().id).subscribe({
+      next: (response) => {
+        this.cartItems = response.cart.items || [];
+        localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
+        this.items = [];
+        this.cartItems.forEach((cartItem) =>
+          this.apiService.getProductById(cartItem.productId).subscribe({
+            next: (product) => {
+              return {
+                id: product.id,
+                name: product.name,
+                description: product.description,
+                price: product.price,
+                quantity: cartItem.quantity,
+                userId: product.userId,
+                image: product.image,
+                category: product.category,
+              } as Product;
+            },
+            error: (error: any) => {
+              console.error('Failed to fetch product data:', error);
+              return null;
+            }
+          })
+        )
+        console.log('Cart items:', this.cartItems);
+        console.log('Loaded cart items:', this.items);
+      },
+      error: (error) => {
+        console.error('Failed to fetch cart data:', error);
       }
-    }
-    this.persistCart();
+    });
   }
 
   private persistCart(): void {
+    console.log('Persisting cart:', this.items);
     this.userCartData = {
       userId: this.authService.getUser().id,
       items: this.items.map((item) => ({
@@ -133,15 +126,10 @@ export class Cart {
         quantity: item.quantity,
       })),
     };
-    this.apiService.updateCart(this.authService.getUser().id, this.userCartData).subscribe({
-      next: (response) => {
-        console.log('Cart updated successfully on server:', response);
-      },
-      error: (error) => {
-
-        console.error('Failed to update cart on server:', error);
-      }
+    this.apiService.updateCart(this.userCartData.userId, this.userCartData).subscribe({
+      next: (response) => console.log('Cart updated successfully on server:', response),
+      error: (error) => console.error('Failed to update cart on server:', error)
     });
-    localStorage.setItem('cartItems', JSON.stringify(this.items));
+    localStorage.setItem('cartItems', JSON.stringify(this.userCartData.items));
   }
 }

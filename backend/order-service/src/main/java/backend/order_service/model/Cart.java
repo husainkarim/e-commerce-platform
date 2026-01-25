@@ -31,14 +31,14 @@ public class Cart {
     @Valid
     private List<CartItem> items;
 
+    public Cart(String userId) {
+        this.userId = userId;
+    }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CartItem {
-
-        @Id
-        private String id;
-        
+    public static class CartItem {        
         @NotBlank(message = "Product ID is required")
         private String productId;
 

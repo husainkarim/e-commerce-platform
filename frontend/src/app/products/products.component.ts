@@ -40,6 +40,7 @@ export class ProductsComponent {
   products: Product[] = [];
   filteredProducts: Product[] = [];
   paginatedProducts: Product[] = [];
+  isLoggedIn: boolean = false;
 
   // Search & Filters
   searchKeyword = '';
@@ -55,7 +56,9 @@ export class ProductsComponent {
 
   categories: string[] = ['Automotive', 'Beauty', 'Books', 'Electronics', 'Fashion', 'Garden', 'General', 'Groceries', 'Health', 'Home', 'Jewelry', 'Movies', 'Music', 'Sports', 'Toys'];
 
-  constructor(private apiService: ApiService, private authService: AuthServiceService) {}
+  constructor(private apiService: ApiService, private authService: AuthServiceService) {
+    this.isLoggedIn = this.authService.isLoggedIn();
+  }
 
   ngOnInit() {
     this.fetchProducts();

@@ -47,7 +47,8 @@ public class UserEventConsumer {
 
     @KafkaListener(topics = "user-updated-topic")
     public void handleUserRoleUpdated(Map<String, Object> event) {
-        if (!this.sellerRepository.existsById((String) event.get("userId"))) {
+        Seller existingSeller = this.sellerRepository.findByUserId((String) event.get("userId"));
+        if (existingSeller == null) {
             return; // does not exist
         }
         // Handle user role update logic here   
@@ -70,7 +71,8 @@ public class UserEventConsumer {
 
     @KafkaListener( topics = "user-deleted-topic")
     public void handleUserDeleted(Map<String, Object> event) {
-        if (!this.sellerRepository.existsById((String) event.get("userId"))) {
+        Seller existingSeller = this.sellerRepository.findByUserId((String) event.get("userId"));
+        if (existingSeller == null) {
             return; // does not exist
         }
         // remove all products from database by get all products with userId

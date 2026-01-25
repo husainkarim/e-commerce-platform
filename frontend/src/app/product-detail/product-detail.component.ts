@@ -127,7 +127,7 @@ export class ProductDetailComponent {
     let cart = localStorage.getItem('cartItems');
     let cartItems = cart ? JSON.parse(cart) : [];
 
-    const existingItem = cartItems.find((item: any) => item.id === this.product.id);
+    const existingItem = cartItems.find((item: any) => item.productId === this.product.id);
     if (existingItem) {
       existingItem.quantity += qty;
     } else {

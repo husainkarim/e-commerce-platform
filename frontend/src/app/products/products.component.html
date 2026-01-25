@@ -70,16 +70,30 @@
 
 	<div class="product-list" *ngIf="paginatedProducts.length; else noResults">
 		<div class="product-card" *ngFor="let product of paginatedProducts">
-			<a [routerLink]="['/products', product.id]" class="product-link">
-				<img [src]="product.image" alt="{{ product.name }}" class="product-image" />
-				<div class="product-info">
-					<h3>{{ product.name }}</h3>
-					<p class="product-category">{{ product.category || 'General' }}</p>
-					<p class="product-description">{{ product.description }}</p>
-					<p class="product-price">${{ product.price | number:'1.2-2' }}</p>
-					<p class="product-quantity" [class.low-stock]="product.quantity < 10">Stock: {{ product.quantity }}</p>
-				</div>
-			</a>
+      @if (isLoggedIn) {
+        <a [routerLink]="['/products', product.id]" class="product-link">
+          <img [src]="product.image" alt="{{ product.name }}" class="product-image" />
+          <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p class="product-category">{{ product.category || 'General' }}</p>
+            <p class="product-description">{{ product.description }}</p>
+            <p class="product-price">${{ product.price | number:'1.2-2' }}</p>
+            <p class="product-quantity" [class.low-stock]="product.quantity < 10">Stock: {{ product.quantity }}</p>
+          </div>
+        </a>
+      } @else {
+        <div>
+          <img [src]="product.image" alt="{{ product.name }}" class="product-image" />
+          <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p class="product-category">{{ product.category || 'General' }}</p>
+            <p class="product-description">{{ product.description }}</p>
+            <p class="product-price">${{ product.price | number:'1.2-2' }}</p>
+            <p class="product-quantity" [class.low-stock]="product.quantity < 10">Stock: {{ product.quantity }}</p>
+          </div>
+        </div>
+      }
+			
 		</div>
 	</div>
 

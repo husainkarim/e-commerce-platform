@@ -205,11 +205,13 @@ public class ProductController {
             response.put("message", "Product not found");
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND); // 404
         }
-        // Logic to delete product from database
-        productRepository.deleteById(productId);
+        // send kafka event before deleting
         Product deletedProduct = new Product();
         deletedProduct.setId(productId);
         kafkaService.sendProductDeletedEvent(deletedProduct);
+        // Logic to delete product from database
+        productRepository.deleteById(productId);
+        
         response.put("message", "Product deleted successfully");
         return new ResponseEntity<>(response, HttpStatus.OK); // 200
     }

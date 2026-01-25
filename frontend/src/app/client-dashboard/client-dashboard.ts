@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthServiceService } from '../auth-service.service';
+import { ApiService } from '../api.service';
+import { Orders } from '../orders/orders';
+import { filter } from 'rxjs/operators';
 
 interface MostBoughtProduct {
   id: number;
@@ -32,6 +35,9 @@ export class ClientDashboard implements OnInit {
   totalSpent: number = 0;
   totalOrders: number = 0;
   totalItemsPurchased: number = 0;
+  items: any[] = [];
+  setItems: any = {};
+  setCategories: any = {};
   mostBoughtProducts: MostBoughtProduct[] = [];
   topCategories: TopCategory[] = [];
   recentOrders: RecentOrder[] = [];
@@ -44,7 +50,7 @@ export class ClientDashboard implements OnInit {
     '#FF9F40',
   ];
 
-  constructor(private authService: AuthServiceService) {}
+  constructor(private authService: AuthServiceService, private apiService: ApiService) {}
 
   ngOnInit() {
     const user = this.authService.getUser();
@@ -53,52 +59,36 @@ export class ClientDashboard implements OnInit {
   }
 
   generateAnalytics() {
-    // Sample purchase data (in real app, would come from backend order API)
-    const sampleProducts = [
-      { id: 1, name: 'Wireless Headphones', quantity: 3, category: 'Electronics', price: 79.99 },
-      { id: 2, name: 'Running Shoes', quantity: 2, category: 'Fashion', price: 89.99 },
-      { id: 3, name: 'Coffee Maker', quantity: 1, category: 'Home', price: 129.99 },
-      { id: 4, name: 'T-Shirt', quantity: 5, category: 'Fashion', price: 24.99 },
-      { id: 5, name: 'Phone Case', quantity: 2, category: 'Electronics', price: 14.99 },
-      { id: 6, name: 'Yoga Mat', quantity: 1, category: 'Sports', price: 34.99 },
-    ];
-
-    // Calculate metrics
-    this.totalItemsPurchased = sampleProducts.reduce((sum, p) => sum + p.quantity, 0);
-    this.totalSpent = sampleProducts.reduce((sum, p) => sum + (p.quantity * p.price), 0);
-    this.totalOrders = Math.floor(this.totalItemsPurchased / 3) + 1;
-
-    // Most bought products (top 4)
-    this.mostBoughtProducts = sampleProducts
-      .map(p => ({ id: p.id, name: p.name, quantity: p.quantity }))
-      .sort((a, b) => b.quantity - a.quantity)
-      .slice(0, 4);
-
-    // Top categories
-    const categoryMap = new Map<string, number>();
-    sampleProducts.forEach(p => {
-      const current = categoryMap.get(p.category) || 0;
-      categoryMap.set(p.category, current + p.quantity);
+    this.apiService.getClientData(this.authService.getUser().id).subscribe({
+      next: (response) => {
+        this.totalOrders = response.clientOrders.totalOrders;
+        this.totalSpent = response.clientOrders.totalSpent;
+        this.totalItemsPurchased = response.clientOrders.orders.map((order: any) => order.items.length).reduce((a: number, b: number) => a + b, 0);
+        this.items = response.clientOrders.orders.flatMap((order: any) => order.items);
+        for (let item of this.items) {
+          this.setItems[item.productId] = (this.setItems[item.productId] || 0) + item.quantity;
+          this.setCategories[item.category] = (this.setCategories[item.category] || 0) + item.quantity;
+        }
+        this.mostBoughtProducts = Object.entries(this.setItems).map(([id, quantity]) => ({
+          id: Number(id),
+          name: response.products.find((p: any) => p.id === Number(id))?.name || 'Unknown',
+          quantity: quantity as number,
+        })).sort((a, b) => b.quantity - a.quantity).slice(0, 4);
+        this.topCategories = Object.entries(this.setCategories).map(([name, count]) => ({
+          name,
+          count: count as number,
+          percentage: Math.round(((count as number) / this.totalItemsPurchased) * 100),
+        })).sort((a, b) => b.count - a.count).slice(0, 5);
+        this.recentOrders = response.clientOrders.orders.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5).map((order: any) => ({
+          id: order.id,
+          date: order.date,
+          amount: order.totalAmount,
+          status: order.status,
+        }));
+      },
+      error: (error) => {
+        console.error('Failed to fetch client dashboard data:', error);
+      }
     });
-
-    const categoryEntries = Array.from(categoryMap.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
-
-    const totalCategoryItems = categoryEntries.reduce((sum, [_, count]) => sum + count, 0);
-
-    this.topCategories = categoryEntries.map(([name, count]) => ({
-      name,
-      count,
-      percentage: Math.round((count / totalCategoryItems) * 100),
-    }));
-
-    // Generate recent orders
-    this.recentOrders = [
-      { id: 3001, date: '2 days ago', amount: 134.98, status: 'Delivered' },
-      { id: 3002, date: '5 days ago', amount: 89.99, status: 'Delivered' },
-      { id: 3003, date: '1 week ago', amount: 179.97, status: 'Delivered' },
-      { id: 3004, date: '2 weeks ago', amount: 49.98, status: 'Delivered' },
-    ];
   }
 }
