@@ -1,6 +1,7 @@
 package backend.order_service.service;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.kafka.annotation.KafkaListener;
 
@@ -20,8 +21,8 @@ public class ProductEventConsumer {
 
     @KafkaListener(topics = "product-created-topic")
     public void handleProductCreated(Map<String, Object> event) {
-        ProductAllowed existingProduct = this.productAllowedRepository.findByProductId((String) event.get("productId"));
-        if (existingProduct != null) {
+        Optional<ProductAllowed> existingProduct = this.productAllowedRepository.findByProductId((String) event.get("productId"));
+        if (existingProduct.isPresent()) {
             return; // already exists
         }
         ProductAllowed productAllowed = new ProductAllowed((String) event.get("productId"), (String) event.get("name"));
@@ -30,8 +31,8 @@ public class ProductEventConsumer {
 
     @KafkaListener(topics = "product-updated-topic")
     public void handleProductUpdated(Map<String, Object> event) {
-        ProductAllowed existingProduct = this.productAllowedRepository.findByProductId((String) event.get("productId"));
-        if (existingProduct == null) {
+        Optional<ProductAllowed> existingProduct = this.productAllowedRepository.findByProductId((String) event.get("productId"));
+        if (existingProduct.isEmpty()) {
             return; // does not exist
         }
         // update product allowed info
@@ -42,8 +43,8 @@ public class ProductEventConsumer {
 
     @KafkaListener(topics = "product-deleted-topic")
     public void handleProductDeleted(Map<String, Object> event) {
-        ProductAllowed existingProduct = this.productAllowedRepository.findByProductId((String) event.get("productId"));
-        if (existingProduct == null) {
+        Optional<ProductAllowed> existingProduct = this.productAllowedRepository.findByProductId((String) event.get("productId"));
+        if (existingProduct.isEmpty()) {
             return; // does not exist
         }
         // delete product allowed info

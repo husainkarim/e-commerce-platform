@@ -19,6 +19,7 @@ import { RouterModule } from '@angular/router';
 export class ManageMediaComponent {
   selectedFile: File | null = null;
   productId: string = '';
+  product: any;
   images: string[] = []; // Array to hold image URLs
   media: any[] = [];
   uploadError: boolean = false;
@@ -31,6 +32,14 @@ export class ManageMediaComponent {
       const id = params.get('id');
       if (id) {
         this.productId = id;
+        this.apiService.getProductById(id).subscribe({
+          next: (response) => {
+            this.product = response.product;
+          },
+          error: (error) => {
+            console.error('Failed to fetch product details:', error);
+          }
+        });
         this.loadProductImages(id);
       }
     });

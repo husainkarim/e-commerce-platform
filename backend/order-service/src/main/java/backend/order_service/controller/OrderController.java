@@ -3,6 +3,7 @@ package backend.order_service.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import backend.order_service.dto.ClientOrders;
 import backend.order_service.dto.UpdateState;
 import backend.order_service.model.Cart;
-import backend.order_service.model.Cart.CartItem;
 import backend.order_service.model.Client;
 import backend.order_service.model.Order;
 import backend.order_service.model.OrderStatus;
@@ -66,14 +66,19 @@ public class OrderController {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         
-        List<Cart> existingCarts = cartRepository.findByUserId(userId);
+        Optional<Cart> existingCarts = cartRepository.findByUserId(userId);
         Cart existingCart;
         if (existingCarts.isEmpty()) {
             existingCart = new Cart(userId);
         } else {
-            existingCart = existingCarts.get(0);
+            existingCart = existingCarts.get();
         }
         existingCart.setItems(updatedCart.getItems());
+        // check for if one of the carts is null or has been deleted
+        existingCart.getItems().removeIf(c ->
+            productAllowedRepository.findByProductId(c.getProductId()).isEmpty()
+        );
+        // save the cleaned cart
         cartRepository.save(existingCart);
         response.put("cart", existingCart);
         response.put("message", "Cart updated successfully");
@@ -91,25 +96,18 @@ public class OrderController {
             response.put("message", "Invalid client user ID");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        List<Cart> carts = cartRepository.findByUserId(userId);
+        Optional<Cart> carts = cartRepository.findByUserId(userId);
         Cart cart;
         if (carts.isEmpty()) {
             cart = new Cart(userId);
         } else {
-            cart = carts.get(0);
+            cart = carts.get();
         }
-        // keep only one cart per user
-        if (carts.size() > 1) {
-            for (int i = 1; i < carts.size(); i++) {
-                cartRepository.delete(carts.get(i));
-            }
-        }
+
         // check for if one of the carts is null or has been deleted
-        for (CartItem c : cart.getItems()) {
-            if (c == null || !this.productAllowedRepository.existsById(c.getProductId())) {
-                cart.getItems().remove(c);
-            }
-        }
+        cart.getItems().removeIf(c ->
+            productAllowedRepository.findByProductId(c.getProductId()).isEmpty()
+        );
         // save the cleaned cart
         cartRepository.save(cart);
         response.put("cart", cart);
