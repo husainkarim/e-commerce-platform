@@ -25,7 +25,7 @@ describe('Cart', () => {
               get: () => null
             }
           }
-        }
+        },
       },
       {
         provide: AuthServiceService,
@@ -38,11 +38,23 @@ describe('Cart', () => {
       {
         provide: ApiService,
         useValue: {
-          GetCartByUserId: () =>
+          getCartByUserId: (id: string) =>
             of({
-              items: []
+              cart: {
+                items: []
+              }
             }),
-          UpdateCart: () =>
+          getProductById: () =>
+            of({
+              id: '1',
+              name: 'Test Product',
+              description: '',
+              price: 10,
+              userId: 'u1',
+              image: '',
+              category: ''
+            }),
+          updateCart: () =>
             of({
               success: true
             })

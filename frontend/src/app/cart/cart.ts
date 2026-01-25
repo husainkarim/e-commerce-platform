@@ -88,7 +88,7 @@ export class Cart {
         this.cartItems.forEach((cartItem) =>
           this.apiService.getProductById(cartItem.productId).subscribe({
             next: (product) => {
-              return {
+              const item: Product = {
                 id: product.id,
                 name: product.name,
                 description: product.description,
@@ -97,7 +97,8 @@ export class Cart {
                 userId: product.userId,
                 image: product.image,
                 category: product.category,
-              } as Product;
+              };
+              this.items.push(item);
             },
             error: (error: any) => {
               console.error('Failed to fetch product data:', error);
