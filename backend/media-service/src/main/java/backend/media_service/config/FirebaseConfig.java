@@ -25,9 +25,9 @@ public class FirebaseConfig {
         }
 
         FirebaseOptions options = FirebaseOptions.builder()
-            .setProjectId("social-network-d4ea8") 
+            .setProjectId("e-commerce-platform-5461b") 
             .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-            .setStorageBucket("social-network-d4ea8.appspot.com") 
+            .setStorageBucket("e-commerce-platform-5461b.appspot.com") 
             .build();
 
         return FirebaseApp.initializeApp(options);

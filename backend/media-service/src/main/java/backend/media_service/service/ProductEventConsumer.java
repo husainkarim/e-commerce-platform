@@ -37,11 +37,10 @@ public class ProductEventConsumer {
     @KafkaListener(topics = "product-updated-topic")
     public void handleProductUpdated(Map<String, Object> event) {
         ProductAllowed productAllowed = productAllowedRepository.findByProductId((String) event.get("productId"));
-        if (productAllowed == null) {
-            return; // does not exist
+        if (productAllowed != null) {
+            this.productAllowedRepository.deleteById((String) event.get("productId"));
         }
         // update product allowed info
-        this.productAllowedRepository.deleteById((String) event.get("productId"));
         ProductAllowed updatedProductAllowed = new ProductAllowed((String) event.get("productId"), (String) event.get("name"));
         this.productAllowedRepository.save(updatedProductAllowed);
     }

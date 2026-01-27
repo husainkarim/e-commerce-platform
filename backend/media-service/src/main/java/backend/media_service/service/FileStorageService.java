@@ -26,7 +26,7 @@ import backend.media_service.util.ImageCompressionUtil;
 public class FileStorageService {
 
     private final Storage storage;
-    private final String bucketName = "social-network-d4ea8.appspot.com";
+    private final String bucketName = "e-commerce-platform-5461b.appspot.com";
 
     public FileStorageService() throws IOException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
