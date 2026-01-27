@@ -25,7 +25,7 @@ public class ProductEventConsumer {
         if (existingProduct.isPresent()) {
             return; // already exists
         }
-        ProductAllowed productAllowed = new ProductAllowed((String) event.get("productId"), (String) event.get("name"));
+        ProductAllowed productAllowed = new ProductAllowed((String) event.get("productId"), (String) event.get("name"), (String) event.get("sellerId"));
         this.productAllowedRepository.save(productAllowed);
     }
 
@@ -37,7 +37,7 @@ public class ProductEventConsumer {
         }
         // update product allowed info
         this.productAllowedRepository.deleteById((String) event.get("productId"));
-        ProductAllowed updatedProductAllowed = new ProductAllowed((String) event.get("productId"), (String) event.get("name"));
+        ProductAllowed updatedProductAllowed = new ProductAllowed((String) event.get("productId"), (String) event.get("name"), (String) event.get("sellerId"));
         this.productAllowedRepository.save(updatedProductAllowed);
     }
 

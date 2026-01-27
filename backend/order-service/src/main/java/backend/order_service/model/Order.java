@@ -15,7 +15,6 @@ import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -78,21 +77,26 @@ public class Order {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ShippingAddress {
-        @NotBlank(message = "Street is required")
-        private String street;
+        @NotBlank(message = "Full name is required")
+        private String fullName;
+
+        @NotBlank(message = "Email is required")
+        @Pattern(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$", message = "Invalid email format")
+        private String email;
+
+        @NotBlank(message = "Phone number is required")
+        private String phone;
+        
+        @NotBlank(message = "Address is required")
+        private String address;
 
         @NotBlank(message = "City is required")
         private String city;
 
-        @NotBlank(message = "State is required")
-        private String state;
-
-        @NotBlank(message = "Zip code is required")
-        @Size(min = 5, max = 10, message = "Zip code must be between 5 and 10 characters")
-        private String zipCode;
-
         @NotBlank(message = "Country is required")
         private String country;
+
+        private String notes;
     }
 
     public void calculateTotal() {

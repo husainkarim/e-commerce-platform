@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 public class ProductAllowed {
     String productId;
     String name;
+    String sellerId;
 }
