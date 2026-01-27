@@ -15,11 +15,11 @@ interface CartItem {
 
 interface Address {
   fullName: string;
+  email: string;
   phone: string;
-  street: string;
+  address: string;
   city: string;
-  state: string;
-  zip: string;
+  country: string;
   notes: string;
 }
 
@@ -46,11 +46,11 @@ export class Checkout {
   paymentMethod = 'PAY ON DELIVERY';
   shippingAddress: Address = {
     fullName: '',
+    email: '',
     phone: '',
-    street: '',
+    address: '',
     city: '',
-    state: '',
-    zip: '',
+    country: '',
     notes: '',
   };
 
@@ -59,6 +59,8 @@ export class Checkout {
       this.router.navigate(['/login']);
       return;
     }
+    this.shippingAddress.fullName = this.authService.getUser().name;
+    this.shippingAddress.email = this.authService.getUser().email;
     this.loadCart();
   }
 
@@ -122,11 +124,11 @@ export class Checkout {
   private isAddressValid(): boolean {
     const required = [
       this.shippingAddress.fullName,
+      this.shippingAddress.email,
       this.shippingAddress.phone,
-      this.shippingAddress.street,
+      this.shippingAddress.address,
       this.shippingAddress.city,
-      this.shippingAddress.state,
-      this.shippingAddress.zip,
+      this.shippingAddress.country,
     ];
     return required.every((field) => field.trim().length > 0);
   }

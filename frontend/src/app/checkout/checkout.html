@@ -31,25 +31,25 @@
 						<span>Full Name</span>
 						<input type="text" [(ngModel)]="shippingAddress.fullName" placeholder="Jane Doe" />
 					</label>
+          <label>
+            <span>Email</span>
+            <input type="email" [(ngModel)]="shippingAddress.email" placeholder="jane@example.com" readonly />
+          </label>
 					<label>
 						<span>Phone</span>
 						<input type="text" [(ngModel)]="shippingAddress.phone" placeholder="(555) 123-4567" />
 					</label>
 					<label class="wide">
-						<span>Street</span>
-						<input type="text" [(ngModel)]="shippingAddress.street" placeholder="123 Main St" />
+						<span>Address</span>
+						<input type="text" [(ngModel)]="shippingAddress.address" placeholder="123 Main St" />
 					</label>
 					<label>
 						<span>City</span>
 						<input type="text" [(ngModel)]="shippingAddress.city" placeholder="Springfield" />
 					</label>
 					<label>
-						<span>State</span>
-						<input type="text" [(ngModel)]="shippingAddress.state" placeholder="CA" />
-					</label>
-					<label>
-						<span>ZIP</span>
-						<input type="text" [(ngModel)]="shippingAddress.zip" placeholder="90210" />
+						<span>Country</span>
+						<input type="text" [(ngModel)]="shippingAddress.country" placeholder="USA" />
 					</label>
 					<label class="wide">
 						<span>Notes (optional)</span>
@@ -58,7 +58,7 @@
 				</div>
 				<div class="actions">
 					<a routerLink="/cart" class="link">Back to cart</a>
-					<button class="primary" (click)="next()" [disabled]="!shippingAddress.fullName || !shippingAddress.phone || !shippingAddress.street || !shippingAddress.city || !shippingAddress.state || !shippingAddress.zip">Review order</button>
+					<button class="primary" (click)="next()" [disabled]="!shippingAddress.fullName || !shippingAddress.email || !shippingAddress.phone || !shippingAddress.address || !shippingAddress.city || !shippingAddress.country">Review order</button>
 				</div>
 			</section>
 
@@ -108,8 +108,8 @@
 				<div class="address-block">
 					<div>{{ shippingAddress.fullName }}</div>
 					<div>{{ shippingAddress.phone }}</div>
-					<div>{{ shippingAddress.street }}</div>
-					<div>{{ shippingAddress.city }}, {{ shippingAddress.state }} {{ shippingAddress.zip }}</div>
+					<div>{{ shippingAddress.address }}</div>
+					<div>{{ shippingAddress.city }}, {{ shippingAddress.country }}</div>
 					<div *ngIf="shippingAddress.notes">Note: {{ shippingAddress.notes }}</div>
 				</div>
 				<a class="link" routerLink="/products">Continue shopping</a>
