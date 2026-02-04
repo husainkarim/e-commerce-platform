@@ -32,7 +32,6 @@
                     (change)="applyFilters()"
                     class="filter-select"
                 >
-                    <option value="">All Statuses</option>
                     <option *ngFor="let status of statusOptions" [value]="status === 'All' ? '' : status">
                         {{ status }}
                     </option>
@@ -77,7 +76,7 @@
             <div class="order-card-header">
                 <div class="order-id-section">
                     <span class="order-label">Order ID</span>
-                    <h3 class="order-number">{{ order.orderNumber }}</h3>
+                    <h3 class="order-number">{{ order.id }}</h3>
                 </div>
                 <div class="order-status-badge" [ngClass]="'status-' + order.status.toLowerCase()">
                     <span class="status-dot"></span>
@@ -96,7 +95,7 @@
                     </svg>
                     <div class="info-content">
                         <span class="info-label">Order Date</span>
-                        <span class="info-value">{{ order.date }}</span>
+                        <span class="info-value">{{ order.createdAt | date:'dd MMM yyyy, hh:mm a' }}</span>
                     </div>
                 </div>
 
@@ -118,7 +117,7 @@
                     </svg>
                     <div class="info-content">
                         <span class="info-label">Total Amount</span>
-                        <span class="info-value price">${{ order.total | number: '1.2-2' }}</span>
+                        <span class="info-value price">${{ order.totalAmount | number: '1.2-2' }}</span>
                     </div>
                 </div>
             </div>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ApiService } from '../api.service';
 import { AuthServiceService } from '../auth-service.service';
 import { FormsModule } from '@angular/forms';
+import { update } from '@angular/fire/database';
 
 interface Order {
   id: number;
@@ -17,11 +18,16 @@ interface Order {
   shippingAddress: string;
 }
 
+interface UpdateStatus {
+  orderId: number;
+  status: string;
+}
+
 @Component({
   selector: 'app-seller-orders',
   imports: [CommonModule, FormsModule],
   templateUrl: './seller-orders.html',
-  styleUrl: './seller-orders.css',
+  styleUrls: ['./seller-orders.css'],
 })
 export class SellerOrders implements OnInit {
   orders: Order[] = [];
@@ -55,7 +61,7 @@ export class SellerOrders implements OnInit {
     this.error = '';
 
     // Uncomment this when API is ready:
-    this.apiService.getOrdersByUserId(this.authService.getUser().id).subscribe({
+    this.apiService.getSellerOrders(this.authService.getUser().id).subscribe({
       next: (data) => {
         this.orders = data;
         this.filterOrders();
@@ -130,33 +136,30 @@ export class SellerOrders implements OnInit {
       }
       this.loading = false;
     }, 300);
-
-    // Uncomment when API is ready:
-    // this.apiService.put(`/orders/${orderId}/status`, { status: newStatus }).subscribe({
-    //   next: (response) => {
-    //     const orderIndex = this.orders.findIndex(o => o.id === orderId);
-    //     if (orderIndex !== -1) {
-    //       this.orders[orderIndex].status = newStatus;
-    //       this.filterOrders();
-    //     }
-    //     this.loading = false;
-    //   },
-    //   error: (err) => {
-    //     this.error = 'Failed to update order status. Please try again.';
-    //     this.loading = false;
-    //   }
-    // });
+    let updateState: UpdateStatus = { orderId, status: newStatus };
+    this.apiService.updateOrderStatus(this.authService.getUser().id, updateState).subscribe({
+      next: (response) => {
+        const orderIndex = this.orders.findIndex(o => o.id === orderId);
+        if (orderIndex !== -1) {
+          this.orders[orderIndex].status = newStatus;
+          this.filterOrders();
+        }
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to update order status. Please try again.';
+        this.loading = false;
+      }
+    });
   }
-
+  // PENDING|CONFIRMED|PROCESSED|DELIVERED|CANCELLED
   getStatusClass(status: string): string {
     const statusClasses: { [key: string]: string } = {
-      'pending': 'status-pending',
-      'accepted': 'status-accepted',
-      'processing': 'status-processing',
-      'shipped': 'status-shipped',
-      'delivered': 'status-delivered',
-      'cancelled': 'status-cancelled',
-      'rejected': 'status-rejected'
+      'PENDING': 'status-pending',
+      'CONFIRMED': 'status-confirmed',
+      'PROCESSED': 'status-processed',
+      'DELIVERED': 'status-delivered',
+      'CANCELLED': 'status-cancelled',
     };
     return statusClasses[status] || '';
   }
@@ -173,26 +176,26 @@ export class SellerOrders implements OnInit {
   }
 
   canAccept(status: string): boolean {
-    return status === 'pending';
+    return status === 'PENDING';
   }
 
   canReject(status: string): boolean {
-    return status === 'pending';
+    return status === 'PENDING';
   }
 
   canProcess(status: string): boolean {
-    return status === 'accepted';
+    return status === 'CONFIRMED';
   }
 
   canShip(status: string): boolean {
-    return status === 'processing';
+    return status === 'PROCESSED';
   }
 
   canDeliver(status: string): boolean {
-    return status === 'shipped';
+    return status === 'DELIVERED';
   }
 
   canCancel(status: string): boolean {
-    return ['pending', 'accepted', 'processing'].includes(status);
+    return ['PENDING', 'CONFIRMED', 'PROCESSED'].includes(status);
   }
 }

@@ -7,7 +7,11 @@
 			<div class="cart-card" *ngFor="let item of items;">
 				<img [src]="item.image" alt="{{ item.name }}" class="cart-image" />
 				<div class="cart-info">
-					<div class="cart-title">{{ item.name }}</div>
+					<div class="cart-title">
+            <a [routerLink]="['/products', item.id]" class="product-link">
+              {{ item.name }}
+            </a>
+          </div>
 					<div class="cart-meta">${{ item.price | number:'1.2-2' }} each</div>
 					<div class="cart-quantity">
 						<button type="button" class="qty-btn" (click)="decrement(item)">-</button>

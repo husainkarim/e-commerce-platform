@@ -10,4 +10,5 @@ import backend.order_service.model.Order;
 @Repository
 public interface OrderRepository extends MongoRepository<Order, String> {
     List<Order> findByUserId(String userId);
+    List<Order> findBySellerId(String sellerId);
 }

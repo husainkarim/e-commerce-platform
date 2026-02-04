@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ApiService } from '../api.service';
 import { AuthServiceService } from '../auth-service.service';
+import { forkJoin } from 'rxjs';
 
 interface Product {
   id: string;
@@ -85,29 +86,38 @@ export class Cart {
         this.cartItems = response.cart.items || [];
         localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
         this.items = [];
-        this.cartItems.forEach((cartItem) =>
-          this.apiService.getProductById(cartItem.productId).subscribe({
-            next: (product) => {
+
+        for (const cartItem of this.cartItems) {
+          forkJoin({
+            productRes: this.apiService.getProductById(cartItem.productId),
+            imageRes: this.apiService.getImagesByProductId(cartItem.productId)
+          }).subscribe({
+            next: ({ productRes, imageRes }) => {
+
+              const image =
+                imageRes?.images?.length > 0
+                  ? imageRes.images[0].imagePath
+                  : 'assets/product-images/default-product-image.jpg';
+
               const item: Product = {
-                id: product.id,
-                name: product.name,
-                description: product.description,
-                price: product.price,
+                id: productRes.product.id,
+                name: productRes.product.name,
+                description: productRes.product.description,
+                price: productRes.product.price,
                 quantity: cartItem.quantity,
-                userId: product.userId,
-                image: product.image,
-                category: product.category,
+                userId: productRes.product.userId,
+                category: productRes.product.category,
+                image: image
               };
+
               this.items.push(item);
+              console.log('Loaded cart item:', item);
             },
-            error: (error: any) => {
-              console.error('Failed to fetch product data:', error);
-              return null;
+            error: (err) => {
+              console.error('Failed to load product or image:', err);
             }
-          })
-        )
-        console.log('Cart items:', this.cartItems);
-        console.log('Loaded cart items:', this.items);
+          });
+        }
       },
       error: (error) => {
         console.error('Failed to fetch cart data:', error);

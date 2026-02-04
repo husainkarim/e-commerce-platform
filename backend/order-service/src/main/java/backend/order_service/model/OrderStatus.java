@@ -19,4 +19,5 @@ public class OrderStatus {
     private String orderId;
     private String status;
     private Date updatedAt = new Date();
+    private Boolean completed = false;
 }

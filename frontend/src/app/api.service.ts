@@ -96,8 +96,13 @@ export class ApiService {
   getOrderById(orderId: string, userId: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/orders/order-details?orderId=${orderId}&userId=${userId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
   }
+
   getOrdersByUserId(userId: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/orders/user-orders?userId=${userId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
+  }
+
+  getSellerOrders(sellerId: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/orders/seller-orders?sellerId=${sellerId}`, { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.authServiceService.getToken()}` } });
   }
 
   updateOrderStatus(userId: string, data: any): Observable<any> {

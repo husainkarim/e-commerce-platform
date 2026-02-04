@@ -129,16 +129,33 @@ public class OrderController {
             response.put("message", "User ID mismatch");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        order.calculateTotal();
-        orderRepository.save(order);
-        OrderStatus orderStatus = new OrderStatus();
-        orderStatus.setOrderId(order.getId());
-        orderStatus.setStatus(order.getStatus());
-        orderStatusRepository.save(orderStatus);
-        kafkaService.sendOrderCreatedEvent(order);
-        response.put("order", order);
+        if (order.getItems() == null || order.getItems().isEmpty()) {
+            response.put("message", "Order must contain at least one item");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+        
+        // get sellers involved in this order which ensures one order per seller
+        List<String> sellerOrders = order.getSellersIds();
+        System.out.println("Placing order for userId: " + userId + " with sellers: " + sellerOrders);
+        System.out.println("Order details: " + order);
+        for (String sellerId : sellerOrders) {
+            Order sellerOrder = order.createOrderForSeller(sellerId);
+            // id is null here and will be generated in the save() method
+            sellerOrder = orderRepository.save(sellerOrder);
+            OrderStatus orderStatus = new OrderStatus();
+            orderStatus.setOrderId(sellerOrder.getId());
+            orderStatus.setStatus(sellerOrder.getStatus());
+            orderStatusRepository.save(orderStatus);
+            kafkaService.sendOrderCreatedEvent(sellerOrder);
+        }
+        // clear the cart after placing the order
+        Optional<Cart> cartOpt = cartRepository.findByUserId(userId);
+        if (cartOpt.isPresent()) {
+            Cart cart = cartOpt.get();
+            cart.getItems().clear();
+            cartRepository.save(cart);
+        }
         response.put("message", "Order placed successfully");
-
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -156,7 +173,7 @@ public class OrderController {
         var orderOpt = orderRepository.findById(orderId);
         if (orderOpt.isPresent()) {
             response.put("order", orderOpt.get());
-            var orderStatusOpt = orderStatusRepository.findById(orderId);
+            var orderStatusOpt = orderStatusRepository.findByOrderId(orderId);
             if (orderStatusOpt.isPresent()) {
                 response.put("status", orderStatusOpt.get().getStatus());
             } else {
@@ -218,7 +235,15 @@ public class OrderController {
             response.put("message", "Invalid client user ID");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        var orders = orderRepository.findByUserId(userId);
+        List<Order> orders = orderRepository.findByUserId(userId);
+        response.put("orders", orders);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/seller-orders")
+    public ResponseEntity<Map<String, Object>> getOrdersBySellerId(@RequestParam String sellerId) {
+        Map<String, Object> response = new HashMap<>();
+        List<Order> orders = orderRepository.findBySellerId(sellerId);
         response.put("orders", orders);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

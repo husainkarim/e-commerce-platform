@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
@@ -30,15 +29,13 @@ public class Order {
     @NotBlank(message = "User ID is required")
     private String userId;
 
-    @NotEmpty(message = "Order must contain at least one item")
+    private String sellerId;
+
+    @NotBlank(message = "Order must contain at least one item")
     @Valid // This is crucial to trigger validation on the OrderItem list
     private List<OrderItem> items;
 
-    //shipping Fees
-    @PositiveOrZero(message = "Shipping fee cannot be negative")
-    private double shippingFees;
-
-    @Pattern(regexp = "PENDING|CONFIRMED|DELIVERED|CANCELLED", message = "Invalid status")
+    @Pattern(regexp = "PENDING|CONFIRMED|PROCESSED|DELIVERED|CANCELLED", message = "Invalid status")
     private String status = "PENDING";
 
     @NotBlank(message = "Payment method is required")
@@ -62,6 +59,9 @@ public class Order {
     public static class OrderItem {
         @NotBlank(message = "Product ID is required")
         private String productId;
+
+        @NotBlank(message = "Product name is required")
+        private String productName;
 
         @NotBlank(message = "Seller ID is required")
         private String sellerId;
@@ -103,5 +103,33 @@ public class Order {
         this.totalAmount = items.stream()
             .mapToDouble(i -> i.getPrice() * i.getQuantity())
             .sum();
+    }
+
+    public Boolean hasMultipleSellers() {
+        return items.stream()
+            .map(OrderItem::getSellerId)
+            .distinct()
+            .count() > 1;
+    }
+
+    public List<String> getSellersIds() {
+        return items.stream()
+            .map(OrderItem::getSellerId)
+            .distinct()
+            .toList();
+    }
+
+    public Order createOrderForSeller(String sellerId) {
+        List<OrderItem> sellerItems = items.stream()
+            .filter(i -> i.getSellerId().equals(sellerId))
+            .toList();
+        Order sellerOrder = new Order();
+        sellerOrder.setUserId(this.userId);
+        sellerOrder.setSellerId(sellerId);
+        sellerOrder.setItems(sellerItems);
+        sellerOrder.setShippingAddress(this.shippingAddress);
+        sellerOrder.setPaymentMethod(this.paymentMethod);
+        sellerOrder.calculateTotal();
+        return sellerOrder;
     }
 }

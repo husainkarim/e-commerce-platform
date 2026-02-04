@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthServiceService } from '../auth-service.service';
 import { ApiService } from '../api.service';
+import { forkJoin } from 'rxjs';
 
 interface CartItem {
-  id: string;
-  name: string;
-  image: string;
+  sellerId: string;
+  productId: string;
+  productName: string;
   price: number;
   quantity: number;
 }
@@ -26,8 +27,8 @@ interface Address {
 interface Order {
   userId: string;
   items: CartItem[];
+  status: string;
   shippingAddress: Address;
-  shippingFees: number;
   paymentMethod: string;
 }
 
@@ -40,9 +41,9 @@ interface Order {
 })
 export class Checkout {
   step = 0;
+  products: any[] = [];
   confirmed = false;
   items: CartItem[] = [];
-  shippingFee = 0;
   paymentMethod = 'PAY ON DELIVERY';
   shippingAddress: Address = {
     fullName: '',
@@ -68,12 +69,8 @@ export class Checkout {
     return this.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   }
 
-  get shipping(): number {
-    return this.subtotal < 100 ? this.shippingFee = 20 : this.shippingFee = 0;
-  }
-
   get total(): number {
-    return this.subtotal + this.shippingFee;
+    return this.subtotal;
   }
 
   goTo(step: number): void {
@@ -102,16 +99,17 @@ export class Checkout {
     }
     this.confirmed = true;
     this.step = 2;
+    console.log('Confirmed order items:', this.items);
     const order: Order = {
       userId: this.authService.getUser().id,
       items: this.items,
+      status: 'PENDING',
       shippingAddress: this.shippingAddress,
-      shippingFees: this.shipping,
       paymentMethod: this.paymentMethod,
     };
     this.apiService.placeOrder(this.authService.getUser().id, order).subscribe({
       next: (response) => {
-        console.log('Order placed successfully:', response);
+        console.log('Order placed successfully:', response.message);
         localStorage.removeItem('cartItems');
         this.items = [];
       },
@@ -133,18 +131,46 @@ export class Checkout {
     return required.every((field) => field.trim().length > 0);
   }
 
+
   private loadCart(): void {
-    const stored = localStorage.getItem('cartItems');
-    if (stored) {
-      try {
-        this.apiService.getCartByUserId(this.authService.getUser().id).subscribe({
-          next: (response) => {
-            this.items = response.items || [];
-          }
-        });
-      } catch (error) {
-        console.warn('Falling back to sample checkout items because stored data is invalid.', error);
-      }
+    const stored = JSON.parse(localStorage.getItem('cartItems') || 'null');
+
+    if (!stored) {
+      console.log('No cart items found in localStorage');
+      return;
     }
+
+    this.items = stored;
+    this.products = [];
+
+    this.items.forEach(item => {
+      forkJoin({
+        productRes: this.apiService.getProductById(item.productId),
+        imageRes: this.apiService.getImagesByProductId(item.productId)
+      }).subscribe({
+        next: ({ productRes, imageRes }) => {
+
+          // update price from backend (important!)
+          item.price = productRes.product.price;
+
+          // resolve image
+          const imageUrl =
+            imageRes?.images?.length > 0
+              ? imageRes.images[0].imagePath
+              : 'assets/product-images/default-product-image.jpg';
+
+          productRes.product.imageUrl = imageUrl;
+
+          this.products.push(productRes.product);
+
+          console.log('Loaded product data for cart item:', productRes.product);
+        },
+        error: (err) => {
+          console.error('Failed to load product or image:', err);
+        }
+      });
+    });
+
+    console.log('Loaded cart items:', this.items);
   }
 }

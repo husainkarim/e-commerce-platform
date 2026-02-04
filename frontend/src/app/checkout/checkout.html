@@ -66,8 +66,8 @@
 				<h3>Review Order</h3>
 				<div class="review-layout">
 					<div class="review-items">
-						<div class="review-card" *ngFor="let item of items">
-							<img [src]="item.image" alt="{{ item.name }}" />
+						<div class="review-card" *ngFor="let item of products">
+							<img [src]="item.imageUrl" alt="{{ item.name }}" />
 							<div class="info">
 								<div class="title">{{ item.name }}</div>
 								<div class="meta">Qty: {{ item.quantity }}</div>
@@ -82,10 +82,6 @@
 							<span>Subtotal</span>
 							<span>${{ subtotal | number:'1.2-2' }}</span>
 						</div>
-						<div class="row">						<span>Delivery</span>
-						<span *ngIf="shipping > 0">${{ shipping | number:'1.2-2' }}</span>
-						<span *ngIf="shipping === 0" style="color: #4caf50; font-weight: 600;">FREE</span>
-					</div>
 					<div class="row">							<span>Payment</span>
 							<span>Pay on Delivery</span>
 						</div>

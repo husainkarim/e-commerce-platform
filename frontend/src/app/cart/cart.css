@@ -54,6 +54,12 @@
 	font-weight: 600;
 }
 
+.cart-title .product-link {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.15s;
+}
+
 .cart-meta {
 	color: #666;
 	font-size: 0.95rem;

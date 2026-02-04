@@ -11,8 +11,8 @@
 		<!-- Order Header -->
 		<div class="order-header-section">
 			<div class="header-left">
-				<h1>{{ order.orderNumber }}</h1>
-				<p class="order-date">Ordered on {{ order.orderDate }}</p>
+				<h1>{{ order.id }}</h1>
+				<p class="order-date">Ordered on {{ order.createdAt | date:'dd MMM yyyy, hh:mm a' }}</p>
 			</div>
 			<div class="header-right">
 				<div class="order-status-badge" [class]="order.status.toLowerCase()">
@@ -26,12 +26,11 @@
 			<h2>Order Timeline</h2>
 			<div class="timeline">
 				<div class="timeline-item" *ngFor="let event of order.timeline; let last = last" [class.completed]="event.completed">
-					<div class="timeline-marker" [class.active]="event.completed"></div>
+					<!-- <div class="timeline-marker" [class.active]="event.completed"></div> -->
 					<div class="timeline-connector" *ngIf="!last"></div>
 					<div class="timeline-content">
 						<h3>{{ event.status }}</h3>
-						<p class="timeline-date">{{ event.date }} at {{ event.time }}</p>
-						<p class="timeline-description">{{ event.description }}</p>
+						<p class="timeline-date">{{ event.updatedAt | date:'dd MMM yyyy, hh:mm a' }} </p>
 					</div>
 				</div>
 			</div>
@@ -44,9 +43,9 @@
 				<h2>Order Items</h2>
 				<div class="items-list">
 					<div class="item-card" *ngFor="let item of order.items">
-						<img [src]="item.image" alt="{{ item.name }}" class="item-image" />
+						<img [src]="item.image" alt="{{ item.productName }}" class="item-image" />
 						<div class="item-details">
-							<h3>{{ item.name }}</h3>
+							<h3>{{ item.productName }}</h3>
 							<p class="item-qty">Quantity: {{ item.quantity }}</p>
 							<p class="item-price">${{ item.price | number: '1.2-2' }}</p>
 						</div>
@@ -73,17 +72,9 @@
 				<!-- Order Summary -->
 				<div class="summary-card">
 					<h3>Order Summary</h3>
-					<div class="summary-row">
-						<span>Subtotal</span>
-						<span>${{ order.subtotal | number: '1.2-2' }}</span>
-					</div>
-					<div class="summary-row">
-						<span>Shipping</span>
-						<span>${{ order.shipping | number: '1.2-2' }}</span>
-					</div>
 					<div class="summary-row total">
 						<span>Total</span>
-						<span>${{ order.total | number: '1.2-2' }}</span>
+						<span>${{ order.totalAmount | number: '1.2-2' }}</span>
 					</div>
 				</div>
 			</div>

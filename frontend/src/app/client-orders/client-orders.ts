@@ -6,26 +6,37 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../api.service';
 
 interface Order {
-  id: number;
-  orderNumber: string;
-  date: string;
+  id: string;
+  createdAt: string;
   status: string;
-  total: number;
+  paymentMethod: string;
+  shippingAddress: {
+    fullName: string;
+    email: string;
+    phone: string;
+    address: string;
+    city: string;
+    country: string;
+    notes: string;
+  };
+  totalAmount: number;
   itemsCount: number;
+  items: any[];
 }
 
 @Component({
   selector: 'app-client-orders',
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './client-orders.html',
-  styleUrl: './client-orders.css',
+  styleUrls: ['./client-orders.css'],
 })
 export class ClientOrders implements OnInit {
   orders: Order[] = [];
     filteredOrders: Order[] = [];
-    searchStatus: string = '';
+    searchStatus: string = 'All';
     searchDate: string = '';
-    statusOptions = ['All', 'Pending', 'Shipped', 'Delivered', 'Cancelled'];
+    // PENDING|CONFIRMED|PROCESSED|DELIVERED|CANCELLED
+    statusOptions = ['All', 'PENDING', 'CONFIRMED', 'PROCESSED', 'DELIVERED', 'CANCELLED'];
 
     constructor(
       private authService: AuthServiceService,
@@ -44,37 +55,36 @@ export class ClientOrders implements OnInit {
     loadOrders() {
       this.apiService.getOrdersByUserId(this.authService.getUser().id).subscribe({
         next: (data) => {
-          this.orders = data;
-        },
+          this.orders = data.orders;
+          this.applyFilters();        },
         error: (err) => {
           console.error('Error fetching orders:', err);
         }
       });
-
-      this.applyFilters();
     }
 
     applyFilters() {
-      this.filteredOrders = this.orders.filter((order) => {
+      this.filteredOrders = this.orders.filter(order => {
         const statusMatch =
           !this.searchStatus ||
           this.searchStatus === 'All' ||
           order.status === this.searchStatus;
 
         const dateMatch =
-          !this.searchDate || order.date === this.searchDate;
+          !this.searchDate ||
+          new Date(order.createdAt).toISOString().split('T')[0] === this.searchDate;
 
         return statusMatch && dateMatch;
       });
     }
 
     clearFilters() {
-      this.searchStatus = '';
+      this.searchStatus = 'All';
       this.searchDate = '';
       this.applyFilters();
     }
 
-    viewOrderDetails(orderId: number) {
+    viewOrderDetails(orderId: string) {
       this.router.navigate(['/orders', orderId]);
     }
 }
