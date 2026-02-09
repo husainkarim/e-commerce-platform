@@ -74,42 +74,42 @@ pipeline {
             }
         }
 
-        // stage('SonarQube Analysis') {
-        //     steps {
-        //         // 'SonarQube' must match the name you give in Jenkins Global Configuration
-        //         withSonarQubeEnv('SonarQube') { 
-        //             script {
-        //                 // 1. Backend Microservices Analysis
-        //                 def services = ['user-service', 'product-service', 'media-service', 'api-gateway']
-        //                 services.each { service ->
-        //                     dir("backend/${service}") {
-        //                         sh "mvn sonar:sonar -Dsonar.projectKey=${service} -Dsonar.projectName=${service}"
-        //                     }
-        //                 }
+        stage('SonarQube Analysis') {
+            steps {
+                // 'SonarQube' must match the name you give in Jenkins Global Configuration
+                withSonarQubeEnv('SonarQube') { 
+                    script {
+                        // 1. Backend Microservices Analysis
+                        def services = ['user-service', 'product-service', 'media-service', 'api-gateway']
+                        services.each { service ->
+                            dir("backend/${service}") {
+                                sh "mvn sonar:sonar -Dsonar.projectKey=${service} -Dsonar.projectName=${service}"
+                            }
+                        }
 
-        //                 // 2. Frontend Analysis
-        //                 dir('frontend') {
-        //                     // Ensure coverage is generated before this if you want it in Sonar
-        //                     // Use npx to run the scanner without manual installation
-        //                     sh "npx sonar-scanner \
-        //                         -Dsonar.projectKey=ecommerce-frontend \
-        //                         -Dsonar.sources=src \
-        //                         -Dsonar.host.url=${SONAR_HOST_URL} \
-        //                         -Dsonar.login=${SONAR_AUTH_TOKEN}"
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+                        // 2. Frontend Analysis
+                        dir('frontend') {
+                            // Ensure coverage is generated before this if you want it in Sonar
+                            // Use npx to run the scanner without manual installation
+                            sh "npx sonar-scanner \
+                                -Dsonar.projectKey=ecommerce-frontend \
+                                -Dsonar.sources=src \
+                                -Dsonar.host.url=${SONAR_HOST_URL} \
+                                -Dsonar.login=${SONAR_AUTH_TOKEN}"
+                        }
+                    }
+                }
+            }
+        }
 
-        // stage("Quality Gate") {
-        //     steps {
-        //         timeout(time: 5, unit: 'MINUTES') {
-        //             // Jenkins will pause here until SonarQube sends a webhook back
-        //             waitForQualityGate abortPipeline: true
-        //         }
-        //     }
-        // }
+        stage("Quality Gate") {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    // Jenkins will pause here until SonarQube sends a webhook back
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
 
         stage('Install & Build & Deploy Application') {
             steps {
