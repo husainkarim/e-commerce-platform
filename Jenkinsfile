@@ -83,49 +83,30 @@ pipeline {
         // SonarQube analysis for both backend and frontend
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
+                // 'SonarQube' must match the name you give in Jenkins Global Configuration
+                withSonarQubeEnv('SonarQube') { 
                     script {
-
-                        def backendServices = [
-                            'user-service',
-                            'product-service',
-                            'media-service',
-                            'order-service',
-                            'api-gateway'
-                        ]
-
-                        def parallelStages = [:]
-
-                        // Backend microservices (parallel)
-                        backendServices.each { service ->
-                            parallelStages["Sonar - ${service}"] = {
-                                dir("backend/${service}") {
-                                    sh "mvn sonar:sonar \
-                                        -Dsonar.projectKey=${service} \
-                                        -Dsonar.projectName=${service}"
-                                }
+                        // 1. Backend Microservices Analysis
+                        def services = ['user-service', 'product-service', 'media-service', 'order-service', 'api-gateway']
+                        services.each { service ->
+                            dir("backend/${service}") {
+                                sh "mvn sonar:sonar -Dsonar.projectKey=${service} -Dsonar.projectName=${service}"
                             }
                         }
 
-                        // Frontend (parallel)
-                        parallelStages["Sonar - Frontend"] = {
-                            dir('frontend') {
-                                sh """
-                                npx sonar-scanner \
+                        // 2. Frontend Analysis
+                        dir('frontend') {
+                            // Ensure coverage is generated before this if you want it in Sonar
+                            // Use npx to run the scanner without manual installation
+                            sh "npx sonar-scanner \
                                 -Dsonar.projectKey=ecommerce-frontend \
                                 -Dsonar.sources=src \
                                 -Dsonar.host.url=${SONAR_HOST_URL} \
-                                -Dsonar.login=${SONAR_AUTH_TOKEN}
-                                """
-                            }
+                                -Dsonar.login=${SONAR_AUTH_TOKEN}"
                         }
-
-                        parallel parallelStages
                     }
                 }
             }
-        }
-
         }
         // This stage will wait for SonarQube to process the analysis and return the quality gate status via webhook
         stage("Quality Gate") {
@@ -136,7 +117,7 @@ pipeline {
                 }
             }
         }
-        // If we reach this stage, it means the quality gate passed successfully
+        //
         stage('Install & Build & Deploy Application') {
             steps {
                 dir('backend') {
