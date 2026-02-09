@@ -31,7 +31,7 @@ pipeline {
                 }
             }
         }
-
+        // backend tests
         stage('Backend Tests') {
             stages {
                 stage('User Service') {
@@ -71,7 +71,7 @@ pipeline {
                 }
             }
         }
-
+        // frontend tests
         stage('Frontend Tests') {
             steps {
                 dir('frontend') {
@@ -80,7 +80,7 @@ pipeline {
                 }
             }
         }
-
+        // SonarQube analysis for both backend and frontend
         stage('SonarQube Analysis') {
             steps {
                 // 'SonarQube' must match the name you give in Jenkins Global Configuration
@@ -108,7 +108,7 @@ pipeline {
                 }
             }
         }
-
+        // This stage will wait for SonarQube to process the analysis and return the quality gate status via webhook
         stage("Quality Gate") {
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
@@ -117,7 +117,7 @@ pipeline {
                 }
             }
         }
-
+        // If we reach this stage, it means the quality gate passed successfully
         stage('Install & Build & Deploy Application') {
             steps {
                 dir('backend') {
