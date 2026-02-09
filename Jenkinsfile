@@ -90,7 +90,12 @@ pipeline {
                         def services = ['user-service', 'product-service', 'media-service', 'order-service', 'api-gateway']
                         services.each { service ->
                             dir("backend/${service}") {
-                                sh "mvn clean sonar:sonar -Dsonar.projectKey=${service} -Dsonar.projectName=${service} -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml"
+                                sh "mvn clean package"  // compile & run tests + generate jacoco
+                                sh "mvn sonar:sonar \
+                                    -Dsonar.projectKey=${service} \
+                                    -Dsonar.projectName=${service} \
+                                    -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+                                    -Dsonar.java.binaries=target/classes"
                             }
                         }
 
