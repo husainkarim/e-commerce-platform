@@ -23,7 +23,8 @@ export class SellerDashboardComponent {
   products: any[] = [];
   totalRevenue: number = 0;
   totalUnitsSold: number = 0;
-  topSellingProducts: TopSellingProduct[] = [];
+  topSellingProductsByRevenue: TopSellingProduct[] = [];
+  topSellingProductsByUnits: TopSellingProduct[] = [];
   chartColors: string[] = [
     '#FF6384',
     '#36A2EB',
@@ -57,7 +58,9 @@ export class SellerDashboardComponent {
     const userId = this.authServiceService.getUser().id;
     this.apiService.getUserProducts(userId).subscribe({
       next: (response) => {
-        this.products = response.products;
+        this.products = response.sellerDashboard.products;
+        this.totalRevenue = response.sellerDashboard.totalRevenue;
+        this.totalUnitsSold = response.sellerDashboard.totalUnitsSold;
         for (let product of this.products) {
           this.apiService.getImagesByProductId(product.id).subscribe({
             next: (imageResponse) => {
@@ -82,7 +85,7 @@ export class SellerDashboardComponent {
 
   calculateAnalytics() {
     // Generate sample sales data (in real app, this would come from backend orders)
-    this.topSellingProducts = this.products
+    this.topSellingProductsByRevenue = this.products
       .map((product: any) => ({
         id: product.id,
         name: product.name,
@@ -91,16 +94,25 @@ export class SellerDashboardComponent {
       }))
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
+    this.topSellingProductsByUnits = this.products
+      .map((product: any) => ({
+        id: product.id,
+        name: product.name,
+        unitsSold: product.unitsSold,
+        revenue: product.revenue,
+      }))
+      .sort((a, b) => b.unitsSold - a.unitsSold)
+      .slice(0, 5);
 
-    // Calculate total metrics
-    this.totalUnitsSold = this.topSellingProducts.reduce(
-      (sum, item) => sum + item.unitsSold,
-      0
-    );
-    this.totalRevenue = this.topSellingProducts.reduce(
-      (sum, item) => sum + item.revenue,
-      0
-    );
+    // // Calculate total metrics
+    // this.totalUnitsSold = this.topSellingProducts.reduce(
+    //   (sum, item) => sum + item.unitsSold,
+    //   0
+    // );
+    // this.totalRevenue = this.topSellingProducts.reduce(
+    //   (sum, item) => sum + item.revenue,
+    //   0
+    // );
   }
 
   deleteProduct(productId: string) {

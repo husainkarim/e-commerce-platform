@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ArrayList;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,12 @@ public class OrderController {
     private final ClientRepository clientRepository;
     private final ProductAllowedRepository productAllowedRepository;
 
+    private static final String[] CATEGORIES = {
+        "General", "Electronics", "Fashion", "Home", "Sports", "Books", "Toys",
+        "Health", "Automotive", "Garden", "Music", "Movies", "Groceries",
+        "Jewelry", "Beauty"
+    };
+
     public OrderController(OrderRepository orderRepository, CartRepository cartRepository, OrderStatusRepository orderStatusRepository, KafkaService kafkaService, ClientRepository clientRepository, ProductAllowedRepository productAllowedRepository) {
         this.orderRepository = orderRepository;
         this.cartRepository = cartRepository;
@@ -64,6 +71,14 @@ public class OrderController {
         if (!userId.equals(updatedCart.getUserId())) {
             response.put("message", "User ID mismatch");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        // check items categories is it valid or not
+        for (Cart.CartItem item : updatedCart.getItems()) {
+            if (!List.of(CATEGORIES).contains(item.getCategory())) {
+                response.put("message", "Invalid category: " + item.getCategory());
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
         }
         
         Optional<Cart> existingCarts = cartRepository.findByUserId(userId);
@@ -133,11 +148,17 @@ public class OrderController {
             response.put("message", "Order must contain at least one item");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
+
+        // check items categories is it valid or not
+        for (Order.OrderItem item : order.getItems()) {
+            if (!List.of(CATEGORIES).contains(item.getCategory())) {
+                response.put("message", "Invalid category: " + item.getCategory());
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+        }
         
         // get sellers involved in this order which ensures one order per seller
         List<String> sellerOrders = order.getSellersIds();
-        System.out.println("Placing order for userId: " + userId + " with sellers: " + sellerOrders);
-        System.out.println("Order details: " + order);
         for (String sellerId : sellerOrders) {
             Order sellerOrder = order.createOrderForSeller(sellerId);
             // id is null here and will be generated in the save() method
@@ -173,9 +194,9 @@ public class OrderController {
         var orderOpt = orderRepository.findById(orderId);
         if (orderOpt.isPresent()) {
             response.put("order", orderOpt.get());
-            var orderStatusOpt = orderStatusRepository.findByOrderId(orderId);
-            if (orderStatusOpt.isPresent()) {
-                response.put("status", orderStatusOpt.get().getStatus());
+            var orderStatusList = orderStatusRepository.findByOrderId(orderId);
+            if (!orderStatusList.isEmpty()) {
+                response.put("status", orderStatusList);
             } else {
                 response.put("status", "Status not found");
             }
@@ -190,11 +211,18 @@ public class OrderController {
     @PostMapping("/update-order-status")
     public ResponseEntity<Map<String, Object>> updateOrderStatus(@RequestBody UpdateState updateState, @RequestParam String userId) {
         Map<String, Object> response = new HashMap<>();
-        List<Client> clients = this.clientRepository.findAll();
-        // Check if userId belongs to a valid client
-        boolean isValidClient = clients.stream().anyMatch(client -> client.getUserId().equals(userId));
-        if (!isValidClient) {
-            response.put("message", "Invalid client user ID");
+        Order orderCheck = orderRepository.findById(updateState.getOrderId()).orElse(null);
+        if (orderCheck == null) {
+            response.put("message", "Order not found");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+        if (orderCheck.getSellerId() == null || !orderCheck.getSellerId().equals(userId)) {
+            response.put("message", "Unauthorized: You are not the seller of this order");
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+        List<String> validStatuses = List.of("PENDING", "SHIPPED", "DELIVERED", "CANCELLED", "DELETED");
+        if (!validStatuses.contains(updateState.getStatus())) {
+            response.put("message", "Invalid status: " + updateState.getStatus());
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         OrderStatus orderStatus = new OrderStatus();
@@ -212,10 +240,16 @@ public class OrderController {
             }
         }
         // send kafka event if order is cancelled or deleted
-        if (updateState.getStatus().equals("cancelled") || updateState.getStatus().equals("deleted")) {
+        if (updateState.getStatus().equals("CANCELLED") || updateState.getStatus().equals("DELETED")) {
             var orderOpt = orderRepository.findById(updateState.getOrderId());
-            if (orderOpt.isPresent()) {
+            if (orderOpt.isPresent() && updateState.getStatus().equals("CANCELLED")) {
                 Order order = orderOpt.get();
+                order.setStatus(updateState.getStatus());
+                orderRepository.save(order);
+                kafkaService.sendOrderDeletedEvent(order);
+            } else if (orderOpt.isPresent() && updateState.getStatus().equals("DELETED")) {
+                Order order = orderOpt.get();
+                orderRepository.deleteById(updateState.getOrderId());
                 kafkaService.sendOrderDeletedEvent(order);
             }
         }
@@ -260,8 +294,12 @@ public class OrderController {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
         var orders = orderRepository.findByUserId(userId);
-        int totalOrders = orders.size();
-        double totalSpent = orders.stream().mapToDouble(order -> order.getTotalAmount()).sum();
+        // if the order status is cancelled or deleted we will not count it in the total spent and total orders
+        // copy the orders list becuase the removeIf method will modify the original list and we need to keep it for the client orders response
+        List<Order> filteredOrders = new ArrayList<>(orders);
+        filteredOrders.removeIf(order -> order.getStatus().equals("CANCELLED") || order.getStatus().equals("DELETED"));
+        int totalOrders = filteredOrders.size();
+        double totalSpent = filteredOrders.stream().mapToDouble(order -> order.getTotalAmount()).sum();
         ClientOrders clientOrders = new ClientOrders(userId, orders, totalOrders, totalSpent);
         response.put("clientOrders", clientOrders);
         return new ResponseEntity<>(response, HttpStatus.OK);

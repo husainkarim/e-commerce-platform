@@ -144,13 +144,13 @@ textarea:focus {
 	text-decoration: none;
 	font-weight: 600;
   cursor: pointer;
-  background: #1976d2;
-	color: #fff;
+  background: #f5f7fa;
+	color: #333;
   transition: background 0.2s, color 0.2s, transform 0.1s;
 }
 
 .link:hover {
-	background-color: #1565c0;
+	background-color: #e8edf5;
 }
 
 .primary,

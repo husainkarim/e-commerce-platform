@@ -35,7 +35,7 @@ public class Order {
     @Valid // This is crucial to trigger validation on the OrderItem list
     private List<OrderItem> items;
 
-    @Pattern(regexp = "PENDING|CONFIRMED|PROCESSED|DELIVERED|CANCELLED", message = "Invalid status")
+    @Pattern(regexp = "PENDING|CONFIRMED|PROCESSED|DELIVERED|CANCELLED|DELETED", message = "Invalid status")
     private String status = "PENDING";
 
     @NotBlank(message = "Payment method is required")
@@ -65,6 +65,9 @@ public class Order {
 
         @NotBlank(message = "Seller ID is required")
         private String sellerId;
+
+        @NotBlank(message = "Category is required")
+        private String category;
 
         @Min(value = 1, message = "Quantity must be at least 1")
         private int quantity;

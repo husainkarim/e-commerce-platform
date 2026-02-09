@@ -106,7 +106,7 @@
                     </svg>
                     <div class="info-content">
                         <span class="info-label">Items</span>
-                        <span class="info-value">{{ order.itemsCount }} {{ order.itemsCount === 1 ? 'item' : 'items' }}</span>
+                        <span class="info-value">{{ calculateTotalItems(order) }} {{ calculateTotalItems(order) === 1 ? 'item' : 'items' }}</span>
                     </div>
                 </div>
 
@@ -131,14 +131,14 @@
                     </svg>
                     View Details
                 </button>
-                <button class="action-btn secondary" (click)="$event.stopPropagation()">
+                <!-- <button class="action-btn secondary" (click)="$event.stopPropagation()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
                         <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
                     Download Invoice
-                </button>
+                </button> -->
             </div>
         </div>
     </div>

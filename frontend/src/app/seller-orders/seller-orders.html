@@ -31,7 +31,7 @@
     <div *ngFor="let order of filteredOrders" class="order-card">
       <div class="order-header">
         <div class="order-number">
-          <strong>{{ order.orderNumber }}</strong>
+          <strong>{{ order.id }}</strong>
         </div>
         <div class="order-status" [ngClass]="getStatusClass(order.status)">
           {{ order.status | uppercase }}
@@ -41,73 +41,71 @@
       <div class="order-details">
         <div class="detail-row">
           <span class="label">Customer:</span>
-          <span class="value">{{ order.customerName }}</span>
+          <span class="value">{{ order.shippingAddress.fullName }}</span>
         </div>
         <div class="detail-row">
           <span class="label">Email:</span>
-          <span class="value">{{ order.customerEmail }}</span>
+          <span class="value">{{ order.shippingAddress.email }}</span>
         </div>
         <div class="detail-row">
           <span class="label">Product:</span>
-          <span class="value">{{ order.productName }}</span>
+          <span class="value">{{ order.items.length }}</span>
         </div>
         <div class="detail-row">
           <span class="label">Quantity:</span>
-          <span class="value">{{ order.quantity }}</span>
+          <span class="value">{{ getTotalQuantity(order.items) }}</span>
         </div>
         <div class="detail-row">
           <span class="label">Total Price:</span>
-          <span class="value price">${{ order.totalPrice.toFixed(2) }}</span>
+          <span class="value price">${{ order.totalAmount.toFixed(2) }}</span>
         </div>
         <div class="detail-row">
           <span class="label">Order Date:</span>
-          <span class="value">{{ formatDate(order.orderDate) }}</span>
+          <span class="value">{{ formatDate(order.createdAt) }}</span>
         </div>
         <div class="detail-row full-width">
           <span class="label">Shipping Address:</span>
-          <span class="value">{{ order.shippingAddress }}</span>
+          <span class="label">Address:</span>
+          <span class="value">{{ order.shippingAddress.address }}</span>
+          <span class="label">City:</span>
+          <span class="value">{{ order.shippingAddress.city }}</span>
+          <span class="label">Country:</span>
+          <span class="value">{{ order.shippingAddress.country }}</span>
         </div>
       </div>
 
       <div class="order-actions">
-        <button 
-          *ngIf="canAccept(order.status)" 
-          (click)="acceptOrder(order.id)" 
+        <button
+          *ngIf="canAccept(order.status)"
+          (click)="acceptOrder(order.id)"
           class="btn btn-accept"
           title="Accept this order">
           ✓ Accept
         </button>
-        <button 
-          *ngIf="canReject(order.status)" 
-          (click)="rejectOrder(order.id)" 
+        <button
+          *ngIf="canReject(order.status)"
+          (click)="rejectOrder(order.id)"
           class="btn btn-reject"
           title="Reject this order">
           ✗ Reject
         </button>
-        <button 
-          *ngIf="canProcess(order.status)" 
-          (click)="markAsProcessing(order.id)" 
+        <button
+          *ngIf="canProcess(order.status)"
+          (click)="markAsProcessing(order.id)"
           class="btn btn-process"
           title="Mark as processing">
           ⚙ Process
         </button>
-        <button 
-          *ngIf="canShip(order.status)" 
-          (click)="markAsShipped(order.id)" 
-          class="btn btn-ship"
-          title="Mark as shipped">
-          📦 Ship
-        </button>
-        <button 
-          *ngIf="canDeliver(order.status)" 
-          (click)="markAsDelivered(order.id)" 
+        <button
+          *ngIf="canDeliver(order.status)"
+          (click)="markAsDelivered(order.id)"
           class="btn btn-deliver"
           title="Mark as delivered">
           ✓ Delivered
         </button>
-        <button 
-          *ngIf="canCancel(order.status)" 
-          (click)="cancelOrder(order.id)" 
+        <button
+          *ngIf="canCancel(order.status)"
+          (click)="cancelOrder(order.id)"
           class="btn btn-cancel"
           title="Cancel this order">
           Cancel

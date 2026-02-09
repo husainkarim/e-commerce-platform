@@ -22,6 +22,7 @@ interface CartItem {
   sellerId: string;
   productId: string;
   productName: string;
+  category: string;
   price: number;
   quantity: number;
 }
@@ -135,6 +136,7 @@ export class ProductDetailComponent {
         sellerId: this.product.userId,
         productId: this.product.id,
         productName: this.product.name,
+        category: this.product.category,
         price: this.product.price,
         quantity: qty
       });
@@ -143,6 +145,8 @@ export class ProductDetailComponent {
       userId: this.authServiceService.getUser().id,
       items: cartItems
     }
+    console.log('product added to cart:', this.product);
+    console.log('Updating cart for user:', userCart);
     this.apiService.updateCart(this.authServiceService.getUser().id, userCart).subscribe({
       next: (response) => {
         console.log('Cart updated successfully:', response);

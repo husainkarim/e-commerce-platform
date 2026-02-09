@@ -215,12 +215,16 @@
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 2px solid #f7fafc;
+    gap: 1rem;
 }
 
 .order-id-section {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .order-label {
@@ -236,6 +240,8 @@
     font-weight: 700;
     color: #2d3748;
     margin: 0;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 /* Status Badge */
@@ -250,6 +256,8 @@
     align-items: center;
     gap: 0.5rem;
     animation: pulse 2s infinite;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .status-dot {

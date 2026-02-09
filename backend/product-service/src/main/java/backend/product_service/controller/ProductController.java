@@ -23,6 +23,7 @@ import backend.product_service.repository.OrderedRepository;
 import backend.product_service.repository.ProductRepository;
 import backend.product_service.repository.SellerRepository;
 import backend.product_service.service.KafkaService;
+import backend.product_service.dto.SellerDashboard;
 
 @RestController
 @RequestMapping("/api/products")
@@ -94,7 +95,8 @@ public class ProductController {
                 product.getUserId()
             );
         }).toList();
-        response.put("products", detailedProducts);
+        SellerDashboard sellerDashboard = new SellerDashboard(detailedProducts);
+        response.put("sellerDashboard", sellerDashboard);
         response.put("message", "User products fetched successfully");
         return new ResponseEntity<>(response, HttpStatus.OK); // 200
     }

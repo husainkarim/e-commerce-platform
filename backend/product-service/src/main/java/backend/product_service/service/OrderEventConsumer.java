@@ -47,7 +47,9 @@ public class OrderEventConsumer {
     @KafkaListener(topics = "order-deleted-topic")
     public void handleOrderDeleted(Map<String, Object> event) {
         String orderId = (String) event.get("orderId");
+        System.out.println("Received order-deleted event for orderId: " + orderId);
         List<Ordered> orderedList = orderedRepository.findByOrderId(orderId);
+        System.out.println("Found " + orderedList);
         // restore product quantity
         for (Ordered ordered : orderedList) {
             Product product = productRepository.findById(ordered.getProductId()).orElse(null);

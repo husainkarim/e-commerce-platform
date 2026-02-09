@@ -71,7 +71,7 @@
 			<div class="order-item" *ngFor="let order of recentOrders">
 				<div class="order-info">
 					<p class="order-id">Order #{{ order.id }}</p>
-					<p class="order-date">{{ order.date }}</p>
+					<p class="order-date">{{ order.date | date:'medium' }}</p>
 				</div>
 				<div class="order-amount">${{ order.amount | number:'1.2-2' }}</div>
 				<div class="order-status" [class]="order.status.toLowerCase()">{{ order.status }}</div>

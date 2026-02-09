@@ -10,6 +10,7 @@ interface CartItem {
   sellerId: string;
   productId: string;
   productName: string;
+  category: string;
   price: number;
   quantity: number;
 }
@@ -160,6 +161,7 @@ export class Checkout {
               : 'assets/product-images/default-product-image.jpg';
 
           productRes.product.imageUrl = imageUrl;
+          productRes.product.quantity = item.quantity;
 
           this.products.push(productRes.product);
 

@@ -21,6 +21,7 @@ interface CartItem {
   sellerId: string;
   productId: string;
   productName: string;
+  category: string;
   price: number;
   quantity: number;
 }
@@ -133,6 +134,7 @@ export class Cart {
         sellerId: item.userId,
         productId: item.id,
         productName: item.name,
+        category: item.category || 'Uncategorized',
         price: item.price,
         quantity: item.quantity,
       })),

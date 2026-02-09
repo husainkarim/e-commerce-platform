@@ -63,6 +63,10 @@ export class ClientOrders implements OnInit {
       });
     }
 
+    calculateTotalItems(order: Order): number {
+      return order.items.reduce((total, item) => total + item.quantity, 0);
+    }
+
     applyFilters() {
       this.filteredOrders = this.orders.filter(order => {
         const statusMatch =

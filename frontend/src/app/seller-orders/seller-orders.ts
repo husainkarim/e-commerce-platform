@@ -6,20 +6,26 @@ import { FormsModule } from '@angular/forms';
 import { update } from '@angular/fire/database';
 
 interface Order {
-  id: number;
-  orderNumber: string;
-  customerName: string;
-  customerEmail: string;
-  productName: string;
-  quantity: number;
-  totalPrice: number;
+  id: string;
+  createdAt: string;
   status: string;
-  orderDate: string;
-  shippingAddress: string;
+  paymentMethod: string;
+  shippingAddress: {
+    fullName: string;
+    email: string;
+    phone: string;
+    address: string;
+    city: string;
+    country: string;
+    notes: string;
+  };
+  totalAmount: number;
+  itemsCount: number;
+  items: any[];
 }
 
 interface UpdateStatus {
-  orderId: number;
+  orderId: string;
   status: string;
 }
 
@@ -38,13 +44,11 @@ export class SellerOrders implements OnInit {
 
   statusOptions = [
     { value: 'all', label: 'All Orders' },
-    { value: 'pending', label: 'Pending' },
-    { value: 'accepted', label: 'Accepted' },
-    { value: 'processing', label: 'Processing' },
-    { value: 'shipped', label: 'Shipped' },
-    { value: 'delivered', label: 'Delivered' },
-    { value: 'cancelled', label: 'Cancelled' },
-    { value: 'rejected', label: 'Rejected' }
+    { value: 'PENDING', label: 'Pending' },
+    { value: 'CONFIRMED', label: 'Confirmed' },
+    { value: 'PROCESSED', label: 'Processed' },
+    { value: 'DELIVERED', label: 'Delivered' },
+    { value: 'CANCELLED', label: 'Cancelled' }
   ];
 
   constructor(
@@ -63,7 +67,7 @@ export class SellerOrders implements OnInit {
     // Uncomment this when API is ready:
     this.apiService.getSellerOrders(this.authService.getUser().id).subscribe({
       next: (data) => {
-        this.orders = data;
+        this.orders = data.orders;
         this.filterOrders();
         this.loading = false;
       },
@@ -90,41 +94,39 @@ export class SellerOrders implements OnInit {
     this.filterOrders();
   }
 
-  acceptOrder(orderId: number): void {
+  getTotalQuantity(items: any[]): number {
+    return items.reduce((acc, item) => acc + item.quantity, 0);
+  }
+
+  acceptOrder(orderId: string): void {
     if (confirm('Are you sure you want to accept this order?')) {
-      this.updateOrderStatus(orderId, 'accepted');
+      this.updateOrderStatus(orderId, 'CONFIRMED');
     }
   }
 
-  rejectOrder(orderId: number): void {
-    if (confirm('Are you sure you want to reject this order? This action cannot be undone.')) {
-      this.updateOrderStatus(orderId, 'rejected');
+  rejectOrder(orderId: string): void {
+    if (confirm('Are you sure you want to reject this order?')) {
+      this.updateOrderStatus(orderId, 'CANCELLED');
     }
   }
 
-  markAsProcessing(orderId: number): void {
-    this.updateOrderStatus(orderId, 'processing');
+  markAsProcessing(orderId: string): void {
+    this.updateOrderStatus(orderId, 'PROCESSED');
   }
 
-  markAsShipped(orderId: number): void {
-    if (confirm('Confirm that this order has been shipped?')) {
-      this.updateOrderStatus(orderId, 'shipped');
-    }
-  }
-
-  markAsDelivered(orderId: number): void {
+  markAsDelivered(orderId: string): void {
     if (confirm('Confirm that this order has been delivered?')) {
-      this.updateOrderStatus(orderId, 'delivered');
+      this.updateOrderStatus(orderId, 'DELIVERED');
     }
   }
 
-  cancelOrder(orderId: number): void {
+  cancelOrder(orderId: string): void {
     if (confirm('Are you sure you want to cancel this order?')) {
-      this.updateOrderStatus(orderId, 'cancelled');
+      this.updateOrderStatus(orderId, 'CANCELLED');
     }
   }
 
-  updateOrderStatus(orderId: number, newStatus: string): void {
+  updateOrderStatus(orderId: string, newStatus: string): void {
     this.loading = true;
 
     // Mock update - replace with actual API call
@@ -187,12 +189,8 @@ export class SellerOrders implements OnInit {
     return status === 'CONFIRMED';
   }
 
-  canShip(status: string): boolean {
-    return status === 'PROCESSED';
-  }
-
   canDeliver(status: string): boolean {
-    return status === 'DELIVERED';
+    return status === 'PROCESSED';
   }
 
   canCancel(status: string): boolean {

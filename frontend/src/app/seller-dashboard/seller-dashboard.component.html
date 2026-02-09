@@ -36,10 +36,10 @@
 			<h3>Best Selling Products</h3>
 			<div class="chart-container">
 				<div class="bar-chart">
-					<div class="bar-item" *ngFor="let item of topSellingProducts">
+					<div class="bar-item" *ngFor="let item of topSellingProductsByUnits">
 						<div class="bar-label">{{ item.name }}</div>
 						<div class="bar-wrapper">
-							<div class="bar" [style.width.%]="(item.unitsSold / (topSellingProducts[0]?.unitsSold || 1)) * 100"></div>
+							<div class="bar" [style.width.%]="(item.unitsSold / (topSellingProductsByUnits[0]?.unitsSold || 1)) * 100"></div>
 							<span class="bar-value">{{ item.unitsSold }} sold</span>
 						</div>
 					</div>
@@ -52,7 +52,7 @@
 			<div class="chart-container">
 				<div class="pie-chart">
 					<div class="pie-legend">
-						<div class="legend-item" *ngFor="let item of topSellingProducts; let i = index">
+						<div class="legend-item" *ngFor="let item of topSellingProductsByRevenue; let i = index">
 							<span class="legend-color" [style.backgroundColor]="chartColors[i]"></span>
 							<span class="legend-text">{{ item.name }}: ${{ item.revenue | number:'1.2-2' }}</span>
 						</div>
