@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OrderDetail } from './order-detail';
 import { ActivatedRoute } from '@angular/router';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('OrderDetail', () => {
   let component: OrderDetail;
@@ -22,7 +23,7 @@ describe('OrderDetail', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [OrderDetail],
+      imports: [OrderDetail, HttpClientTestingModule],
       providers: [
         {
           provide: ActivatedRoute,

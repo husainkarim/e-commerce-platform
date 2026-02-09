@@ -55,6 +55,13 @@ pipeline {
                         }
                     }
                 }
+                stage('Order Service') {
+                    steps {
+                        dir('backend/order-service') {
+                            sh 'mvn clean verify'
+                        }
+                    }
+                }
                 stage('API Gateway') {
                     steps {
                         dir('backend/api-gateway') {
@@ -80,7 +87,7 @@ pipeline {
                 withSonarQubeEnv('SonarQube') { 
                     script {
                         // 1. Backend Microservices Analysis
-                        def services = ['user-service', 'product-service', 'media-service', 'api-gateway']
+                        def services = ['user-service', 'product-service', 'media-service', 'order-service', 'api-gateway']
                         services.each { service ->
                             dir("backend/${service}") {
                                 sh "mvn sonar:sonar -Dsonar.projectKey=${service} -Dsonar.projectName=${service}"

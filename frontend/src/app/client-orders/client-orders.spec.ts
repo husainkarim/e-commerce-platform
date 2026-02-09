@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ClientOrders } from './client-orders';
 import { ActivatedRoute } from '@angular/router';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('ClientOrders', () => {
   let component: ClientOrders;
@@ -22,7 +23,7 @@ describe('ClientOrders', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ClientOrders],
+      imports: [ClientOrders, HttpClientTestingModule],
       providers: [
         {
           provide: ActivatedRoute,
