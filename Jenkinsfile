@@ -91,9 +91,7 @@ pipeline {
                         services.each { service ->
                             dir("backend/${service}") {
                                 sh "mvn clean package"  // compile & run tests + generate jacoco
-                                sh "mvn sonar:sonar \
-                                    -Dsonar.projectKey=${service} \
-                                    -Dsonar.projectName=${service}
+                                sh "mvn sonar:sonar -Dsonar.projectKey=${service} -Dsonar.projectName=${service}"
                             }
                         }
 
