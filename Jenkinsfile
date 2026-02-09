@@ -93,9 +93,7 @@ pipeline {
                                 sh "mvn clean package"  // compile & run tests + generate jacoco
                                 sh "mvn sonar:sonar \
                                     -Dsonar.projectKey=${service} \
-                                    -Dsonar.projectName=${service} \
-                                    -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
-                                    -Dsonar.java.binaries=target/classes"
+                                    -Dsonar.projectName=${service}
                             }
                         }
 
