@@ -10,4 +10,5 @@ import backend.product_service.model.Product;
 @Repository
 public interface ProductRepository extends MongoRepository<Product, String> {
     List<Product> findByUserId(String userId);
+    List<Product> findByCategory(String category);
 }
