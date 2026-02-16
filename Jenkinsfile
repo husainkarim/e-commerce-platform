@@ -72,14 +72,14 @@ pipeline {
         //     }
         // }
         // frontend tests
-        // stage('Frontend Tests') {
-        //     steps {
-        //         dir('frontend') {
-        //             sh 'npm ci'
-        //             sh 'npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox'
-        //         }
-        //     }
-        // }
+        stage('Frontend Tests') {
+            steps {
+                dir('frontend') {
+                    sh 'npm ci'
+                    sh 'npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox --code-coverage'
+                }
+            }
+        }
         // SonarQube analysis for both backend and frontend
         stage('SonarQube Analysis') {
             steps {
@@ -102,6 +102,8 @@ pipeline {
                             sh "npx sonar-scanner \
                                 -Dsonar.projectKey=ecommerce-frontend \
                                 -Dsonar.sources=src \
+                                -Dsonar.javascript.lcov.reportPaths=coverage/frontend/lcov.info \
+                                -Dsonar.typescript.lcov.reportPaths=coverage/frontend/lcov.info \
                                 -Dsonar.host.url=${SONAR_HOST_URL} \
                                 -Dsonar.login=${SONAR_AUTH_TOKEN}"
                         }
