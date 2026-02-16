@@ -23,28 +23,28 @@ public class Routes {
     @Bean
     public RouterFunction<ServerResponse> userServiceRoute() {
         return GatewayRouterFunctions.route("user-service")
-            .route(RequestPredicates.path("/api/users/**"), HandlerFunctions.http(userServiceUrl))
+            .route(RequestPredicates.path("/api/users/**"), HandlerFunctions.forward(userServiceUrl))
             .build();
     }
 
     @Bean
     public RouterFunction<ServerResponse> productServiceRoute() {
         return GatewayRouterFunctions.route("product-service")
-            .route(RequestPredicates.path("/api/products/**"), HandlerFunctions.http(productServiceUrl))
+            .route(RequestPredicates.path("/api/products/**"), HandlerFunctions.forward(productServiceUrl))
             .build();
     }
 
     @Bean
     public RouterFunction<ServerResponse> mediaServiceRoute() {
         return GatewayRouterFunctions.route("media-service")
-            .route(RequestPredicates.path("/api/media/**"), HandlerFunctions.http(mediaServiceUrl))
+            .route(RequestPredicates.path("/api/media/**"), HandlerFunctions.forward(mediaServiceUrl))
             .build();
     }
 
     @Bean
     public RouterFunction<ServerResponse> orderServiceRoute() {
         return GatewayRouterFunctions.route("order-service")
-            .route(RequestPredicates.path("/api/orders/**"), HandlerFunctions.http(orderServiceUrl))
+            .route(RequestPredicates.path("/api/orders/**"), HandlerFunctions.forward(orderServiceUrl))
             .build();
     }
 }
