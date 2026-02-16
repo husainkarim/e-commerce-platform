@@ -26,8 +26,9 @@ describe('ProductDetailComponent', () => {
 
   beforeEach(async () => {
     apiService = jasmine.createSpyObj<ApiService>('ApiService', ['getProductById', 'getImagesByProductId', 'updateCart']);
-    authService = jasmine.createSpyObj<AuthServiceService>('AuthServiceService', ['getUser']);
+    authService = jasmine.createSpyObj<AuthServiceService>('AuthServiceService', ['getUser', 'getToken']);
     authService.getUser.and.returnValue({ id: 'u1' });
+    authService.getToken.and.returnValue('mock-token');
 
     apiService.getProductById.and.returnValue(of({ product }));
     apiService.getImagesByProductId.and.returnValue(of({ images: [{ imagePath: 'img1.png' }] }));
@@ -71,9 +72,16 @@ describe('ProductDetailComponent', () => {
   });
 
   it('should update quantity within bounds', () => {
-    // Reset component state
+    // Manually set a proper product object
+    component.product = {
+      ...product,
+      images: ['img1.png'],
+      image: 'img1.png',
+      originalPrice: 200
+    };
+    fixture.detectChanges();
+
     component.selectedQuantity = 1;
-    component.product = { ...product };
 
     component.increaseQuantity();
     expect(component.selectedQuantity).toBe(2);
@@ -81,11 +89,14 @@ describe('ProductDetailComponent', () => {
     component.decreaseQuantity();
     expect(component.selectedQuantity).toBe(1);
 
+    component.updateQuantity('5');
+    expect(component.selectedQuantity).toBe(5);
+
     component.updateQuantity('10');
-    expect(component.selectedQuantity).toBe(product.quantity); // Should cap at max quantity
+    expect(component.selectedQuantity).toBe(5);
 
     component.updateQuantity('0');
-    expect(component.selectedQuantity).toBe(1); // Should default to 1
+    expect(component.selectedQuantity).toBe(1);
   });
 
   it('should return total price', () => {
