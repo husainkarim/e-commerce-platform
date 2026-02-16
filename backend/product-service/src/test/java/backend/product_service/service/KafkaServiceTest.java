@@ -1,18 +1,14 @@
 package backend.product_service.service;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
 
@@ -28,6 +24,10 @@ class KafkaServiceTest {
     private KafkaService kafkaService;
 
     private Product testProduct;
+
+    private static final String PRODUCT_CREATED_TOPIC = "product-created-topic";
+    private static final String PRODUCT_UPDATED_TOPIC = "product-updated-topic";
+    private static final String PRODUCT_DELETED_TOPIC = "product-deleted-topic";
 
     @BeforeEach
     void setUp() {
@@ -46,7 +46,7 @@ class KafkaServiceTest {
         kafkaService.sendProductCreatedEvent(testProduct);
 
         verify(kafkaTemplate).send(
-            eq("product-created-topic"),
+            eq(PRODUCT_CREATED_TOPIC),
             any()
         );
     }
@@ -56,7 +56,7 @@ class KafkaServiceTest {
         kafkaService.sendProductUpdatedEvent(testProduct);
 
         verify(kafkaTemplate).send(
-            eq("product-updated-topic"),
+            eq(PRODUCT_UPDATED_TOPIC),
             any()
         );
     }
@@ -66,7 +66,7 @@ class KafkaServiceTest {
         kafkaService.sendProductDeletedEvent(testProduct);
 
         verify(kafkaTemplate).send(
-            eq("product-deleted-topic"),
+            eq(PRODUCT_DELETED_TOPIC),
             any()
         );
     }
@@ -75,21 +75,21 @@ class KafkaServiceTest {
     void shouldPublishProductCreatedEventWithCorrectData() {
         kafkaService.sendProductCreatedEvent(testProduct);
         
-        verify(kafkaTemplate).send(eq("product-created-topic"), any());
+        verify(kafkaTemplate).send(eq(PRODUCT_CREATED_TOPIC), any());
     }
 
     @Test
     void shouldPublishProductUpdatedEventWithCorrectData() {
         kafkaService.sendProductUpdatedEvent(testProduct);
         
-        verify(kafkaTemplate).send(eq("product-updated-topic"), any());
+        verify(kafkaTemplate).send(eq(PRODUCT_UPDATED_TOPIC), any());
     }
 
     @Test
     void shouldPublishProductDeletedEventWithCorrectData() {
         kafkaService.sendProductDeletedEvent(testProduct);
         
-        verify(kafkaTemplate).send(eq("product-deleted-topic"), any());
+        verify(kafkaTemplate).send(eq(PRODUCT_DELETED_TOPIC), any());
     }
 
     @Test
@@ -102,7 +102,7 @@ class KafkaServiceTest {
         kafkaService.sendProductCreatedEvent(testProduct);
         kafkaService.sendProductCreatedEvent(product2);
         
-        verify(kafkaTemplate, times(2)).send(eq("product-created-topic"), any());
+        verify(kafkaTemplate, times(2)).send(eq(PRODUCT_CREATED_TOPIC), any());
     }
 
     @Test
@@ -110,7 +110,7 @@ class KafkaServiceTest {
         kafkaService.sendProductCreatedEvent(testProduct);
         
         // Verify that the Kafka template was called with the correct topic
-        verify(kafkaTemplate).send(eq("product-created-topic"), any());
+        verify(kafkaTemplate).send(eq(PRODUCT_CREATED_TOPIC), any());
     }
 }
 

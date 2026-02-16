@@ -22,6 +22,8 @@ class JwtServiceTest {
     private static final String VALID_ROLE = "USER";
     private static final String VALID_USER_ID = "12345";
 
+    private static final String INVALID_TOKEN = "invalid.token.here";
+
     @Mock
     private HttpServletRequest mockRequest;
 
@@ -68,7 +70,7 @@ class JwtServiceTest {
 
     @Test
     void shouldReturnFalseForInvalidToken() {
-        String invalidToken = "invalid.token.here";
+        String invalidToken = INVALID_TOKEN;
         
         boolean isValid = jwtService.validateToken(invalidToken);
         
@@ -151,7 +153,7 @@ class JwtServiceTest {
 
     @Test
     void shouldThrowExceptionWhenExtractingEmailFromInvalidToken() {
-        String invalidToken = "invalid.token.here";
+        String invalidToken = INVALID_TOKEN;
         
         assertThatThrownBy(() -> jwtService.getEmailFromToken(invalidToken))
                 .isInstanceOf(Exception.class);
@@ -159,7 +161,7 @@ class JwtServiceTest {
 
     @Test
     void shouldThrowExceptionWhenExtractingRoleFromInvalidToken() {
-        String invalidToken = "invalid.token.here";
+        String invalidToken = INVALID_TOKEN;
         
         assertThatThrownBy(() -> jwtService.getRoleFromToken(invalidToken))
                 .isInstanceOf(Exception.class);

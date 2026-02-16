@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ApiService } from '../api.service';
 import { AuthServiceService } from '../auth-service.service';
 import { FormsModule } from '@angular/forms';
-import { update } from '@angular/fire/database';
 
 interface Order {
   id: string;
@@ -52,8 +51,8 @@ export class SellerOrders implements OnInit {
   ];
 
   constructor(
-    private apiService: ApiService,
-    private authService: AuthServiceService
+    private readonly apiService: ApiService,
+    private readonly authService: AuthServiceService
   ) {}
 
   ngOnInit(): void {
