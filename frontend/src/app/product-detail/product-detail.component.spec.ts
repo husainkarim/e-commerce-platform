@@ -21,7 +21,10 @@ describe('ProductDetailComponent', () => {
     originalPrice: 200,
     quantity: 5,
     userId: 'u1',
-    category: 'Electronics'
+    category: 'Electronics',
+    revenue: 0,
+    soldQuantity: 0,
+    image: 'img1.png'
   };
 
   beforeEach(async () => {
@@ -73,13 +76,22 @@ describe('ProductDetailComponent', () => {
 
   it('should update quantity within bounds', () => {
     // Manually set a proper product object
-    // localStorage.clear();
+    localStorage.clear();
     apiService.updateCart.calls.reset();
+    
     component.product = {
-      ...product,
-      images: ['img1.png'],
+      id: 'p1',
+      name: 'Phone',
+      description: 'Smart',
+      price: 100,
+      originalPrice: 200,
+      quantity: 5,
+      userId: 'u1',
+      category: 'Electronics',
+      revenue: 0,
+      soldQuantity: 0,
       image: 'img1.png',
-      originalPrice: 200
+      images: ['img1.png']
     };
     fixture.detectChanges();
 
@@ -115,11 +127,20 @@ describe('ProductDetailComponent', () => {
     apiService.updateCart.and.returnValue(of({ success: true }));
 
     component.product = {
-      ...product,
+      id: 'p1',
+      name: 'Phone',
+      description: 'Smart',
+      price: 100,
+      originalPrice: 200,
+      quantity: 5,
+      userId: 'u1',
+      category: 'Electronics',
       revenue: 0,
       soldQuantity: 0,
       image: 'img1.png'
     };
+    component.selectedQuantity = 1;
+    fixture.detectChanges();
 
     component.addToCart(2);
 
@@ -127,7 +148,7 @@ describe('ProductDetailComponent', () => {
     const saved = JSON.parse(localStorage.getItem('cartItems') || '[]');
     expect(saved.length).toBe(1);
     expect(saved[0].quantity).toBe(2);
-    expect(saved[0].productId).toBe(product.id);
+    expect(saved[0].productId).toBe('p1');
     expect(window.alert).toHaveBeenCalled();
   });
 

@@ -70,8 +70,15 @@ describe('ClientDashboard', () => {
   });
 
   it('should handle API errors', () => {
-    apiService.getClientData.and.returnValue(throwError(() => new Error('fail')));
+    spyOn(console, 'error');   // 👈 ADD THIS
+
+    apiService.getClientData.and.returnValue(
+      throwError(() => new Error('fail'))
+    );
+
     component.generateAnalytics();
+
     expect(apiService.getClientData).toHaveBeenCalled();
+    expect(console.error).toHaveBeenCalled();  // optional but professional
   });
 });
