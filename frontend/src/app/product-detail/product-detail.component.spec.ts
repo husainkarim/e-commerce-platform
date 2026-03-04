@@ -73,6 +73,7 @@ describe('ProductDetailComponent', () => {
 
   it('should update quantity within bounds', () => {
     // Manually set a proper product object
+    // localStorage.clear();
     apiService.updateCart.calls.reset();
     component.product = {
       ...product,
@@ -111,7 +112,7 @@ describe('ProductDetailComponent', () => {
     localStorage.clear();
     apiService.updateCart.calls.reset();
     authService.getUser.and.returnValue({ id: 'u1' });
-    // apiService.updateCart.and.returnValue(of({ success: true }));
+    apiService.updateCart.and.returnValue(of({ success: true }));
 
     component.product = {
       ...product,
