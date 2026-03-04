@@ -1,8 +1,7 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../api.service';
 import { AuthServiceService } from '../auth-service.service';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SellerDashboardComponent } from '../seller-dashboard/seller-dashboard.component';
 import { ClientDashboard } from '../client-dashboard/client-dashboard';
@@ -14,7 +13,7 @@ import { ClientDashboard } from '../client-dashboard/client-dashboard';
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
-export class ProfileComponent {
+export class ProfileComponent implements OnInit {
   user = {
     id: '',
     name: '',
@@ -28,7 +27,14 @@ export class ProfileComponent {
   isAdmin: boolean = false;
   showDashboard: boolean = false;
 
-  constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService, private authServiceService: AuthServiceService) {
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly apiService: ApiService,
+    private readonly authServiceService: AuthServiceService
+  ) {}
+
+  ngOnInit(): void {
     let currentUser = this.authServiceService.getUser();
     if (!this.authServiceService.isLoggedIn()) {
       console.error('User is not logged in.');
@@ -62,7 +68,7 @@ export class ProfileComponent {
     this.isAdmin = this.user.role === 'admin';
     // Show dashboard only when viewing own profile
     const currentUser = this.authServiceService.getUser();
-    this.showDashboard = currentUser && currentUser.id === this.user.id;
+    this.showDashboard = currentUser?.id === this.user.id;
   }
 
   openEditProfileModal() {

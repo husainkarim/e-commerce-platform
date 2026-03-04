@@ -50,10 +50,10 @@ export class OrderDetail implements OnInit {
   loading: boolean = true;
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private authService: AuthServiceService,
-    private apiService: ApiService
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly authService: AuthServiceService,
+    private readonly apiService: ApiService
   ) {}
 
   ngOnInit() {

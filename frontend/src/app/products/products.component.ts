@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -36,7 +36,7 @@ interface Cart {
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.css']
 })
-export class ProductsComponent {
+export class ProductsComponent implements OnInit {
   products: Product[] = [];
   filteredProducts: Product[] = [];
   paginatedProducts: Product[] = [];
@@ -56,7 +56,10 @@ export class ProductsComponent {
 
   categories: string[] = ['Automotive', 'Beauty', 'Books', 'Electronics', 'Fashion', 'Garden', 'General', 'Groceries', 'Health', 'Home', 'Jewelry', 'Movies', 'Music', 'Sports', 'Toys'];
 
-  constructor(private apiService: ApiService, private authService: AuthServiceService) {
+  constructor(
+    private readonly apiService: ApiService,
+    private readonly authService: AuthServiceService
+  ) {
     this.isLoggedIn = this.authService.isLoggedIn();
   }
 

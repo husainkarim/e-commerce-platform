@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -40,7 +40,7 @@ interface Order {
   templateUrl: './checkout.html',
   styleUrl: './checkout.css',
 })
-export class Checkout {
+export class Checkout implements OnInit {
   step = 0;
   products: any[] = [];
   confirmed = false;
@@ -56,7 +56,13 @@ export class Checkout {
     notes: '',
   };
 
-  constructor(private authService: AuthServiceService, private router: Router, private apiService: ApiService) {
+  constructor(
+    private readonly authService: AuthServiceService,
+    private readonly router: Router,
+    private readonly apiService: ApiService
+  ) {}
+
+  ngOnInit() {
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
       return;

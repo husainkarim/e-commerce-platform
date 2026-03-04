@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup, ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -12,7 +12,7 @@ import { AuthServiceService } from '../auth-service.service';
   templateUrl: './product-form.component.html',
   styleUrl: './product-form.component.css'
 })
-export class ProductFormComponent {
+export class ProductFormComponent implements OnInit {
   productForm: FormGroup;
 
   isEditMode = false;
@@ -28,8 +28,12 @@ export class ProductFormComponent {
 
   categories: string[] = ['Automotive', 'Beauty', 'Books', 'Electronics', 'Fashion', 'Garden', 'General', 'Groceries', 'Health', 'Home', 'Jewelry', 'Movies', 'Music', 'Sports', 'Toys'];
 
-  constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService, private authServiceService: AuthServiceService) {
-    const id = this.route.snapshot.paramMap.get('id');
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly apiService: ApiService,
+    private readonly authServiceService: AuthServiceService
+  ) {
     this.productForm = new FormGroup({
       name: new FormControl('', [Validators.required ]),
       description: new FormControl('', [Validators.required ]),
@@ -37,13 +41,16 @@ export class ProductFormComponent {
       quantity: new FormControl(0, [Validators.required ]),
       category: new FormControl('General', [Validators.required ])
     });
+  }
 
+  ngOnInit(): void {
     if (!this.authServiceService.isLoggedIn()) {
       console.error('User is not logged in.');
       this.router.navigate(['/login']);
       return;
     }
 
+    const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditMode = true;
       this.apiService.getProductById(id).subscribe({

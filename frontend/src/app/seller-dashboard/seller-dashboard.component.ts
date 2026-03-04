@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, NavigationEnd, Router, RouterModule } from '@angular/router';
 import { ApiService } from '../api.service';
@@ -19,7 +19,7 @@ interface TopSellingProduct {
   templateUrl: './seller-dashboard.component.html',
   styleUrl: './seller-dashboard.component.css'
 })
-export class SellerDashboardComponent {
+export class SellerDashboardComponent implements OnInit {
   products: any[] = [];
   totalRevenue: number = 0;
   totalUnitsSold: number = 0;
@@ -36,7 +36,14 @@ export class SellerDashboardComponent {
     '#C9CBCF',
   ];
 
-  constructor(private apiService: ApiService, private authServiceService: AuthServiceService, private router: Router, private route: ActivatedRoute) {
+  constructor(
+    private readonly apiService: ApiService,
+    private readonly authServiceService: AuthServiceService,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute
+  ) {}
+
+  ngOnInit() {
     if (!this.authServiceService.isLoggedIn()) {
       console.error('User is not logged in.');
       this.router.navigate(['/login']);
@@ -48,9 +55,6 @@ export class SellerDashboardComponent {
     ).subscribe(() => {
       this.getUserProducts();
     });
-  }
-
-  ngOnInit() {
     this.getUserProducts();
   }
 
@@ -103,16 +107,6 @@ export class SellerDashboardComponent {
       }))
       .sort((a, b) => b.unitsSold - a.unitsSold)
       .slice(0, 5);
-
-    // // Calculate total metrics
-    // this.totalUnitsSold = this.topSellingProducts.reduce(
-    //   (sum, item) => sum + item.unitsSold,
-    //   0
-    // );
-    // this.totalRevenue = this.topSellingProducts.reduce(
-    //   (sum, item) => sum + item.revenue,
-    //   0
-    // );
   }
 
   deleteProduct(productId: string) {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -26,7 +26,7 @@ interface CartItem {
   quantity: number;
 }
 
-interface userCart {
+interface UserCart {
   userId: string;
   items: CartItem[];
 }
@@ -38,12 +38,18 @@ interface userCart {
   templateUrl: './cart.html',
   styleUrl: './cart.css',
 })
-export class Cart {
+export class Cart implements OnInit {
   items: Product[] = [];
   cartItems: CartItem[] = [];
-  userCartData: userCart | null = null;
+  userCartData: UserCart | null = null;
 
-  constructor(private apiService: ApiService, private authService: AuthServiceService, private router: Router) {
+  constructor(
+    private readonly apiService: ApiService,
+    private readonly authService: AuthServiceService,
+    private readonly router: Router
+  ) {}
+
+  ngOnInit() {
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
       return;

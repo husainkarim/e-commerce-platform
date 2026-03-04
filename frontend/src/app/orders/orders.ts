@@ -25,8 +25,8 @@ export class Orders implements OnInit {
   isSeller: boolean = false;
 
   constructor(
-    private authService: AuthServiceService,
-    private router: Router
+    private readonly authService: AuthServiceService,
+    private readonly router: Router
   ) {}
 
   ngOnInit() {

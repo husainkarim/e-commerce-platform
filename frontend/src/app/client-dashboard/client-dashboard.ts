@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthServiceService } from '../auth-service.service';
 import { ApiService } from '../api.service';
-import { Orders } from '../orders/orders';
 
 
 interface MostBoughtProduct {
@@ -50,7 +49,10 @@ export class ClientDashboard implements OnInit {
     '#FF9F40',
   ];
 
-  constructor(private authService: AuthServiceService, private apiService: ApiService) {}
+  constructor(
+    private readonly authService: AuthServiceService,
+    private readonly apiService: ApiService
+  ) {}
 
   ngOnInit() {
     const user = this.authService.getUser();

@@ -10,8 +10,8 @@ import { Subscription } from 'rxjs/internal/Subscription';
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-  private authService = inject(AuthServiceService);
-  private subscriptions = new Subscription();
+  private readonly authService = inject(AuthServiceService);
+  private readonly subscriptions = new Subscription();
 
   isLoggedInSignal = signal(false);
 

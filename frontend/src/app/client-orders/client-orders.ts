@@ -39,9 +39,9 @@ export class ClientOrders implements OnInit {
     statusOptions = ['All', 'PENDING', 'CONFIRMED', 'PROCESSED', 'DELIVERED', 'CANCELLED'];
 
     constructor(
-      private authService: AuthServiceService,
-      private apiService: ApiService,
-      private router: Router
+      private readonly authService: AuthServiceService,
+      private readonly apiService: ApiService,
+      private readonly router: Router
     ) {}
 
     ngOnInit() {

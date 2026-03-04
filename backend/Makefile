@@ -5,6 +5,9 @@ COMPOSE = docker compose
 build:
 	$(COMPOSE) build
 
+pull:
+	$(COMPOSE) pull
+
 up:
 	$(COMPOSE) up -d
 

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -39,11 +39,18 @@ interface Cart {
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.css'
 })
-export class ProductDetailComponent {
+export class ProductDetailComponent implements OnInit {
   product: any;
   selectedQuantity: number = 1;
 
-  constructor(private route: ActivatedRoute, private apiService: ApiService, private authServiceService: AuthServiceService, private router: Router) {
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly apiService: ApiService,
+    private readonly authServiceService: AuthServiceService,
+    private readonly router: Router
+  ) {}
+
+  ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.apiService.getProductById(id).subscribe({
@@ -107,8 +114,8 @@ export class ProductDetailComponent {
   }
 
   updateQuantity(value: string): void {
-    const qty = parseInt(value, 10);
-    if (!isNaN(qty) && qty >= 1 && qty <= this.product.quantity) {
+    const qty = Number.parseInt(value, 10);
+    if (!Number.isNaN(qty) && qty >= 1 && qty <= this.product.quantity) {
       this.selectedQuantity = qty;
     } else if (qty > this.product.quantity) {
       this.selectedQuantity = this.product.quantity;
