@@ -2,68 +2,112 @@ package backend.api_gateway.routes;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
-@SpringJUnitConfig
 public class RoutesTest {
 
-    @TestConfiguration
-    static class RoutesTestConfig {
-        
-        @Bean
-        @Primary
-        public RouteLocatorBuilder routeLocatorBuilder() {
-            return Mockito.mock(RouteLocatorBuilder.class);
-        }
-
-        @Bean
-        public Routes routes() {
-            return new Routes();
-        }
-    }
-
-    @Autowired
-    private Routes routes;
+    private final ApplicationContextRunner contextRunner =
+            new ApplicationContextRunner()
+                    .withUserConfiguration(Routes.class)
+                    .withPropertyValues(
+                            "user.service.url=http://localhost:8081",
+                            "product.service.url=http://localhost:8082",
+                            "media.service.url=http://localhost:8083",
+                            "order.service.url=http://localhost:8084"
+                    );
 
     @Test
     void shouldLoadAllRouteBeans() {
-        assertThat(routes).isNotNull();
+        contextRunner.run(context -> {
+            assertThat(context).hasBean("userServiceRoute");
+            assertThat(context).hasBean("productServiceRoute");
+            assertThat(context).hasBean("mediaServiceRoute");
+            assertThat(context).hasBean("orderServiceRoute");
+        });
     }
 
     @Test
     void shouldLoadAllRouterFunctionBeans() {
-        assertThat(routes).isInstanceOf(Routes.class);
+        contextRunner.run(context -> {
+            assertThat(context).hasSingleBean(Routes.class);
+            assertThat(context.getBean("userServiceRoute")).isNotNull();
+            assertThat(context.getBean("productServiceRoute")).isNotNull();
+            assertThat(context.getBean("mediaServiceRoute")).isNotNull();
+            assertThat(context.getBean("orderServiceRoute")).isNotNull();
+        });
     }
 
     @Test
     void shouldHaveCorrectServiceUrls() {
-        assertThat(routes).isNotNull();
+        contextRunner.run(context -> {
+            Routes routes = context.getBean(Routes.class);
+            
+            assertThat(routes).isNotNull();
+        });
     }
 
     @Test
     void shouldLoadRoutesWithValidUrls() {
-        assertThat(routes).isNotNull();
+        contextRunner.withPropertyValues(
+                "user.service.url=https://user-service.example.com",
+                "product.service.url=https://product-service.example.com",
+                "media.service.url=https://media-service.example.com",
+                "order.service.url=https://order-service.example.com"
+        ).run(context -> {
+            assertThat(context).hasBean("userServiceRoute");
+            assertThat(context).hasBean("productServiceRoute");
+            assertThat(context).hasBean("mediaServiceRoute");
+            assertThat(context).hasBean("orderServiceRoute");
+        });
+    }
+
+    @Test
+    void shouldNotCreateContextWithoutServiceUrls() {
+        new ApplicationContextRunner()
+                .withUserConfiguration(Routes.class)
+                .run(context -> {
+                    // Context should fail when service URLs are missing
+                    assertThat(context).hasFailed();
+                    assertThat(context.getStartupFailure()).hasMessageContaining("Illegal character in path");
+                });
     }
 
     @Test
     void shouldSupportMultiplePortNumbers() {
-        assertThat(routes).isNotNull();
+        contextRunner.withPropertyValues(
+                "user.service.url=http://localhost:9001",
+                "product.service.url=http://localhost:9002",
+                "media.service.url=http://localhost:9003",
+                "order.service.url=http://localhost:9004"
+        ).run(context -> {
+            assertThat(context).hasBean("userServiceRoute");
+            assertThat(context).hasBean("productServiceRoute");
+            assertThat(context).hasBean("mediaServiceRoute");
+            assertThat(context).hasBean("orderServiceRoute");
+        });
     }
 
     @Test
     void shouldSupportDifferentHosts() {
-        assertThat(routes).isNotNull();
+        contextRunner.withPropertyValues(
+                "user.service.url=http://user-host:8081",
+                "product.service.url=http://product-host:8082",
+                "media.service.url=http://media-host:8083",
+                "order.service.url=http://order-host:8084"
+        ).run(context -> {
+            assertThat(context).hasBean("userServiceRoute");
+            assertThat(context).hasBean("productServiceRoute");
+            assertThat(context).hasBean("mediaServiceRoute");
+            assertThat(context).hasBean("orderServiceRoute");
+        });
     }
 
     @Test
     void shouldCreateRoutesBeanSuccessfully() {
-        assertThat(routes).isNotNull();
-        assertThat(routes).isInstanceOf(Routes.class);
+        contextRunner.run(context -> {
+            Routes routes = context.getBean(Routes.class);
+            assertThat(routes).isNotNull();
+            assertThat(routes).isInstanceOf(Routes.class);
+        });
     }
 }
