@@ -73,6 +73,7 @@ describe('ProductDetailComponent', () => {
 
   it('should update quantity within bounds', () => {
     // Manually set a proper product object
+    apiService.updateCart.calls.reset();
     component.product = {
       ...product,
       images: ['img1.png'],
@@ -108,9 +109,16 @@ describe('ProductDetailComponent', () => {
   it('should add to cart and persist in localStorage', () => {
     spyOn(window, 'alert');
     localStorage.clear();
-    apiService.updateCart.and.returnValue(of({ success: true }));
+    apiService.updateCart.calls.reset();
+    authService.getUser.and.returnValue({ id: 'u1' });
+    // apiService.updateCart.and.returnValue(of({ success: true }));
 
-    component.product = { ...product };
+    component.product = {
+      ...product,
+      revenue: 0,
+      soldQuantity: 0,
+      image: 'img1.png'
+    };
 
     component.addToCart(2);
 
@@ -123,6 +131,7 @@ describe('ProductDetailComponent', () => {
   });
 
   it('should ignore addToCart when out of stock', () => {
+    apiService.updateCart.calls.reset();
     component.product.quantity = 0;
     component.addToCart(1);
     expect(apiService.updateCart).not.toHaveBeenCalled();
