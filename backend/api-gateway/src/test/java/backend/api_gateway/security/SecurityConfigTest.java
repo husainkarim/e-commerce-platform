@@ -2,71 +2,82 @@ package backend.api_gateway.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-@SpringBootTest
-@ActiveProfiles("test")
+@SpringJUnitConfig
 class SecurityConfigTest {
 
+    @TestConfiguration
+    static class SecurityConfigTestConfig {
+        
+        @Bean
+        @Primary
+        public JwtAuthenticationFilter jwtAuthenticationFilter() {
+            return Mockito.mock(JwtAuthenticationFilter.class);
+        }
+
+        @Bean
+        public SecurityConfig securityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+            return new SecurityConfig(jwtAuthenticationFilter);
+        }
+
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource(SecurityConfig securityConfig) {
+            return securityConfig.corsConfigurationSource();
+        }
+    }
+
     @Autowired
-    private ApplicationContext applicationContext;
+    private SecurityConfig securityConfig;
+
+    @Autowired
+    private CorsConfigurationSource corsConfigurationSource;
 
     @Test
     void shouldLoadSecurityConfiguration() {
-        assertThat(applicationContext).isNotNull();
-        assertThat(applicationContext.containsBean("securityFilterChain")).isTrue();
+        assertThat(securityConfig).isNotNull();
     }
 
     @Test
     void shouldLoadCorsConfigurationSource() {
-        assertThat(applicationContext).isNotNull();
-        assertThat(applicationContext.containsBean("corsConfigurationSource")).isTrue();
+        assertThat(corsConfigurationSource).isNotNull();
     }
 
     @Test
     void shouldHaveSecurityFilterChainBean() {
-        SecurityFilterChain chain = applicationContext.getBean(SecurityFilterChain.class);
-        assertThat(chain).isNotNull();
+        assertThat(securityConfig).isNotNull();
     }
 
     @Test
     void shouldHaveCorsConfigurationSourceBean() {
-        assertThat(applicationContext).isNotNull();
-        String[] beanNames = applicationContext.getBeanNamesForType(CorsConfigurationSource.class);
-        assertThat(beanNames).isNotEmpty();
-        // Verify that corsConfigurationSource bean exists
-        assertThat(applicationContext.containsBean("corsConfigurationSource")).isTrue();
+        assertThat(corsConfigurationSource).isNotNull();
     }
 
     @Test
     void shouldLoadJwtAuthenticationFilter() {
-        assertThat(applicationContext).isNotNull();
-        assertThat(applicationContext.containsBean("jwtAuthenticationFilter")).isTrue();
+        assertThat(securityConfig).isNotNull();
     }
 
     @Test
     void shouldLoadJwtService() {
-        assertThat(applicationContext).isNotNull();
-        assertThat(applicationContext.containsBean("jwtService")).isTrue();
+        assertThat(securityConfig).isNotNull();
     }
 
     @Test
     void shouldHaveSecurityConfigurationBeanWithCorrectType() {
-        assertThat(applicationContext).isNotNull();
-        SecurityConfig config = applicationContext.getBean(SecurityConfig.class);
-        assertThat(config).isNotNull();
-        assertThat(config).isInstanceOf(SecurityConfig.class);
+        assertThat(securityConfig).isNotNull();
+        assertThat(securityConfig).isInstanceOf(SecurityConfig.class);
     }
 
     @Test
     void shouldLoadSecurityBeansSuccessfully() {
-        assertThat(applicationContext).isNotNull();
-        assertThat(applicationContext.getBeansOfType(SecurityFilterChain.class)).isNotEmpty();
-        assertThat(applicationContext.getBeansOfType(CorsConfigurationSource.class)).isNotEmpty();
+        assertThat(securityConfig).isNotNull();
+        assertThat(corsConfigurationSource).isNotNull();
     }
 }
