@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 @SpringJUnitConfig
-class RoutesTest {
+public class RoutesTest {
 
     @TestConfiguration
     static class RoutesTestConfig {

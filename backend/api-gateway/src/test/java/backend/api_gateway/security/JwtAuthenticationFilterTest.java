@@ -19,7 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @ExtendWith(MockitoExtension.class)
-class JwtAuthenticationFilterTest {
+public class JwtAuthenticationFilterTest {
 
     private static final String VALID_EMAIL = "test@example.com";
     private static final String VALID_ROLE = "USER";

@@ -11,7 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @SpringJUnitConfig
-class SecurityConfigTest {
+public class SecurityConfigTest {
 
     @TestConfiguration
     static class SecurityConfigTestConfig {
