@@ -1,6 +1,8 @@
 
 <div class="media-container">
 	<h2>Manage Product Images</h2>
+  <h3 *ngIf="product">Product Name: {{ product.name }}</h3>
+  <h3 *ngIf="product">Product ID: {{ productId }}</h3>
 	<div class="media-list">
 		<div class="media-item" *ngFor="let image of images; let i = index">
 			<img [src]="image" alt="Product Image" class="media-img" />
@@ -14,4 +16,5 @@
 		<div *ngIf="previewImage" class="media-preview">
 			<img [src]="previewImage" alt="Preview" style="width:100px; height:100px; object-fit:cover; border-radius:8px; margin-top:10px;" />
 		</div>
+    <a routerLink="/profile" class="back-btn">Back to Profile</a>
 </div>

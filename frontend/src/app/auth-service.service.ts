@@ -1,6 +1,5 @@
-import { Component, ChangeDetectionStrategy, signal, computed, Input, Injectable, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -50,8 +49,11 @@ export class AuthServiceService {
   logout() {
     this.user = null;
     this.token = null;
+    // remove all relevant data from localStorage
+    localStorage.removeItem('cartItems');
     localStorage.removeItem('user');
     localStorage.removeItem('authToken');
+
 
     // *** CRITICAL: Emit the new state to all subscribers ***
     this._isLoggedInSubject.next(false);
@@ -65,6 +67,7 @@ export class AuthServiceService {
   setUser(user: any) { this.user = user; }
   isSeller(): boolean { return this.user?.role === 'seller'; }
   isAdmin(): boolean { return this.user?.role === 'admin'; }
+  isClient(): boolean { return this.user?.role === 'client'; }
   getToken() { return this.token; }
   isLoggedIn(): boolean { return !!this.user; }
 }

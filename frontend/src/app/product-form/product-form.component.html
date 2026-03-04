@@ -7,8 +7,14 @@
 			<input type="text" id="name" formControlName="name" required />
 		</div>
 		<div class="form-group">
+			<label for="category">Category</label>
+			<select id="category" formControlName="category" required>
+				<option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+			</select>
+		</div>
+		<div class="form-group">
 			<label for="description">Description</label>
-			<textarea id="description" formControlName="description" required></textarea>
+			<textarea id="description" formControlName="description" required rows="4"></textarea>
 		</div>
 		<div class="form-group">
 			<label for="price">Price</label>

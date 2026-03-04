@@ -4,6 +4,8 @@ down:
 	docker compose down
 build:
 	docker compose build
+pull:
+	docker compose pull
 logs:
 	docker compose logs -f
 restart:

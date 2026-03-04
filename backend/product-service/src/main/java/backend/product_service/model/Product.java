@@ -26,6 +26,9 @@ public class Product {
     private String description;
 
     @NotBlank
+    private String category;
+
+    @NotBlank
     private double price;
 
     @NotBlank

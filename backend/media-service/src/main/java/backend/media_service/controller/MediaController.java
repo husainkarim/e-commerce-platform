@@ -54,9 +54,9 @@ public class MediaController {
                 response.put("message", "File is empty");
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
-            if (file.getSize() > 2 * 1024 * 1024) {
+            if (file.getSize() > 0.5 * 1024 * 1024) {
                 System.out.println("File too large");
-                response.put("message", "File too large (max 2MB)");
+                response.put("message", "File too large (max 0.5MB OR 500KB)");
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
             String fileUrl = fileStorageService.uploadCompressedImage(file);

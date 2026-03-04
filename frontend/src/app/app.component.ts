@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { AuthServiceService } from './auth-service.service';
 import { CommonModule } from '@angular/common';
 import { inject, signal, computed } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { routerMock } from './router-mock';
-import { AppNavLink } from './app-nav-link';
 
 @Component({
   selector: 'app-root',
@@ -16,8 +14,6 @@ import { AppNavLink } from './app-nav-link';
 })
 export class AppComponent {
   title = 'E-Commerce Platform';
-
-  router = routerMock;
 
   // Inject the REAL AuthServiceService
   private authService = inject(AuthServiceService);
@@ -31,6 +27,8 @@ export class AppComponent {
     const role = this.userRoleSignal();
     return role === 'seller' || role === 'admin';
   });
+
+  isClientSignal = computed(() => this.userRoleSignal() === 'client');
 
   constructor() {
     // 1. Subscribe to the Observables to automatically update local Signals

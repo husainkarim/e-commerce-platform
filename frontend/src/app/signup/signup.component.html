@@ -38,6 +38,8 @@
               alt=""
               [class.selected-avatar]="signupForm.value.avatar === option"
               (click)="signupForm.get('avatar')?.setValue(option)"
+              (keydown.enter)="signupForm.get('avatar')?.setValue(option)"
+              (keydown.space)="signupForm.get('avatar')?.setValue(option)"
             />
           </div>
         </ng-container>

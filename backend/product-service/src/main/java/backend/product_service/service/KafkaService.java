@@ -19,6 +19,7 @@ public class KafkaService {
         Map<String, Object> event = new HashMap<>();
         event.put("productId", product.getId());
         event.put("name", product.getName());
+        event.put("sellerId", product.getUserId());
         kafkaTemplate.send("product-created-topic", event);
     }
 
@@ -27,6 +28,7 @@ public class KafkaService {
         Map<String, Object> event = new HashMap<>();
         event.put("productId", product.getId());
         event.put("name", product.getName());
+        event.put("sellerId", product.getUserId());
         kafkaTemplate.send("product-updated-topic", event);
     }
 

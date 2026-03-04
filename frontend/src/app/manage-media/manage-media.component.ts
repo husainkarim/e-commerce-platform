@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ApiService } from '../api.service';
 
 @Component({
@@ -11,17 +11,21 @@ import { ApiService } from '../api.service';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    RouterModule
   ]
 })
-export class ManageMediaComponent {
+export class ManageMediaComponent implements OnInit {
   selectedFile: File | null = null;
   productId: string = '';
+  product: any;
   images: string[] = []; // Array to hold image URLs
   media: any[] = [];
   uploadError: boolean = false;
   previewImage: boolean = false;
-  constructor(private route: ActivatedRoute, private apiService: ApiService) { }
+  constructor(
+    private readonly route: ActivatedRoute, private readonly apiService: ApiService
+  ) {}
 
   ngOnInit(): void {
     // Subscribe so it reacts if the route param changes
@@ -29,6 +33,14 @@ export class ManageMediaComponent {
       const id = params.get('id');
       if (id) {
         this.productId = id;
+        this.apiService.getProductById(id).subscribe({
+          next: (response) => {
+            this.product = response.product;
+          },
+          error: (error) => {
+            console.error('Failed to fetch product details:', error);
+          }
+        });
         this.loadProductImages(id);
       }
     });
@@ -60,24 +72,30 @@ export class ManageMediaComponent {
     formData.append('file', this.selectedFile);   // file
     formData.append('productId', this.productId);  // string or number
     console.log('Uploading file for product ID:', formData);
-    this.apiService.addmedia(formData).subscribe(response => {
-      console.log('Image uploaded successfully', response);
-      this.uploadError = false;
-      this.selectedFile = null; // Clear the selected file
-      this.loadProductImages(this.productId);
-    }, error => {
-      console.error('Error uploading image', error);
-      this.uploadError = true;
+    this.apiService.addmedia(formData).subscribe({
+      next: (response) => {
+        console.log('Image uploaded successfully', response);
+        this.uploadError = false;
+        this.selectedFile = null; // Clear the selected file
+        this.loadProductImages(this.productId);
+      },
+      error: (error) => {
+        console.error('Error uploading image', error);
+        this.uploadError = true;
+      }
     });
   }
 
   deleteFile(index: number) {
     let mediaData = this.media[index];
-    this.apiService.deleteImage(mediaData).subscribe(response => {
-      console.log('Image deleted successfully', response);
-      this.loadProductImages(this.productId);
-    }, error => {
-      console.error('Error deleting image', error);
+    this.apiService.deleteImage(mediaData).subscribe({
+      next: (response) => {
+        console.log('Image deleted successfully', response);
+        this.loadProductImages(this.productId);
+      },
+      error: (error) => {
+        console.error('Error deleting image', error);
+      }
     });
   }
 }

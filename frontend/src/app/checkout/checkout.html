@@ -1,0 +1,115 @@
+
+<div class="checkout-page">
+	<div class="checkout-header">
+		<h2>Checkout</h2>
+		<p>Complete your order with Pay on Delivery</p>
+	</div>
+
+	<div class="wizard">
+		<div class="wizard-steps">
+			<div class="step" [class.active]="step === 0" [class.done]="step > 0">
+				<div class="circle">1</div>
+				<div class="label">Address</div>
+			</div>
+			<div class="divider"></div>
+			<div class="step" [class.active]="step === 1" [class.done]="step > 1">
+				<div class="circle">2</div>
+				<div class="label">Review</div>
+			</div>
+			<div class="divider"></div>
+			<div class="step" [class.active]="step === 2">
+				<div class="circle">3</div>
+				<div class="label">Confirm</div>
+			</div>
+		</div>
+
+		<div class="wizard-body">
+			<section *ngIf="step === 0" class="panel">
+				<h3>Shipping Address</h3>
+				<div class="form-grid">
+					<label>
+						<span>Full Name</span>
+						<input type="text" [(ngModel)]="shippingAddress.fullName" placeholder="Jane Doe" />
+					</label>
+          <label>
+            <span>Email</span>
+            <input type="email" [(ngModel)]="shippingAddress.email" placeholder="jane@example.com" readonly />
+          </label>
+					<label>
+						<span>Phone</span>
+						<input type="text" [(ngModel)]="shippingAddress.phone" placeholder="(555) 123-4567" />
+					</label>
+					<label class="wide">
+						<span>Address</span>
+						<input type="text" [(ngModel)]="shippingAddress.address" placeholder="123 Main St" />
+					</label>
+					<label>
+						<span>City</span>
+						<input type="text" [(ngModel)]="shippingAddress.city" placeholder="Springfield" />
+					</label>
+					<label>
+						<span>Country</span>
+						<input type="text" [(ngModel)]="shippingAddress.country" placeholder="USA" />
+					</label>
+					<label class="wide">
+						<span>Notes (optional)</span>
+						<textarea rows="3" [(ngModel)]="shippingAddress.notes" placeholder="Gate code, delivery instructions..."></textarea>
+					</label>
+				</div>
+				<div class="actions">
+					<a routerLink="/cart" class="link">Back to cart</a>
+					<button class="primary" (click)="next()" [disabled]="!shippingAddress.fullName || !shippingAddress.email || !shippingAddress.phone || !shippingAddress.address || !shippingAddress.city || !shippingAddress.country">Review order</button>
+				</div>
+			</section>
+
+			<section *ngIf="step === 1" class="panel">
+				<h3>Review Order</h3>
+				<div class="review-layout">
+					<div class="review-items">
+						<div class="review-card" *ngFor="let item of products">
+							<img [src]="item.imageUrl" alt="{{ item.name }}" />
+							<div class="info">
+								<div class="title">{{ item.name }}</div>
+								<div class="meta">Qty: {{ item.quantity }}</div>
+								<div class="price">${{ (item.price * item.quantity) | number:'1.2-2' }}</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="summary">
+						<h4>Order Summary</h4>
+						<div class="row">
+							<span>Subtotal</span>
+							<span>${{ subtotal | number:'1.2-2' }}</span>
+						</div>
+					<div class="row">							<span>Payment</span>
+							<span>Pay on Delivery</span>
+						</div>
+						<div class="row total">
+							<span>Total</span>
+							<span>${{ total | number:'1.2-2' }}</span>
+						</div>
+					</div>
+				</div>
+				<div class="actions">
+					<button class="ghost" (click)="back()">Back</button>
+					<button class="primary" (click)="confirm()">Confirm - Pay on Delivery</button>
+				</div>
+			</section>
+
+			<section *ngIf="step === 2" class="panel confirm">
+				<div class="success-icon">✓</div>
+				<h3>Order Confirmed!</h3>
+				<p>Your Pay on Delivery order is confirmed. We will deliver to:</p>
+				<div class="address-block">
+					<div>{{ shippingAddress.fullName }}</div>
+					<div>{{ shippingAddress.phone }}</div>
+					<div>{{ shippingAddress.address }}</div>
+					<div>{{ shippingAddress.city }}, {{ shippingAddress.country }}</div>
+					<div *ngIf="shippingAddress.notes">Note: {{ shippingAddress.notes }}</div>
+				</div>
+				<a class="link" routerLink="/products">Continue shopping</a>
+			</section>
+		</div>
+	</div>
+</div>

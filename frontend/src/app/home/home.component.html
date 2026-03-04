@@ -1,4 +1,8 @@
 <div class="welcome-container">
 	<h1>Welcome to Our E-Commerce Platform!</h1>
-	<p>Discover amazing products and deals. Please login or register to continue.</p>
+  @if (isLoggedInSignal()) {
+    <p>Explore our wide range of products and enjoy your shopping experience.</p>
+  } @else {
+	  <p>Discover amazing products and deals. Please login or register to continue.</p>
+  }
 </div>

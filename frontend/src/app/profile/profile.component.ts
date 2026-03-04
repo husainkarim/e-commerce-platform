@@ -1,18 +1,19 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../api.service';
 import { AuthServiceService } from '../auth-service.service';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { SellerDashboardComponent } from '../seller-dashboard/seller-dashboard.component';
+import { ClientDashboard } from '../client-dashboard/client-dashboard';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SellerDashboardComponent, ClientDashboard],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
-export class ProfileComponent {
+export class ProfileComponent implements OnInit {
   user = {
     id: '',
     name: '',
@@ -21,7 +22,19 @@ export class ProfileComponent {
     avatar: ''
   };
   isAllowedToDelete: boolean = false;
-  constructor(private route: ActivatedRoute, private router: Router, private apiService: ApiService, private authServiceService: AuthServiceService) {
+  isSeller: boolean = false;
+  isClient: boolean = false;
+  isAdmin: boolean = false;
+  showDashboard: boolean = false;
+
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly apiService: ApiService,
+    private readonly authServiceService: AuthServiceService
+  ) {}
+
+  ngOnInit(): void {
     let currentUser = this.authServiceService.getUser();
     if (!this.authServiceService.isLoggedIn()) {
       console.error('User is not logged in.');
@@ -35,18 +48,27 @@ export class ProfileComponent {
         next: (response) => {
           console.log('Profile data fetched successfully:', response);
           this.user = response.user;
+          this.setUserRole();
         },
         error: (error) => {
           console.error('Failed to fetch profile data:', error);
-          // Handle error (e.g., show error message, redirect)
           this.router.navigate(['/not-found']);
         }
       });
     } else {
       this.user = this.authServiceService.getUser();
+      this.setUserRole();
     }
     this.isAllowedToDelete = currentUser && (currentUser.role === 'admin' || currentUser.id === this.user.id);
+  }
 
+  setUserRole() {
+    this.isSeller = this.user.role === 'seller';
+    this.isClient = this.user.role === 'client';
+    this.isAdmin = this.user.role === 'admin';
+    // Show dashboard only when viewing own profile
+    const currentUser = this.authServiceService.getUser();
+    this.showDashboard = currentUser?.id === this.user.id;
   }
 
   openEditProfileModal() {

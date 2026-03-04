@@ -20,7 +20,7 @@ export class SignupComponent {
     options: ['1.png', '2.png', '3.png', '4.png', '5.png', '6.png', '7.png', '8.png', '9.png']
   };
 
-  constructor( private router: Router, private apiService: ApiService ) {
+  constructor(private readonly router: Router, private readonly apiService: ApiService) {
     this.signupForm = new FormGroup({
       name: new FormControl('', [Validators.required, Validators.minLength(4)]),
       email: new FormControl('', [Validators.required, Validators.email]),
@@ -47,6 +47,7 @@ export class SignupComponent {
       });
 
       // redirect to dashboard or home page
+      alert('Signup successful!');
       this.router.navigate(['/']);
       this.signupForm.reset();
     }

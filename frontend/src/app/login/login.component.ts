@@ -14,7 +14,11 @@ import { AuthServiceService } from '../auth-service.service';
 export class LoginComponent {
   loginForm: FormGroup;
 
-  constructor( private router: Router, private apiService: ApiService, private authService: AuthServiceService) {
+  constructor(
+    private readonly router: Router,
+    private readonly apiService: ApiService,
+    private readonly authService: AuthServiceService
+  ) {
     this.loginForm = new FormGroup({
       email: new FormControl('', [Validators.required, Validators.email]),
       password: new FormControl('', [Validators.required, Validators.minLength(8)])
@@ -25,7 +29,7 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       console.log(this.loginForm.value);
 
-      //TODO: send post to backend API
+      //send post to backend API
       this.apiService.login(this.loginForm.value).subscribe({
         next: (response) => {
           console.log('Login successful:', response);

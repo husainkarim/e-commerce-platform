@@ -1,0 +1,81 @@
+<div class="dashboard-container">
+	<div class="dashboard-header">
+		<h2>Your Dashboard</h2>
+		<p class="user-greeting">Welcome back, {{ userName }}!</p>
+	</div>
+
+	<div class="analytics-section">
+		<div class="metric-card">
+			<div class="metric-icon spending-icon">💳</div>
+			<div class="metric-content">
+				<p class="metric-label">Total Spent</p>
+				<p class="metric-value">${{ totalSpent | number:'1.2-2' }}</p>
+			</div>
+		</div>
+
+		<div class="metric-card">
+			<div class="metric-icon orders-icon">📦</div>
+			<div class="metric-content">
+				<p class="metric-label">Orders Placed</p>
+				<p class="metric-value">{{ totalOrders }}</p>
+			</div>
+		</div>
+
+		<div class="metric-card">
+			<div class="metric-icon items-icon">🛒</div>
+			<div class="metric-content">
+				<p class="metric-label">Items Purchased</p>
+				<p class="metric-value">{{ totalItemsPurchased }}</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="charts-section">
+		<div class="chart-card">
+			<h3>Most Bought Products</h3>
+			<div class="chart-container">
+				<div class="bar-chart">
+					<div class="bar-item" *ngFor="let item of mostBoughtProducts">
+						<div class="bar-label">{{ item.name }}</div>
+						<div class="bar-wrapper">
+							<div class="bar" [style.width.%]="(item.quantity / (mostBoughtProducts[0]?.quantity || 1)) * 100"></div>
+							<span class="bar-value">{{ item.quantity }} bought</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="chart-card">
+			<h3>Top Categories</h3>
+			<div class="chart-container">
+				<div class="category-breakdown">
+					<div class="category-item" *ngFor="let cat of topCategories; let i = index">
+						<div class="category-header">
+							<span class="category-name">{{ cat.name }}</span>
+							<span class="category-percentage">{{ cat.percentage }}%</span>
+						</div>
+						<div class="category-bar">
+							<div class="category-progress" [style.width.%]="cat.percentage" [style.backgroundColor]="chartColors[i]"></div>
+						</div>
+						<div class="category-count">{{ cat.count }} items</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="order-history-section" *ngIf="recentOrders.length > 0">
+		<h3>Recent Orders</h3>
+		<div class="order-list">
+			<div class="order-item" *ngFor="let order of recentOrders">
+				<div class="order-info">
+					<p class="order-id">Order #{{ order.id }}</p>
+					<p class="order-date">{{ order.date | date:'medium' }}</p>
+				</div>
+				<div class="order-amount">${{ order.amount | number:'1.2-2' }}</div>
+				<div class="order-status" [class]="order.status.toLowerCase()">{{ order.status }}</div>
+			</div>
+		</div>
+	</div>
+</div>

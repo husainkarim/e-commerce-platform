@@ -1,19 +1,148 @@
 
 
-<div class="product-detail-container">
-	<img [src]="product?.image" alt="Product Image" class="product-detail-image" />
-	<div class="product-detail-info">
-		<h2>{{ product?.name }}</h2>
-		<p class="product-detail-description">{{ product?.description }}</p>
-		<p class="product-detail-price">Price: ${{ product?.price }}</p>
-		<p class="product-detail-quantity">Quantity: {{ product?.quantity }}</p>
-		<p class="product-detail-seller">Seller: <a href="/profile/{{ product?.userId }}">{{ product?.userId }}</a></p>
-	</div>
-</div>
+<div class="product-detail-page">
+  <!-- Breadcrumb Navigation -->
+  <div class="breadcrumb">
+    <a routerLink="/products" class="breadcrumb-link">Products</a>
+    <span class="breadcrumb-separator">/</span>
+    <span class="breadcrumb-current">{{ product?.name || 'Product' }}</span>
+  </div>
 
-<div class="product-images-section" *ngIf="product?.images?.length">
-	<h3>Product Images</h3>
-	<div class="product-images-list">
-		<img *ngFor="let img of product.images" [src]="img" alt="Product Image" class="product-detail-gallery-img" />
-	</div>
+  <div class="product-detail-wrapper">
+    <!-- Image Gallery Section -->
+    <div class="product-gallery-section">
+      <div class="main-image-container">
+        <img
+          [src]="product?.image || 'assets/product-images/default-product-image.jpg'"
+          alt="Product Image"
+          class="product-main-image"
+        />
+        <span *ngIf="product?.quantity && product?.quantity > 0" class="stock-badge">In Stock</span>
+        <span *ngIf="!product?.quantity || product?.quantity === 0" class="stock-badge out-of-stock">Out of Stock</span>
+      </div>
+
+      <!-- Thumbnail Gallery -->
+      <div class="thumbnails-section" *ngIf="product?.images?.length > 1">
+        <div class="thumbnails-container">
+          <img
+            *ngFor="let img of product.images"
+            [src]="img"
+            alt="Product Thumbnail"
+            class="thumbnail-img"
+            (click)="selectImage(img)"
+            [class.active]="img === product.image"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Info Section -->
+    <div class="product-info-section">
+      <!-- Header -->
+      <div class="product-header">
+        <h1>{{ product?.name }}</h1>
+        <div class="product-meta">
+          <span class="category-badge">{{ product?.category || 'General' }}</span>
+          <div class="rating">
+            <span class="stars">★★★★☆</span>
+            <span class="review-count">(128 reviews)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Price Section -->
+      <div class="price-section">
+        <div class="price-container">
+          <span class="current-price">${{ product?.price | number: '1.2-2' }}</span>
+          <span class="original-price" *ngIf="product?.originalPrice">${{ product?.originalPrice | number: '1.2-2' }}</span>
+        </div>
+        <div class="discount-badge" *ngIf="product?.originalPrice">
+          Save {{ calculateDiscount() }}%
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="description-section">
+        <h3>Product Description</h3>
+        <p>{{ product?.description }}</p>
+      </div>
+
+      <!-- Specifications -->
+      <div class="specifications-section">
+        <h3>Specifications</h3>
+        <div class="specs-grid">
+          <div class="spec-item">
+            <span class="spec-label">Stock</span>
+            <span class="spec-value">{{ product?.quantity }} units</span>
+            <span class="spec-label">Sold</span>
+            <span class="spec-value">{{ product?.unitsSold }} units</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Category</span>
+            <span class="spec-value">{{ product?.category || 'General' }}</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Seller</span>
+            <a [routerLink]="['/profile', product?.userId]" class="spec-value seller-link">
+              View Seller Profile
+            </a>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Product ID</span>
+            <span class="spec-value">{{ product?.id }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quantity Selector -->
+      <div class="quantity-section" *ngIf="product?.quantity > 0">
+        <h3>Quantity</h3>
+        <div class="quantity-controls">
+          <button class="qty-btn" (click)="decreaseQuantity()" [disabled]="selectedQuantity <= 1">−</button>
+          <input
+            type="number"
+            class="qty-input"
+            [(ngModel)]="selectedQuantity"
+            (blur)="updateQuantity($any($event.target).value)"
+            [max]="product?.quantity"
+            min="1"
+          />
+          <button class="qty-btn" (click)="increaseQuantity()" [disabled]="selectedQuantity >= product?.quantity">+</button>
+        </div>
+        <p class="available-stock">{{ product?.quantity }} units available</p>
+        <div class="total-price-display">
+          <span class="total-label">Total:</span>
+          <span class="total-value">${{ getTotalPrice() | number: '1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button
+          class="btn btn-primary"
+          [disabled]="!product?.quantity || product?.quantity === 0"
+          (click)="addToCart(selectedQuantity)"
+        >
+          🛒 Add to Cart
+        </button>
+        <button class="btn btn-secondary">♥ Save for Later</button>
+      </div>
+
+      <!-- Additional Info -->
+      <div class="additional-info">
+        <div class="info-item">
+          <span class="info-icon">✓</span>
+          <span>Free Shipping on Orders Over $100</span>
+        </div>
+        <div class="info-item">
+          <span class="info-icon">✓</span>
+          <span>30-Day Money Back Guarantee</span>
+        </div>
+        <div class="info-item">
+          <span class="info-icon">✓</span>
+          <span>Secure Checkout</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

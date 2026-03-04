@@ -18,7 +18,10 @@ export class EditProfileComponent implements OnChanges {
 
   profileForm: FormGroup;
 
-  constructor(private authServiceService: AuthServiceService, private apiService: ApiService) {
+  constructor(
+    private readonly authServiceService: AuthServiceService,
+    private readonly apiService: ApiService
+  ) {
     this.user = authServiceService.getUser();
     this.profileForm = new FormGroup({
       id: new FormControl({ value: this.user?.id ?? '', disabled: true }),

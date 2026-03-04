@@ -17,6 +17,8 @@ public class Routes {
 	private String productServiceUrl;
     @Value("${media.service.url}")
 	private String mediaServiceUrl;
+    @Value("${order.service.url}")
+    private String orderServiceUrl;
 
     @Bean
     public RouterFunction<ServerResponse> userServiceRoute() {
@@ -36,6 +38,13 @@ public class Routes {
     public RouterFunction<ServerResponse> mediaServiceRoute() {
         return GatewayRouterFunctions.route("media-service")
             .route(RequestPredicates.path("/api/media/**"), HandlerFunctions.http(mediaServiceUrl))
+            .build();
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> orderServiceRoute() {
+        return GatewayRouterFunctions.route("order-service")
+            .route(RequestPredicates.path("/api/orders/**"), HandlerFunctions.http(orderServiceUrl))
             .build();
     }
 }

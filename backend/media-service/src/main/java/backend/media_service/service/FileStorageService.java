@@ -26,7 +26,7 @@ import backend.media_service.util.ImageCompressionUtil;
 public class FileStorageService {
 
     private final Storage storage;
-    private final String bucketName = "social-network-d4ea8.appspot.com";
+    private final String bucketName = "e-commerce-platform-5461b.firebasestorage.app";
 
     public FileStorageService() throws IOException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -69,7 +69,7 @@ public class FileStorageService {
         // Compress to 70% quality
         byte[] compressedBytes = ImageCompressionUtil.compress(rgbImage, 0.7f);
 
-        String fileName = "images/" + file.getOriginalFilename() + UUID.randomUUID() + ".jpg";
+        String fileName = "images/" + UUID.randomUUID() + ".jpg";
 
         BlobId blobId = BlobId.of(bucketName, fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
