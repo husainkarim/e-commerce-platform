@@ -1,13 +1,26 @@
-target/
+# Node
 node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build outputs
+dist/
+build/
+coverage/
+
+# Git
 .git/
 .gitignore
+
+# Docker
 Dockerfile
 docker-compose.yml
+
+# Env
+.env
+
+# Misc
 *.log
 *.tmp
 *.cache
-coverage/
-dist/
-build/
-.env
+.DS_Store
