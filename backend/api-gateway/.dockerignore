@@ -1,13 +1,7 @@
-target/
-node_modules/
-.git/
-.gitignore
-Dockerfile
-docker-compose.yml
-*.log
-*.tmp
-*.cache
-coverage/
-dist/
-build/
-.env
+# Ignore everything
+*
+
+# Allow only what we need
+!target/
+!target/user-service-0.0.1-SNAPSHOT.jar
+!Dockerfile
