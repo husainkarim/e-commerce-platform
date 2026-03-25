@@ -101,7 +101,9 @@ pipeline {
                         dir('frontend') {
                             // Ensure coverage is generated before this if you want it in Sonar
                             // Use npx to run the scanner without manual installation
-                            sh "npx sonar-scanner \
+                            sh "npm install sonar-scanner --save-dev --registry=https://registry.npmjs.org/"
+    
+                            sh "node_modules/.bin/sonar-scanner \
                                 -Dsonar.projectKey=ecommerce-frontend \
                                 -Dsonar.sources=src \
                                 -Dsonar.javascript.lcov.reportPaths=coverage/frontend/lcov.info \
