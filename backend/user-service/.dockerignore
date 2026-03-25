@@ -1,0 +1,7 @@
+# Ignore everything
+*
+
+# Allow only what we need
+!target/
+!target/user-service-0.0.1-SNAPSHOT.jar
+!Dockerfile
