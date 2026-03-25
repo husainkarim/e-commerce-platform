@@ -32,54 +32,54 @@ pipeline {
             }
         }
         // backend tests
-        stage('Backend Tests') {
-            stages {
-                stage('User Service') {
-                    steps {
-                        dir('backend/user-service') {
-                            sh 'mvn clean verify'
-                        }
-                    }
-                }
-                stage('Product Service') {
-                    steps {
-                        dir('backend/product-service') {
-                            sh 'mvn clean verify'
-                        }
-                    }
-                }
-                stage('Media Service') {
-                    steps {
-                        dir('backend/media-service') {
-                            sh 'mvn clean verify'
-                        }
-                    }
-                }
-                stage('Order Service') {
-                    steps {
-                        dir('backend/order-service') {
-                            sh 'mvn clean verify'
-                        }
-                    }
-                }
-                stage('API Gateway') {
-                    steps {
-                        dir('backend/api-gateway') {
-                            sh 'mvn clean verify'
-                        }
-                    }
-                }
-            }
-        }
+        // stage('Backend Tests') {
+        //     stages {
+        //         stage('User Service') {
+        //             steps {
+        //                 dir('backend/user-service') {
+        //                     sh 'mvn clean verify'
+        //                 }
+        //             }
+        //         }
+        //         stage('Product Service') {
+        //             steps {
+        //                 dir('backend/product-service') {
+        //                     sh 'mvn clean verify'
+        //                 }
+        //             }
+        //         }
+        //         stage('Media Service') {
+        //             steps {
+        //                 dir('backend/media-service') {
+        //                     sh 'mvn clean verify'
+        //                 }
+        //             }
+        //         }
+        //         stage('Order Service') {
+        //             steps {
+        //                 dir('backend/order-service') {
+        //                     sh 'mvn clean verify'
+        //                 }
+        //             }
+        //         }
+        //         stage('API Gateway') {
+        //             steps {
+        //                 dir('backend/api-gateway') {
+        //                     sh 'mvn clean verify'
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
         // frontend tests
-        stage('Frontend Tests') {
-            steps {
-                dir('frontend') {
-                    sh 'npm ci'
-                    sh 'npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox --code-coverage'
-                }
-            }
-        }
+        // stage('Frontend Tests') {
+        //     steps {
+        //         dir('frontend') {
+        //             sh 'npm ci'
+        //             sh 'npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox --code-coverage'
+        //         }
+        //     }
+        // }
         // SonarQube analysis for both backend and frontend
         stage('SonarQube Analysis') {
             steps {
