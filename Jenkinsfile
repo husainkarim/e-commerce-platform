@@ -8,6 +8,8 @@ pipeline {
 
     environment {
         GCP_KEY_FILE = '/var/jenkins_home/keys/serviceAccountKey.json'
+        NEXUS_URL = "nexus:8081"
+        NEXUS_DOCKER_REGISTRY = "nexus:5000"
     }
 
     stages {
@@ -120,6 +122,51 @@ pipeline {
                 }
             }
         }
+
+        stage('Publish Artifacts to Nexus') {
+            steps {
+                configFileProvider([configFile(fileId: 'my-nexus-settings', variable: 'MAVEN_SETTINGS')]) {
+                    script {
+                        def services = ['user-service', 'product-service', 'media-service', 'order-service', 'api-gateway']
+                        services.each { service ->
+                            dir("backend/${service}") {
+                                // Requirement #3: Artifact Publishing
+                                // Requirement #5: Versioning (retrieved from pom.xml)
+                                sh "mvn -s ${MAVEN_SETTINGS} deploy -DskipTests"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Docker Build & Push to Nexus') {
+            steps {
+                script {
+                    // Requirement #6: Docker Integration
+                    docker.withRegistry("http://${NEXUS_DOCKER_REGISTRY}", 'nexus-credentials-id') {
+                        
+                        // 1. Build & Push Backend Microservices
+                        def services = ['user-service', 'product-service', 'media-service', 'order-service', 'api-gateway']
+                        services.each { service ->
+                            dir("backend/${service}") {
+                                // Build the image and tag it with the Jenkins build number for versioning
+                                def appImage = docker.build("${service}:${env.BUILD_NUMBER}")
+                                appImage.push()
+                                appImage.push("latest")
+                            }
+                        }
+
+                        // 2. Build & Push Frontend
+                        dir('frontend') {
+                            def feImage = docker.build("ecommerce-frontend:${env.BUILD_NUMBER}")
+                            feImage.push()
+                            feImage.push("latest")
+                        }
+                    }
+                }
+            }
+        }
         //
         stage('Install & Build & Deploy Application') {
             steps {
@@ -144,7 +191,6 @@ pipeline {
                             export KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD
                             make jar
                             make down
-                            make build
                             make up
                         '''
                     }

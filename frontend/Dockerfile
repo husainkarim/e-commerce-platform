@@ -1,7 +1,7 @@
 # Stage 1: Build the Angular application
 FROM node:20-alpine AS build
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json .npmrc ./
 RUN npm ci --include=dev
 COPY . .
 # Note: Ensure the build path here matches the path in the COPY command below

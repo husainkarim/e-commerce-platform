@@ -65,6 +65,20 @@ services:
     depends_on:
       - jenkins
 
+  nexus:
+    image: sonatype/nexus3:latest
+    container_name: nexus
+    # User 1000 is the default 'nexus' user inside the official image
+    user: "1000" 
+    ports:
+      - "8081:8081"
+      - "5000:5000"
+    networks:
+      - safezone-net
+    volumes:
+      - nexus_data:/nexus-data
+    restart: unless-stopped
+
 networks:
   safezone-net:
     driver: bridge
@@ -75,3 +89,4 @@ volumes:
   sonarqube_data:
   sonarqube_extensions:
   sonarqube_logs:
+  nexus_data:

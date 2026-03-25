@@ -1,6 +1,14 @@
 COMPOSE = docker compose
+REGISTRY = nexus:5000
 
 .PHONY: build up down logs restart remove
+
+login:
+	@echo "Logging into Nexus Repository..."
+	docker login $(REGISTRY)
+
+pull-nexus: login
+	$(COMPOSE) pull
 
 build:
 	$(COMPOSE) build
@@ -16,6 +24,7 @@ down:
 
 restart:
 	$(COMPOSE) down
+	$(MAKE) pull-nexus
 	$(COMPOSE) up -d
 
 logs:
