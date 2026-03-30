@@ -109,6 +109,133 @@ npm start
 - SonarQube checks code quality and helps enforce quality gates.
 - Nexus can be used to store built artifacts and dependencies.
 
+## Nexus Setup and Publishing Documentation
+
+This section documents how Nexus is configured in this project, how Maven and Docker integrate with Nexus, and how CI/CD publishes and retrieves artifacts.
+
+### 1. Nexus Setup and Configuration
+
+Nexus is started from the root `docker-compose.yml` and exposed on:
+
+- `8081`: Nexus UI and repository endpoints
+- `5000`: Docker hosted registry (push target)
+- `5001`: Docker group/proxy registry (pull target)
+
+Start infrastructure:
+
+```bash
+cd /home/halabbood/e-commerce-platform
+docker compose up -d nexus
+```
+
+Recommended Nexus repositories:
+
+- Maven hosted (release): `maven-releases`
+- Maven hosted (snapshot): `maven-snapshots`
+- Docker hosted (push): `docker-hosted` mapped to `5000`
+- Docker group/proxy (pull): mapped to `5001`
+
+Create credentials in Nexus for CI usage and map them to Jenkins credentials:
+
+- `my-nexus-settings`: Maven `settings.xml` with `<servers>` credentials
+- `nexus-credentials-id`: username/password for `docker login`
+
+### 2. Maven and Docker Integration
+
+#### Maven integration
+
+Each backend service defines `distributionManagement` in `pom.xml`:
+
+- Releases: `http://nexus:8081/repository/maven-releases/`
+- Snapshots: `http://nexus:8081/repository/maven-snapshots/`
+
+Example deploy command (per service):
+
+```bash
+cd backend/user-service
+mvn -s /path/to/settings.xml clean deploy -DskipTests
+```
+
+Example artifact retrieval from Nexus:
+
+```bash
+# Retrieve a published release JAR directly from Nexus
+curl -u <user>:<password> -O \
+  http://localhost:8081/repository/maven-releases/com/safezone/user-service/0.0.1-SNAPSHOT/user-service-0.0.1-SNAPSHOT.jar
+```
+
+Note: Adjust group/artifact/version path to match your published coordinates.
+
+#### Docker integration
+
+The pipeline uses two registries:
+
+- Push: `nexus:5000`
+- Pull: `nexus:5001`
+
+Manual publish example:
+
+```bash
+docker login localhost:5000 -u <user> -p <password>
+docker build -t localhost:5000/user-service:latest backend/user-service
+docker push localhost:5000/user-service:latest
+```
+
+Manual retrieval example:
+
+```bash
+docker login localhost:5001 -u <user> -p <password>
+docker pull localhost:5001/user-service:latest
+```
+
+### 3. CI/CD Publishing Workflow
+
+The Jenkins pipeline publishes both Maven and Docker artifacts.
+
+Workflow summary:
+
+1. Checkout source and initialize GitHub commit status.
+2. Run SonarQube analysis for backend services and frontend.
+3. Enforce quality gate (`waitForQualityGate`).
+4. Publish Maven artifacts using:
+	- `mvn -s ${MAVEN_SETTINGS} deploy -DskipTests`
+5. Build and push Docker images to Nexus hosted registry (`5000`) with tags:
+	- `${BUILD_NUMBER}`
+	- `latest`
+6. Deploy stack using backend compose and published images.
+
+Example commands used in pipeline behavior:
+
+```bash
+# Maven publish stage
+mvn -s ${MAVEN_SETTINGS} deploy -DskipTests
+
+# Docker publish stage
+docker build -t nexus:5000/user-service:${BUILD_NUMBER} -t nexus:5000/user-service:latest .
+docker push nexus:5000/user-service:${BUILD_NUMBER}
+docker push nexus:5000/user-service:latest
+```
+
+### 4. Screenshots Checklist
+
+Add these screenshots to your project documentation for evidence:
+
+1. Nexus repositories list (`maven-releases`, `maven-snapshots`, docker repos).
+2. Nexus browse view showing a published Maven artifact.
+3. Nexus browse view showing a published Docker image/tag.
+4. Jenkins stage view showing:
+	- `Publish Artifacts to Nexus`
+	- `Docker Build & Push to Nexus`
+5. Terminal output for successful `mvn deploy` and `docker pull`.
+
+Suggested screenshot file naming convention:
+
+- `docs/screenshots/nexus-repositories.png`
+- `docs/screenshots/nexus-maven-artifact.png`
+- `docs/screenshots/nexus-docker-image.png`
+- `docs/screenshots/jenkins-nexus-stages.png`
+- `docs/screenshots/artifact-retrieval-terminal.png`
+
 ## Notes
 
 - Configure environment variables in backend `.env` files before running.

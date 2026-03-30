@@ -14,9 +14,15 @@ pipeline {
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout & Secret Injection') {
             steps {
                 checkout scm
+                script {
+                    // Inject Firebase Key BEFORE any compilation happens
+                    withCredentials([file(credentialsId: 'media-service-gcp-key', variable: 'GCP_KEY_FILE')]) {
+                        sh "cp ${GCP_KEY_FILE} backend/media-service/src/main/resources/serviceAccountKey.json"
+                    }
+                }
             }
         }
 
@@ -187,14 +193,10 @@ pipeline {
                     withCredentials([
                         string(credentialsId: 'MONGODB_URI', variable: 'MONGODB_URI'),
                         string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
-                        string(credentialsId: 'KEYSTORE_PASSWORD', variable: 'KEYSTORE_PASSWORD'),
-                        file(credentialsId: 'media-service-gcp-key', variable: 'GCP_KEY_FILE')
+                        string(credentialsId: 'KEYSTORE_PASSWORD', variable: 'KEYSTORE_PASSWORD')
                     ]) {
                         sh '''
-                            # 1. Fix Firebase: Copy the secret file into the resources folder before building the JAR
-                            cp "$GCP_KEY_FILE" media-service/src/main/resources/serviceAccountKey.json
-                            
-                            # 2. Fix Kafka: Clean up the "accidental directory" if it exists from a failed run
+                            # Fix Kafka: Clean up the "accidental directory" if it exists from a failed run
                             # This prevents the [Errno 21] error
                             if [ -d "../kafka-config.properties" ]; then
                                 rm -rf "../kafka-config.properties"
