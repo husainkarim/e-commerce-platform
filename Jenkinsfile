@@ -9,7 +9,8 @@ pipeline {
     environment {
         GCP_KEY_FILE = '/var/jenkins_home/keys/serviceAccountKey.json'
         NEXUS_URL = "nexus:8081"
-        NEXUS_DOCKER_REGISTRY = "nexus:5000"
+        NEXUS_PUSH_REGISTRY = "nexus:5000" // For pushing your images
+        NEXUS_PULL_REGISTRY = "nexus:5001" // For pulling base images
     }
 
     stages {
@@ -145,25 +146,28 @@ pipeline {
         stage('Docker Build & Push to Nexus') {
             steps {
                 script {
-                    // Requirement #6: Docker Integration
-                    docker.withRegistry("http://${NEXUS_DOCKER_REGISTRY}", 'nexus-credentials-id') {
+                    // 1. Login to the PULLING registry first so the 'FROM' command works
+                    docker.withRegistry("http://${NEXUS_PULL_REGISTRY}", 'nexus-credentials-id') {
                         
-                        // 1. Build & Push Backend Microservices
-                        def services = ['user-service', 'product-service', 'media-service', 'order-service', 'api-gateway']
-                        services.each { service ->
-                            dir("backend/${service}") {
-                                // Build the image and tag it with the Jenkins build number for versioning
-                                def appImage = docker.build("${service}:${env.BUILD_NUMBER}")
-                                appImage.push()
-                                appImage.push("latest")
+                        // 2. Wrap the build/push in the PUSHING registry context
+                        docker.withRegistry("http://${NEXUS_PUSH_REGISTRY}", 'nexus-credentials-id') {
+                            
+                            def services = ['user-service', 'product-service', 'media-service', 'order-service', 'api-gateway']
+                            services.each { service ->
+                                dir("backend/${service}") {
+                                    // This build now has access to nexus:5001 for the 'FROM' line
+                                    // and will tag it for nexus:5000 for the 'push'
+                                    def appImage = docker.build("${NEXUS_PUSH_REGISTRY}/${service}:${env.BUILD_NUMBER}")
+                                    appImage.push()
+                                    appImage.push("latest")
+                                }
                             }
-                        }
 
-                        // 2. Build & Push Frontend
-                        dir('frontend') {
-                            def feImage = docker.build("ecommerce-frontend:${env.BUILD_NUMBER}")
-                            feImage.push()
-                            feImage.push("latest")
+                            dir('frontend') {
+                                def feImage = docker.build("${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:${env.BUILD_NUMBER}")
+                                feImage.push()
+                                feImage.push("latest")
+                            }
                         }
                     }
                 }
