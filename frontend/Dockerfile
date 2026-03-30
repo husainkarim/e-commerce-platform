@@ -2,7 +2,7 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json .npmrc ./
-RUN npm ci --include=dev
+RUN npm ci
 COPY . .
 # Note: Ensure the build path here matches the path in the COPY command below
 RUN npm run build -- --configuration=production
