@@ -172,7 +172,7 @@ pipeline {
 
                         dir('frontend') {
                             echo "Building and Pushing Frontend..."
-                            sh "docker build --network e-commerce-platform_safezone-net -t ${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:${env.BUILD_NUMBER} -t ${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:latest ."
+                            sh "docker build --add-host nexus:172.xx.x.x -t ${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:${env.BUILD_NUMBER} -t ${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:latest ."
                             sh "docker push ${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:${env.BUILD_NUMBER}"
                             sh "docker push ${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:latest"
                         }
