@@ -42,6 +42,7 @@ interface Cart {
 export class ProductDetailComponent implements OnInit {
   product: any;
   selectedQuantity: number = 1;
+  isSeller: boolean = false;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -51,6 +52,7 @@ export class ProductDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.isSeller = this.authServiceService.isSeller();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.apiService.getProductById(id).subscribe({
