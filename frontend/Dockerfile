@@ -1,11 +1,17 @@
 # Stage 1: Build the Angular application
 FROM node:20-alpine AS build
 WORKDIR /app
+
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
 COPY package.json package-lock.json .npmrc ./
-RUN npm ci
+
+RUN npm ci --no-audit --no-fund
+
 COPY . .
+
 # Note: Ensure the build path here matches the path in the COPY command below
-RUN npm run build -- --configuration=production
+RUN npx ng build --configuration=production --progress=false
 
 # Stage 2: Serve the application using a lightweight server
 FROM nginx:alpine
