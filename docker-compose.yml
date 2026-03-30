@@ -3,6 +3,12 @@ services:
   jenkins:
     build: .
     container_name: jenkins
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
     ports:
       - "8080:8080"
       - "50000:50000"
