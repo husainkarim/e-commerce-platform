@@ -2,16 +2,17 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 
+# Tell Puppeteer NOT to download Chromium during npm ci
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV NODE_OPTIONS="--max-old-space-size=2048"
 
 COPY package.json package-lock.json .npmrc ./
 
-RUN npm ci --no-audit --no-fund || exit 1
+# Add high timeout for the Nexus proxy
+RUN npm ci --no-audit --no-fund --fetch-timeout=600000
 
 COPY . .
-
-# Note: Ensure the build path here matches the path in the COPY command below
-RUN ./node_modules/.bin/ng build --configuration=production --progress=false
+RUN npx ng build --configuration=production
 
 # Stage 2: Serve the application using a lightweight server
 FROM nginx:alpine
