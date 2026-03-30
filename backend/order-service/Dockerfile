@@ -1,4 +1,4 @@
-FROM nexus:5000/eclipse-temurin:21-jdk-alpine
+FROM nexus:5001/eclipse-temurin:21-jdk-alpine
 
 WORKDIR /app
 ARG JAR_FILE=target/*.jar
