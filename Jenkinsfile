@@ -146,28 +146,35 @@ pipeline {
         stage('Docker Build & Push to Nexus') {
             steps {
                 script {
-                    // 1. Login to the PULLING registry first so the 'FROM' command works
-                    docker.withRegistry("http://${NEXUS_PULL_REGISTRY}", 'nexus-credentials-id') {
+                    // Using the credentials variable to manually login to BOTH ports
+                    withCredentials([usernamePassword(credentialsId: 'nexus-credentials-id', 
+                                    passwordVariable: 'NEXUS_PWD', 
+                                    usernameVariable: 'NEXUS_USR')]) {
                         
-                        // 2. Wrap the build/push in the PUSHING registry context
-                        docker.withRegistry("http://${NEXUS_PUSH_REGISTRY}", 'nexus-credentials-id') {
-                            
-                            def services = ['user-service', 'product-service', 'media-service', 'order-service', 'api-gateway']
-                            services.each { service ->
-                                dir("backend/${service}") {
-                                    // This build now has access to nexus:5001 for the 'FROM' line
-                                    // and will tag it for nexus:5000 for the 'push'
-                                    def appImage = docker.build("${NEXUS_PUSH_REGISTRY}/${service}:${env.BUILD_NUMBER}")
-                                    appImage.push()
-                                    appImage.push("latest")
-                                }
-                            }
+                        // Login to the PUSHING port (5000)
+                        sh "echo ${NEXUS_PWD} | docker login ${NEXUS_PUSH_REGISTRY} -u ${NEXUS_USR} --password-stdin"
+                        
+                        // Login to the PULLING port (5001) - THIS FIXES THE 401 ERROR
+                        sh "echo ${NEXUS_PWD} | docker login ${NEXUS_PULL_REGISTRY} -u ${NEXUS_USR} --password-stdin"
 
-                            dir('frontend') {
-                                def feImage = docker.build("${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:${env.BUILD_NUMBER}")
-                                feImage.push()
-                                feImage.push("latest")
+                        def services = ['user-service', 'product-service', 'media-service', 'order-service', 'api-gateway']
+                        services.each { service ->
+                            dir("backend/${service}") {
+                                echo "Building and Pushing ${service}..."
+                                
+                                // Tagging it for port 5000 (Hosted) while Dockerfile uses 5001 (Group)
+                                sh "docker build -t ${NEXUS_PUSH_REGISTRY}/${service}:${env.BUILD_NUMBER} -t ${NEXUS_PUSH_REGISTRY}/${service}:latest ."
+                                
+                                sh "docker push ${NEXUS_PUSH_REGISTRY}/${service}:${env.BUILD_NUMBER}"
+                                sh "docker push ${NEXUS_PUSH_REGISTRY}/${service}:latest"
                             }
+                        }
+
+                        dir('frontend') {
+                            echo "Building and Pushing Frontend..."
+                            sh "docker build -t ${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:${env.BUILD_NUMBER} -t ${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:latest ."
+                            sh "docker push ${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:${env.BUILD_NUMBER}"
+                            sh "docker push ${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:latest"
                         }
                     }
                 }
