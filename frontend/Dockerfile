@@ -6,12 +6,12 @@ ENV NODE_OPTIONS="--max-old-space-size=2048"
 
 COPY package.json package-lock.json .npmrc ./
 
-RUN npm ci --no-audit --no-fund
+RUN npm ci --no-audit --no-fund || exit 1
 
 COPY . .
 
 # Note: Ensure the build path here matches the path in the COPY command below
-RUN npx ng build --configuration=production --progress=false
+RUN ./node_modules/.bin/ng build --configuration=production --progress=false
 
 # Stage 2: Serve the application using a lightweight server
 FROM nginx:alpine
