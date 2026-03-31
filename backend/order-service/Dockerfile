@@ -1,6 +1,7 @@
-FROM eclipse-temurin:21-jdk-alpine
+FROM nexus:5001/eclipse-temurin:21-jdk-alpine
 
 WORKDIR /app
-COPY ./target/order-service-0.0.1-SNAPSHOT.jar /app
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} app.jar
 EXPOSE 8400
-CMD ["java", "-jar", "order-service-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "app.jar"]

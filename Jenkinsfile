@@ -8,12 +8,21 @@ pipeline {
 
     environment {
         GCP_KEY_FILE = '/var/jenkins_home/keys/serviceAccountKey.json'
+        NEXUS_URL = "nexus:8081"
+        NEXUS_PUSH_REGISTRY = "nexus:5000" // For pushing your images
+        NEXUS_PULL_REGISTRY = "nexus:5001" // For pulling base images
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout & Secret Injection') {
             steps {
                 checkout scm
+                script {
+                    // Inject Firebase Key BEFORE any compilation happens
+                    withCredentials([file(credentialsId: 'media-service-gcp-key', variable: 'GCP_KEY_FILE')]) {
+                        sh "cp ${GCP_KEY_FILE} backend/media-service/src/main/resources/serviceAccountKey.json"
+                    }
+                }
             }
         }
 
@@ -99,7 +108,9 @@ pipeline {
                         dir('frontend') {
                             // Ensure coverage is generated before this if you want it in Sonar
                             // Use npx to run the scanner without manual installation
-                            sh "npx sonar-scanner \
+                            sh "npm install sonar-scanner --save-dev --registry=https://registry.npmjs.org/"
+    
+                            sh "node_modules/.bin/sonar-scanner \
                                 -Dsonar.projectKey=ecommerce-frontend \
                                 -Dsonar.sources=src \
                                 -Dsonar.javascript.lcov.reportPaths=coverage/frontend/lcov.info \
@@ -120,6 +131,61 @@ pipeline {
                 }
             }
         }
+
+        stage('Publish Artifacts to Nexus') {
+            steps {
+                configFileProvider([configFile(fileId: 'my-nexus-settings', variable: 'MAVEN_SETTINGS')]) {
+                    script {
+                        def services = ['user-service', 'product-service', 'media-service', 'order-service', 'api-gateway']
+                        services.each { service ->
+                            dir("backend/${service}") {
+                                // Requirement #3: Artifact Publishing
+                                // Requirement #5: Versioning (retrieved from pom.xml)
+                                sh "mvn -s ${MAVEN_SETTINGS} deploy -DskipTests"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Docker Build & Push to Nexus') {
+            steps {
+                script {
+                    // Using the credentials variable to manually login to BOTH ports
+                    withCredentials([usernamePassword(credentialsId: 'nexus-credentials-id', 
+                                    passwordVariable: 'NEXUS_PWD', 
+                                    usernameVariable: 'NEXUS_USR')]) {
+                        
+                        // Login to the PUSHING port (5000)
+                        sh "echo ${NEXUS_PWD} | docker login ${NEXUS_PUSH_REGISTRY} -u ${NEXUS_USR} --password-stdin"
+                        
+                        // Login to the PULLING port (5001) - THIS FIXES THE 401 ERROR
+                        sh "echo ${NEXUS_PWD} | docker login ${NEXUS_PULL_REGISTRY} -u ${NEXUS_USR} --password-stdin"
+
+                        def services = ['user-service', 'product-service', 'media-service', 'order-service', 'api-gateway']
+                        services.each { service ->
+                            dir("backend/${service}") {
+                                echo "Building and Pushing ${service}..."
+                                
+                                // Tagging it for port 5000 (Hosted) while Dockerfile uses 5001 (Group)
+                                sh "docker build -t ${NEXUS_PUSH_REGISTRY}/${service}:${env.BUILD_NUMBER} -t ${NEXUS_PUSH_REGISTRY}/${service}:latest ."
+                                
+                                sh "docker push ${NEXUS_PUSH_REGISTRY}/${service}:${env.BUILD_NUMBER}"
+                                sh "docker push ${NEXUS_PUSH_REGISTRY}/${service}:latest"
+                            }
+                        }
+
+                        dir('frontend') {
+                            echo "Building and Pushing Frontend..."
+                            sh "docker build --network=host -t ${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:${env.BUILD_NUMBER} -t ${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:latest ."
+                            sh "docker push ${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:${env.BUILD_NUMBER}"
+                            sh "docker push ${NEXUS_PUSH_REGISTRY}/ecommerce-frontend:latest"
+                        }
+                    }
+                }
+            }
+        }
         //
         stage('Install & Build & Deploy Application') {
             steps {
@@ -127,14 +193,10 @@ pipeline {
                     withCredentials([
                         string(credentialsId: 'MONGODB_URI', variable: 'MONGODB_URI'),
                         string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
-                        string(credentialsId: 'KEYSTORE_PASSWORD', variable: 'KEYSTORE_PASSWORD'),
-                        file(credentialsId: 'media-service-gcp-key', variable: 'GCP_KEY_FILE')
+                        string(credentialsId: 'KEYSTORE_PASSWORD', variable: 'KEYSTORE_PASSWORD')
                     ]) {
                         sh '''
-                            # 1. Fix Firebase: Copy the secret file into the resources folder before building the JAR
-                            cp "$GCP_KEY_FILE" media-service/src/main/resources/serviceAccountKey.json
-                            
-                            # 2. Fix Kafka: Clean up the "accidental directory" if it exists from a failed run
+                            # Fix Kafka: Clean up the "accidental directory" if it exists from a failed run
                             # This prevents the [Errno 21] error
                             if [ -d "../kafka-config.properties" ]; then
                                 rm -rf "../kafka-config.properties"
@@ -144,7 +206,6 @@ pipeline {
                             export KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD
                             make jar
                             make down
-                            make build
                             make up
                         '''
                     }

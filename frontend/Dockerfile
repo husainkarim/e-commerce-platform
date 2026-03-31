@@ -1,11 +1,18 @@
 # Stage 1: Build the Angular application
 FROM node:20-alpine AS build
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci --include=dev
+
+# Tell Puppeteer NOT to download Chromium during npm ci
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
+COPY package.json package-lock.json .npmrc ./
+
+# Add high timeout for the Nexus proxy
+RUN npm ci --no-audit --no-fund --fetch-timeout=600000
+
 COPY . .
-# Note: Ensure the build path here matches the path in the COPY command below
-RUN npm run build -- --configuration=production
+RUN npx ng build --configuration=production
 
 # Stage 2: Serve the application using a lightweight server
 FROM nginx:alpine

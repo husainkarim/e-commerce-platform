@@ -46,7 +46,7 @@ services:
 
   # 🧑‍💼 User Service
   user-service:
-    build: ./user-service
+    image: nexus:5000/user-service:latest
     container_name: user-service
     environment:
       JWT_SECRET: ${JWT_SECRET}
@@ -59,7 +59,7 @@ services:
 
   # 🛒 Product Service
   product-service:
-    build: ./product-service
+    image: nexus:5000/product-service:latest
     container_name: product-service
     environment:
       MONGODB_URI: ${MONGODB_URI}
@@ -72,7 +72,7 @@ services:
 
   # 🖼️ Media Service
   media-service:
-    build: ./media-service
+    image: nexus:5000/media-service:latest
     container_name: media-service
     environment:
       MONGODB_URI: ${MONGODB_URI}
@@ -85,7 +85,7 @@ services:
 
   # 🧾 Order Service
   order-service:
-    build: ./order-service
+    image: nexus:5000/order-service:latest
     container_name: order-service
     environment:
       MONGODB_URI: ${MONGODB_URI}
@@ -98,7 +98,7 @@ services:
 
   # 🚪 API Gateway (only exposed to frontend)
   api-gateway:
-    build: ./api-gateway
+    image: nexus:5000/api-gateway:latest
     container_name: api-gateway
     ports:
       - "8443:8443"
@@ -116,9 +116,7 @@ services:
       - external
 
   frontend:
-    build:
-      context: ../frontend  # Tell Compose to look for the Dockerfile in the parent directory
-      dockerfile: Dockerfile
+    image: nexus:5000/ecommerce-frontend:latest
     container_name: frontend
     ports:
       - "4200:80"           # Map host port 4200 to container's Nginx port 4200
