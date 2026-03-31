@@ -95,7 +95,7 @@
       </div>
 
       <!-- Quantity Selector -->
-      <div class="quantity-section" *ngIf="product?.quantity > 0">
+      <div class="quantity-section" *ngIf="product?.quantity > 0 || !isSeller">
         <h3>Quantity</h3>
         <div class="quantity-controls">
           <button class="qty-btn" (click)="decreaseQuantity()" [disabled]="selectedQuantity <= 1">−</button>
@@ -117,10 +117,10 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="action-buttons">
+      <div class="action-buttons" *ngIf="!isSeller">
         <button
           class="btn btn-primary"
-          [disabled]="!product?.quantity || product?.quantity === 0 || isSeller"
+          [disabled]="!product?.quantity || product?.quantity === 0"
           (click)="addToCart(selectedQuantity)"
         >
           🛒 Add to Cart
