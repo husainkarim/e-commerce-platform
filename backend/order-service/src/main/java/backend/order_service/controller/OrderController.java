@@ -235,7 +235,7 @@ public class OrderController {
             response.put("message", "Unauthorized: You are not the seller of this order");
             return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
-        List<String> validStatuses = List.of("PENDING", "SHIPPED", "DELIVERED", "CANCELLED", "DELETED");
+        List<String> validStatuses = List.of("PENDING", "CONFIRMED", "PROCESSED", "DELIVERED", "CANCELLED", "DELETED");
         if (!validStatuses.contains(updateState.getStatus())) {
             response.put("message", "Invalid status: " + updateState.getStatus());
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
