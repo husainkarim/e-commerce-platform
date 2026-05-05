@@ -1,10 +1,12 @@
 package backend.order_service.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.ArrayList;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import backend.order_service.model.Cart;
 import backend.order_service.model.Client;
 import backend.order_service.model.Order;
 import backend.order_service.model.OrderStatus;
+import backend.order_service.model.ProductAllowed;
 import backend.order_service.repository.CartRepository;
 import backend.order_service.repository.ClientRepository;
 import backend.order_service.repository.OrderRepository;
@@ -89,10 +92,22 @@ public class OrderController {
             existingCart = existingCarts.get();
         }
         existingCart.setItems(updatedCart.getItems());
-        // check for if one of the carts is null or has been deleted
+        
+        List<String> productIds = existingCart.getItems()
+            .stream()
+            .map(Cart.CartItem::getProductId)
+            .toList();
+
+        List<ProductAllowed> allowedProducts = productAllowedRepository.findByProductIdIn(productIds);
+
+        Set<String> allowedIds = allowedProducts.stream()
+            .map(ProductAllowed::getProductId)
+            .collect(Collectors.toSet());
+
         existingCart.getItems().removeIf(c ->
-            productAllowedRepository.findByProductId(c.getProductId()).isEmpty()
+            !allowedIds.contains(c.getProductId())
         );
+        
         // save the cleaned cart
         cartRepository.save(existingCart);
         response.put("cart", existingCart);

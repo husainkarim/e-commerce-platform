@@ -44,6 +44,21 @@ services:
       KAFKA_CLUSTERS_BOOTSTRAPSERVERS: kafka:29092
       DYNAMIC_CONFIG_ENABLED: 'true'
 
+  mongodb:
+    container_name: mongodb
+    image: mongodb/mongodb-community-server:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - internal
+      - external
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+
   # 🧑‍💼 User Service
   user-service:
     image: nexus:5000/user-service:latest
@@ -123,6 +138,9 @@ services:
     networks:
       - external            # Use the network that is exposed/accessible to the host
     restart: always
+
+volumes:
+  mongodb_data:
 
 networks:
   internal:
