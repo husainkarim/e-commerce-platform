@@ -1,0 +1,53 @@
+<div class="about-container">
+	<h1>E-Commerce Platform</h1>
+
+	<p class="lead">A full-stack, production-ready <strong>microservices-based e-commerce platform</strong> built with Spring Boot, Angular, and modern DevOps practices.</p>
+
+	<section>
+		<h2>Technologies</h2>
+		<ul>
+			<li>Frontend: Angular</li>
+			<li>Backend: Java (Spring Boot microservices)</li>
+			<li>Database: MongoDB</li>
+			<li>Media storage: Firebase Storage (used by <em>media-service</em>)</li>
+			<li>DevOps: Jenkins, SonarQube, ngrok, Nexus</li>
+		</ul>
+	</section>
+
+	<section>
+		<h2>Architecture</h2>
+		<p>The application follows a microservices architecture. Backend services include:</p>
+		<ul>
+			<li>api-gateway</li>
+			<li>user-service</li>
+			<li>product-service</li>
+			<li>media-service (uploads images to Firebase)</li>
+			<li>order-service</li>
+		</ul>
+	</section>
+
+	<section>
+		<h2>Run the Project</h2>
+		<p>Prerequisites: Java 21+, Maven, Node.js & npm, Docker & Docker Compose, MongoDB.</p>
+
+		<p>Start backend & infra from project root:</p>
+		<pre class="cmd">make up
+# or
+docker compose up -d</pre>
+
+		<p>Start frontend:</p>
+		<pre class="cmd">cd frontend
+npm install
+npm start</pre>
+	</section>
+
+	<section>
+		<h2>CI / CD</h2>
+		<p>The repository includes a `Jenkinsfile` that builds services, runs SonarQube analysis and publishes Maven and Docker artifacts to Nexus.</p>
+	</section>
+
+	<footer>
+		<p>Author: Husain Al Abbood — Project related to Reboot01 institute</p>
+		<p>License: MIT</p>
+	</footer>
+</div>

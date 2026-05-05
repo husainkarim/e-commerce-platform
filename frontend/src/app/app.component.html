@@ -10,19 +10,20 @@
           <a routerLink="/cart" routerLinkActive="active">Cart</a>
         }
         <a routerLink="/orders" routerLinkActive="active">Orders</a>
-
+        <a routerLink="/about" routerLinkActive="active">About</a>
         <a (click)="logout()" routerLinkActive="active">Logout</a>
       } @else {
+        <a routerLink="/about" routerLinkActive="active">About</a>
         <a routerLink="/signup" routerLinkActive="active">Signup</a>
         <a routerLink="/login" routerLinkActive="active">Login</a>
       }
     </nav>
   </header>
-  
+
   <main class="main-content">
     <router-outlet></router-outlet>
   </main>
-  
+
 
   <footer class="main-footer">
     <p>&copy; 2024 E-Commerce Platform. All rights reserved.</p>

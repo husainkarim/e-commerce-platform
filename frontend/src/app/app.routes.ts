@@ -19,10 +19,12 @@ import { Cart } from './cart/cart';
 import { Checkout } from './checkout/checkout';
 import { Orders } from './orders/orders';
 import { OrderDetail } from './order-detail/order-detail';
+import { AboutPage } from './about-page/about-page';
 
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
+  { path: 'about', component: AboutPage },
   { path: 'products', component: ProductsComponent },
   { path: 'products/:id', component: ProductDetailComponent },
   { path: 'login', component: LoginComponent },
