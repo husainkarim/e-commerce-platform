@@ -1,7 +1,7 @@
 package backend.order_service.service;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -23,8 +23,8 @@ public class ProductEventConsumer {
 
     @KafkaListener(topics = "product-created-topic")
     public void handleProductCreated(Map<String, Object> event) {
-        Optional<ProductAllowed> existingProduct = this.productAllowedRepository.findByProductId((String) event.get("productId"));
-        if (existingProduct.isPresent()) {
+        List<ProductAllowed> existingProducts = this.productAllowedRepository.findByProductId((String) event.get("productId"));
+        if (!existingProducts.isEmpty()) {
             return; // already exists
         }
         ProductAllowed productAllowed = new ProductAllowed((String) event.get("productId"), (String) event.get("name"), (String) event.get("sellerId"));
@@ -33,8 +33,8 @@ public class ProductEventConsumer {
 
     @KafkaListener(topics = "product-updated-topic")
     public void handleProductUpdated(Map<String, Object> event) {
-        Optional<ProductAllowed> existingProduct = this.productAllowedRepository.findByProductId((String) event.get("productId"));
-        if (!existingProduct.isEmpty()) {
+        List<ProductAllowed> existingProducts = this.productAllowedRepository.findByProductId((String) event.get("productId"));
+        if (!existingProducts.isEmpty()) {
             // update product allowed info
             this.productAllowedRepository.deleteById((String) event.get("productId"));
         }
@@ -44,8 +44,8 @@ public class ProductEventConsumer {
 
     @KafkaListener(topics = "product-deleted-topic")
     public void handleProductDeleted(Map<String, Object> event) {
-        Optional<ProductAllowed> existingProduct = this.productAllowedRepository.findByProductId((String) event.get("productId"));
-        if (existingProduct.isEmpty()) {
+        List<ProductAllowed> existingProducts = this.productAllowedRepository.findByProductId((String) event.get("productId"));
+        if (existingProducts.isEmpty()) {
             return; // does not exist
         }
         // delete product allowed info
